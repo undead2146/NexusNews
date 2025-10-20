@@ -1,0 +1,136 @@
+name: NexusNews CI
+
+permissions:
+  contents: read
+  pull-requests: write
+
+on:
+  push:
+    branches: [ dev, main ]
+  pull_request:
+    branches: [ dev, main ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  JAVA_VERSION: '17'
+  BUILD_CONFIGURATION: 'Release'
+
+jobs:
+  detect-changes:
+    name: Detect File Changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      app: ${{ steps.filter.outputs.app }}
+      gradle: ${{ steps.filter.outputs.gradle }}
+      any: ${{ steps.filter.outputs.any }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Filter Changed Paths
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            app:
+              - 'app/**'
+            gradle:
+              - 'gradle/**'
+              - 'build.gradle.kts'
+              - 'settings.gradle.kts'
+              - 'gradle.properties'
+            any:
+              - '**/*.kt'
+              - '**/*.java'
+              - '**/*.xml'
+              - '**/*.gradle.kts'
+              - '**/*.toml'
+              - '.github/workflows/**'
+
+      - name: Changes Summary
+        run: |
+          echo "### 🔍 File Changes Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- App: ${{ steps.filter.outputs.app == 'true' && '✅' || '❌' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Gradle: ${{ steps.filter.outputs.gradle == 'true' && '✅' || '❌' }}" >> $GITHUB_STEP_SUMMARY
+
+  build-android:
+    name: Build Android
+    needs: detect-changes
+    if: ${{ github.event_name == 'workflow_dispatch' || needs.detect-changes.outputs.any == 'true' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+
+      - name: Cache Gradle
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Ensure Gradle Wrapper Jar
+        run: |
+          if [ ! -f gradle/wrapper/gradle-wrapper.jar ]; then
+            echo "Downloading gradle-wrapper.jar"
+            curl -L -o gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v8.13.0/gradle/wrapper/gradle-wrapper.jar
+          fi
+
+      - name: Build Projects
+        run: |
+          echo "Building Android project"
+          ./gradlew build -x test
+
+      - name: Run Tests
+        run: |
+          echo "Running tests"
+          ./gradlew test
+
+      - name: Assemble Debug APK
+        run: |
+          echo "Assembling debug APK"
+          ./gradlew assembleDebug
+
+      - name: Rename APK
+        run: mv app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/NexusNews-debug.apk
+
+      - name: Upload Android Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexusnews-debug-${{ github.sha }}
+          path: app/build/outputs/apk/debug/NexusNews-debug.apk
+          if-no-files-found: error
+
+  summary:
+    name: Build Summary
+    needs: [build-android]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Generate Summary
+        run: |
+          echo "### 🚀 NexusNews Build Results" >> $GITHUB_STEP_SUMMARY
+          echo "| Platform | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "| --- | --- |" >> $GITHUB_STEP_SUMMARY
+          echo "| Android | ${{ needs.build-android.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
