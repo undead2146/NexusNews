@@ -26,7 +26,7 @@ export default withMermaid(
     defineConfig({
         title: 'NexusNews',
         description: 'Android News App Documentation',
-        base: '/',
+        base: '/NexusNews/',
 
         ignoreDeadLinks: true,
 
