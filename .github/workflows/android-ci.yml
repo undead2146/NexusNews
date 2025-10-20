@@ -87,6 +87,13 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Ensure Gradle Wrapper Jar
+        run: |
+          if [ ! -f gradle/wrapper/gradle-wrapper.jar ]; then
+            echo "Downloading gradle-wrapper.jar"
+            curl -L -o gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v8.13.0/gradle/wrapper/gradle-wrapper.jar
+          fi
+
       - name: Build Projects
         run: |
           echo "Building Android project"
@@ -102,11 +109,14 @@ jobs:
           echo "Assembling debug APK"
           ./gradlew assembleDebug
 
+      - name: Rename APK
+        run: mv app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/NexusNews-debug.apk
+
       - name: Upload Android Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: nexusnews-android-debug
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: nexusnews-debug-${{ github.sha }}
+          path: app/build/outputs/apk/debug/NexusNews-debug.apk
           if-no-files-found: error
 
   summary:
