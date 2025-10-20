@@ -25,7 +25,7 @@ release/
 # VS Code
 .vscode/
 .vs/
-./Notes/
+Notes/
 
 # Compiled class file
 *.class
