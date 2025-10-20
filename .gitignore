@@ -1,3 +1,32 @@
+# Android
+*.iml
+.gradle/
+local.properties
+.idea/
+build/
+captures/
+*.apk
+*.aar
+*.ap_
+*.dex
+bin/
+gen/
+gradle-app.setting
+!gradle-wrapper.jar
+.DS_Store
+proguard/
+*.log
+navigation.json
+.externalNativeBuild
+.cxx
+google-services.json
+release/
+
+# VS Code
+.vscode/
+.vs/
+./Notes/
+
 # Compiled class file
 *.class
 

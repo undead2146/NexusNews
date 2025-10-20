@@ -1,6 +1,6 @@
-# NewsNexus AI
+# NexusNews AI
 
- <!-- _![NewsNexus AI Banner](https://via.placeholder.com/1200x300/0F4C5A/FFFFFF?text=NewsNexus+AI) Replace with actual banner/screenshot -->
+ <!-- _![NexusNews AI Banner](https://via.placeholder.com/1200x300/0F4C5A/FFFFFF?text=NexusNews+AI) Replace with actual banner/screenshot -->
 
 A modern Android news aggregator app that combines international news APIs with local sources (via web scraping). Powered by OpenRouter AI for intelligent features like auto-summarization, sentiment analysis, multi-language translations, and related article recommendations. Built as a college assignment to explore Jetpack Compose, MVVM, Clean Architecture, and advanced Android patterns.
 
