@@ -2,8 +2,10 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.kotlin.kapt)  // **New: For Room/Hilt/Moshi processors**
-    alias(libs.plugins.hilt.android)  // **New: Hilt plugin**
+    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.hilt.android)
+    alias(libs.plugins.ktlint)
+    alias(libs.plugins.detekt)
 }
 
 android {
@@ -39,6 +41,19 @@ android {
     buildFeatures {
         compose = true
     }
+
+    // Added ktlint configuration for code style checking
+    ktlint {
+        android.set(true)
+        verbose.set(true)
+    }
+
+    // Added detekt configuration for static code analysis
+    detekt {
+        toolVersion = libs.versions.detektGradle.get()
+        buildUponDefaultConfig = true
+        parallel = true
+    }
 }
 
 dependencies {
@@ -52,11 +67,9 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    implementation(libs.retrofit)  // Already there – great for APIs!
+    implementation(libs.retrofit) 
     
-    // **New: Add these for full project**
-    
-    // MVVM + Compose Extras
+    // MVVM + Compose Extra
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.navigation.compose)
     
@@ -105,4 +118,11 @@ dependencies {
     testImplementation(libs.bundles.testingUnit)
     testImplementation(libs.hilt.android.testing)
     kaptTest(libs.hilt.compiler)  // kapt for tests
+}
+
+// Added by user to enable HTML reports for Detekt static code analysis
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    reports {
+        html.required.set(true)
+    }
 }
