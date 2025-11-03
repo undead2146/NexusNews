@@ -18,58 +18,59 @@ import java.io.IOException
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class BaseUseCaseTest {
-    
     private val testDispatcher = StandardTestDispatcher()
-    
+
     @Before
     fun setup() {
         Dispatchers.setMain(testDispatcher)
     }
-    
+
     @After
     fun tearDown() {
         Dispatchers.resetMain()
     }
-    
+
     @Test
-    fun `invoke should emit success result`() = runTest {
-        // Given
-        val useCase = TestUseCase(testDispatcher, shouldFail = false)
-        
-        // When & Then
-        useCase("test").test {
-            val result = awaitItem()
-            assertTrue(result is Result.Success)
-            assertEquals("test", (result as Result.Success).data)
-            awaitComplete()
+    fun `invoke should emit success result`() =
+        runTest {
+            // Given
+            val useCase = TestUseCase(testDispatcher, shouldFail = false)
+
+            // When & Then
+            useCase("test").test {
+                val result = awaitItem()
+                assertTrue(result is Result.Success)
+                assertEquals("test", (result as Result.Success).data)
+                awaitComplete()
+            }
         }
-    }
-    
+
     @Test
-    fun `invoke should emit error result on exception`() = runTest {
-        // Given
-        val useCase = TestUseCase(testDispatcher, shouldFail = true)
-        
-        // When & Then
-        useCase("test").test {
-            val result = awaitItem()
-            assertTrue(result is Result.Error)
-            assertTrue((result as Result.Error).exception is IOException)
-            awaitComplete()
+    fun `invoke should emit error result on exception`() =
+        runTest {
+            // Given
+            val useCase = TestUseCase(testDispatcher, shouldFail = true)
+
+            // When & Then
+            useCase("test").test {
+                val result = awaitItem()
+                assertTrue(result is Result.Error)
+                assertTrue((result as Result.Error).exception is IOException)
+                awaitComplete()
+            }
         }
-    }
-    
+
     // Test implementation
     private class TestUseCase(
         dispatcher: kotlinx.coroutines.CoroutineDispatcher,
-        private val shouldFail: Boolean
+        private val shouldFail: Boolean,
     ) : BaseUseCase<String, String>(dispatcher) {
-        override fun execute(params: String) = flow {
-            if (shouldFail) {
-                throw IOException("Test exception")
+        override fun execute(params: String) =
+            flow {
+                if (shouldFail) {
+                    throw IOException("Test exception")
+                }
+                emit(Result.Success(params))
             }
-            emit(Result.Success(params))
-        }
     }
 }
-

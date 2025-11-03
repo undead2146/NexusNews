@@ -16,5 +16,5 @@ data class Article(
     val author: String?,
     val source: String,
     val publishedAt: LocalDateTime,
-    val category: String?
+    val category: String?,
 )

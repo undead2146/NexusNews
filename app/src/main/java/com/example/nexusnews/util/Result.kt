@@ -5,31 +5,37 @@ package com.example.nexusnews.util
  * Provides type-safe handling of loading, success, and error states.
  */
 sealed class Result<out T> {
-    data class Success<T>(val data: T) : Result<T>()
-    data class Error(val exception: Throwable) : Result<Nothing>()
+    data class Success<T>(
+        val data: T,
+    ) : Result<T>()
+
+    data class Error(
+        val exception: Throwable,
+    ) : Result<Nothing>()
+
     data object Loading : Result<Nothing>()
-    
+
     /**
      * Returns data if Success, null otherwise.
      */
-    fun getOrNull(): T? = when (this) {
-        is Success -> data
-        else -> null
-    }
-    
+    fun getOrNull(): T? =
+        when (this) {
+            is Success -> data
+            else -> null
+        }
+
     /**
      * Returns true if this is a Success result.
      */
     fun isSuccess(): Boolean = this is Success
-    
+
     /**
      * Returns true if this is an Error result.
      */
     fun isError(): Boolean = this is Error
-    
+
     /**
      * Returns true if this is a Loading result.
      */
     fun isLoading(): Boolean = this is Loading
 }
-

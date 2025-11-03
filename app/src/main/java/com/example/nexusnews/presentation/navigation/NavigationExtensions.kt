@@ -7,10 +7,6 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import timber.log.Timber
 
 /**
- * Extension functions for safe navigation.
- */
-
-/**
  * Navigate to a screen with single top behavior.
  * Prevents multiple copies of the same screen in the back stack.
  */
@@ -41,11 +37,10 @@ fun NavController.navigateToArticleDetail(articleId: String) {
 /**
  * Safe pop back stack with error handling.
  */
-fun NavController.safePopBackStack(): Boolean {
-    return try {
+fun NavController.safePopBackStack(): Boolean =
+    try {
         popBackStack()
     } catch (e: Throwable) {
         Timber.e(e, "Error popping back stack")
         false
     }
-}

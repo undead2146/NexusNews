@@ -15,12 +15,12 @@ interface NewsRepository {
      * @return Flow emitting Result states (Loading, Success, Error)
      */
     fun getArticles(forceRefresh: Boolean = false): Flow<Result<List<Article>>>
-    
+
     /**
      * Fetches a single article by ID.
      */
     fun getArticleById(id: String): Flow<Result<Article>>
-    
+
     /**
      * Searches articles by query.
      */

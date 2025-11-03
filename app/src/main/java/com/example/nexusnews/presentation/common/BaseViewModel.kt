@@ -17,18 +17,22 @@ import timber.log.Timber
  * - Loading state management
  */
 abstract class BaseViewModel : ViewModel() {
-    
     private val _events = MutableSharedFlow<UiEvent>()
     val events: SharedFlow<UiEvent> = _events.asSharedFlow()
-    
+
     /**
      * Coroutine exception handler for viewModelScope.
      */
-    protected val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        Timber.e(throwable, "Uncaught exception in ViewModel")
-        handleError(throwable)
-    }
-    
+    protected val exceptionHandler =
+        CoroutineExceptionHandler { _, throwable ->
+            Timber.e(
+                throwable,
+                "Uncaught exception in ViewModel",
+            )
+
+            handleError(throwable)
+        }
+
     /**
      * Handle errors and convert to user-friendly messages.
      */
@@ -38,7 +42,7 @@ abstract class BaseViewModel : ViewModel() {
             _events.emit(UiEvent.ShowError(message))
         }
     }
-    
+
     /**
      * Emit a one-time UI event.
      */
@@ -53,8 +57,15 @@ abstract class BaseViewModel : ViewModel() {
  * Sealed interface for one-time UI events.
  */
 sealed interface UiEvent {
-    data class ShowError(val message: String) : UiEvent
-    data class ShowSuccess(val message: String) : UiEvent
-    data class Navigate(val route: String) : UiEvent
-}
+    data class ShowError(
+        val message: String,
+    ) : UiEvent
 
+    data class ShowSuccess(
+        val message: String,
+    ) : UiEvent
+
+    data class Navigate(
+        val route: String,
+    ) : UiEvent
+}

@@ -12,7 +12,6 @@ import java.io.IOException
  * Implements offline-first strategy using NetworkBoundResource pattern.
  */
 abstract class BaseRepository {
-    
     /**
      * Helper function for network-bound resources with caching.
      * Implements the offline-first pattern:
@@ -20,7 +19,7 @@ abstract class BaseRepository {
      * 2. Fetch from network
      * 3. Update cache
      * 4. Emit fresh data
-     * 
+     *
      * @param fetchFromLocal Fetch cached data
      * @param shouldFetch Determine if network fetch is needed
      * @param fetchFromRemote Fetch from network
@@ -30,33 +29,33 @@ abstract class BaseRepository {
         fetchFromLocal: suspend () -> T?,
         shouldFetch: (T?) -> Boolean = { true },
         fetchFromRemote: suspend () -> T,
-        saveRemoteData: suspend (T) -> Unit = {}
-    ): Flow<Result<T>> = flow {
-        emit(Result.Loading)
-        
-        // Emit cached data first
-        val localData = fetchFromLocal()
-        if (localData != null) {
-            emit(Result.Success(localData))
-        }
-        
-        // Check if network fetch is needed
-        if (shouldFetch(localData)) {
-            try {
-                val remoteData = fetchFromRemote()
-                saveRemoteData(remoteData)
-                emit(Result.Success(remoteData))
-            } catch (e: IOException) {
-                Timber.e(e, "Network fetch failed")
-                // If we have cached data, don't emit error
-                if (localData == null) {
-                    emit(Result.Error(e))
+        saveRemoteData: suspend (T) -> Unit = {},
+    ): Flow<Result<T>> =
+        flow {
+            emit(Result.Loading)
+
+            // Emit cached data first
+            val localData = fetchFromLocal()
+            if (localData != null) {
+                emit(Result.Success(localData))
+            }
+
+            // Check if network fetch is needed
+            if (shouldFetch(localData)) {
+                try {
+                    val remoteData = fetchFromRemote()
+                    saveRemoteData(remoteData)
+                    emit(Result.Success(remoteData))
+                } catch (e: IOException) {
+                    Timber.e(e, "Network fetch failed")
+                    // If we have cached data, don't emit error
+                    if (localData == null) {
+                        emit(Result.Error(e))
+                    }
                 }
             }
+        }.catch { e ->
+            Timber.e(e, "Error in networkBoundResource")
+            emit(Result.Error(e))
         }
-    }.catch { e ->
-        Timber.e(e, "Error in networkBoundResource")
-        emit(Result.Error(e))
-    }
 }
-

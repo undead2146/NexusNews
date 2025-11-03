@@ -10,26 +10,24 @@ import timber.log.Timber
 /**
  * Base use case for executing business logic operations.
  * Provides consistent error handling and threading.
- * 
+ *
  * @param In Input parameter type
  * @param Out Output result type
  */
 abstract class BaseUseCase<In, Out>(
-    private val dispatcher: CoroutineDispatcher
+    private val dispatcher: CoroutineDispatcher,
 ) {
     /**
      * Executes the use case operation.
      * Automatically handles threading and error catching.
      */
-    operator fun invoke(params: In): Flow<Result<Out>> {
-        return execute(params)
+    operator fun invoke(params: In): Flow<Result<Out>> =
+        execute(params)
             .catch { e ->
                 Timber.e(e, "Error in use case: ${this::class.simpleName}")
                 emit(Result.Error(e))
-            }
-            .flowOn(dispatcher)
-    }
-    
+            }.flowOn(dispatcher)
+
     /**
      * Implement business logic here.
      */

@@ -5,4 +5,4 @@ package com.example.nexusnews.util
  * Add common extension functions
  */
 
-// Add extension functions
+fun String?.orEmpty(): String = this ?: ""
