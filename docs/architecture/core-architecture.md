@@ -69,6 +69,128 @@ import com.example.nexusnews.util.constants.DatabaseConstants.ARTICLES_TABLE
 - Unidirectional Data Flow: State flows down, events flow up
 - State Management: StateFlow for reactive UI updates
 
+## Network Layer Architecture
+
+### Network Layer Overview
+
+The network layer provides a robust, reactive foundation for API communication with comprehensive error handling, retry logic, and monitoring capabilities.
+
+### Network Components
+
+#### 1. NetworkMonitor
+
+- **Purpose:** Real-time network connectivity monitoring
+- **Implementation:** Uses ConnectivityManager with Flow-based reactive streams
+- **Features:**
+  - Connectivity state observation
+  - Network type detection (WiFi, Cellular, Ethernet)
+  - Reactive updates for UI adaptation
+
+#### 2. RetryPolicy
+
+- **Purpose:** Configurable retry logic with exponential backoff
+- **Features:**
+  - Exponential backoff with jitter
+  - Configurable retry attempts and delays
+  - Selective retry based on exception types
+  - Custom retry conditions
+
+#### 3. OkHttp Interceptors
+
+- **AuthInterceptor:** API key and authentication header injection
+- **ErrorInterceptor:** HTTP error parsing and typed exception throwing
+- **RetryInterceptor:** Automatic retry logic integration
+
+#### 4. NetworkDataSource
+
+- **Purpose:** Base class for network operations
+- **Features:**
+  - Connectivity checking before requests
+  - Automatic retry with policy
+  - Standardized error handling
+  - Flow-based response wrapping
+
+#### 5. API Response Models
+
+- **ApiResponse&lt;T&gt;:** Sealed class for success/error states
+- **ErrorResponse:** Structured error information from APIs
+- **NetworkException:** Typed exception hierarchy
+
+### Network Request Flow
+
+```mermaid
+Request → Connectivity Check → Auth Headers → API Call → Error Handling
+     ↓                                                    ↓
+Retry Logic ← Response Processing ← Success/Error Parsing
+```
+
+### Network Error Handling Strategy
+
+#### Typed Network Exceptions
+
+- **UnauthorizedException:** 401 responses
+- **ForbiddenException:** 403 responses
+- **NotFoundException:** 404 responses
+- **RateLimitException:** 429 responses
+- **ServerException:** 5xx responses
+- **HttpException:** Other 4xx responses
+
+#### Error Processing Pipeline
+
+1. **ErrorInterceptor:** Parses HTTP responses into typed exceptions
+2. **RetryInterceptor:** Applies retry logic for retryable errors
+3. **NetworkDataSource:** Wraps results in ApiResponse sealed class
+4. **Repository:** Converts to domain Result types
+5. **ViewModel:** Maps to UiState for presentation
+
+### Network Dependency Injection
+
+Network components are configured via Hilt modules:
+
+```kotlin
+@Module
+@InstallIn(SingletonComponent::class)
+object NetworkModule {
+    @Provides
+    fun provideOkHttpClient(
+        authInterceptor: AuthInterceptor,
+        retryInterceptor: RetryInterceptor,
+        errorInterceptor: ErrorInterceptor
+    ): OkHttpClient
+
+    @Provides
+    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit
+}
+```
+
+### Network Testing Strategy
+
+#### Unit Testing
+
+- **NetworkMonitor:** Connectivity state testing with mock Context
+- **RetryPolicy:** Backoff calculation and retry logic testing
+- **Interceptors:** HTTP request/response manipulation testing
+- **NetworkDataSource:** Error handling and Flow emission testing
+
+#### Integration Testing
+
+- **MockWebServer:** End-to-end API call simulation
+- **Interceptor Chain:** Full request pipeline testing
+- **Error Scenarios:** Network failures and API errors
+
+### Network Configuration Constants
+
+Network behavior is controlled by constants:
+
+```kotlin
+object NetworkConstants {
+    const val CONNECT_TIMEOUT_SECONDS = 30L
+    const val READ_TIMEOUT_SECONDS = 30L
+    const val MAX_RETRY_ATTEMPTS = 3
+    const val RETRY_BACKOFF_MULTIPLIER = 2.0
+}
+```
+
 ## Data Flow
 
 ```mermaid

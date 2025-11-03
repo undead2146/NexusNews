@@ -73,16 +73,14 @@ Complete reference of all dependencies used in NexusNews with their purposes, ve
 
 **Usage**: NewsAPI, Guardian API, OpenRouter API calls
 
-### JSON Parsing (Moshi)
+### Network Monitoring
 
 | Library | Version | Purpose | Documentation |
 |---------|---------|---------|---------------|
-| `com.squareup.moshi:moshi` | 1.15.1 | JSON parsing library | [Docs](https://github.com/square/moshi) |
-| `com.squareup.moshi:moshi-kotlin` | 1.15.1 | Kotlin support for Moshi | [Docs](https://github.com/square/moshi#kotlin) |
-| `com.squareup.moshi:moshi-kotlin-codegen` | 1.15.1 | Code generation (kapt) | [Docs](https://github.com/square/moshi#codegen) |
+| `androidx.test:core` | 1.5.0 | Android testing core | [Docs](https://developer.android.com/training/testing/local-tests) |
+| `com.squareup.okhttp3:mockwebserver` | 4.12.0 | Mock HTTP server for testing | [Docs](https://github.com/square/okhttp/tree/master/mockwebserver) |
 
-**Bundle**: `libs.bundles.moshiBundle`  
-**Usage**: Parsing API responses from NewsAPI, Guardian, OpenRouter
+**Usage**: Network connectivity monitoring, testing HTTP interactions
 
 ---
 
@@ -211,6 +209,7 @@ Complete reference of all dependencies used in NexusNews with their purposes, ve
 ### AI Service
 
 **OpenRouter** ([openrouter.ai](https://openrouter.ai))
+
 - **Purpose**: AI summarization, sentiment analysis, translation
 - **Models**: GPT-4o-mini, Claude Haiku, Gemini, etc.
 - **Pricing**: Pay-per-token (tracked in app)
@@ -229,6 +228,7 @@ Complete reference of all dependencies used in NexusNews with their purposes, ve
 All versions are centralized in [`gradle/libs.versions.toml`](../../gradle/libs.versions.toml).
 
 To update a dependency:
+
 1. Update version in `libs.versions.toml`
 2. Sync Gradle
 3. Update this documentation
