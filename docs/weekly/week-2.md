@@ -10,3 +10,4 @@
 | Added comprehensive unit tests for BaseUseCase, BaseRepository, and ErrorHandler with full test coverage. | `test(arch): add unit tests for core architecture components with turbine and coroutines testing` |
 | Created core architecture documentation and updated README with architecture overview. | `docs(arch): create core-architecture.md documentation and update README with architecture section` |
 | Resolved ktlint warnings and build issues in MainActivity, Theme, and test files. | `fix: resolve ktlint warnings and build issues in MainActivity, Theme, and test files` |
+| Restructured constants into separate classes by category (NetworkConstants, ApiConstants, DatabaseConstants, UiConstants, AppConstants). | `refactor: restructure constants into separate classes by category for better maintainability` |

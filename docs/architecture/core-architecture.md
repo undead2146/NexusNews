@@ -4,6 +4,24 @@
 
 NexusNews follows Clean Architecture principles with MVVM pattern for the presentation layer.
 
+## Constants Organization
+
+Constants are organized into separate classes by category for better maintainability:
+
+- **NetworkConstants:** Network configuration, timeouts, retry policies
+- **ApiConstants:** HTTP headers, status codes, API response formats  
+- **DatabaseConstants:** Database schema, table/column names
+- **UiConstants:** UI dimensions, animations, layout values
+- **AppConstants:** General application settings and preferences
+
+### Usage Example
+
+```kotlin
+import com.example.nexusnews.util.constants.NetworkConstants.CONNECT_TIMEOUT_SECONDS
+import com.example.nexusnews.util.constants.ApiConstants.HTTP_OK
+import com.example.nexusnews.util.constants.DatabaseConstants.ARTICLES_TABLE
+```
+
 ## Architecture Layers
 
 ### 1. Domain Layer (Business Logic)
