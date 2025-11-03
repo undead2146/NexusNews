@@ -39,21 +39,105 @@ export default withMermaid(
 
             nav: [
                 { text: 'Home', link: '/' },
-                { text: 'Weekly Reports', link: '/weekly/' }
+                { text: 'Quick Ref', link: '/QUICK-REFERENCE' },
+                { text: 'Project', link: '/project/' },
+                { text: 'Architecture', link: '/architecture/' },
+                { text: 'Development', link: '/development/' },
+                { text: 'API', link: '/api/' },
+                { text: 'Weekly Reports', link: '/weekly/' },
+                { text: 'Context', link: '/context/' }
             ],
 
-            sidebar: [
-                {
-                    text: 'Getting Started',
-                    items: [
-                        { text: 'Introduction', link: '/' }
-                    ]
-                },
-                {
-                    text: 'Weekly Reports',
-                    items: generateWeeklyItems()
-                }
-            ],
+            sidebar: {
+                '/architecture/': [
+                    {
+                        text: 'Architecture',
+                        items: [
+                            { text: 'Overview', link: '/architecture/' },
+                            { text: 'News Sources', link: '/architecture/news-sources' },
+                            { text: 'AI Integration', link: '/architecture/ai-integration' },
+                            { text: 'Data Management', link: '/architecture/data-management' },
+                            { text: 'Dependency Injection', link: '/architecture/dependency-injection' }
+                        ]
+                    }
+                ],
+                '/development/': [
+                    {
+                        text: 'Development',
+                        items: [
+                            { text: 'Overview', link: '/development/' },
+                            { text: 'Setup Guide', link: '/development/setup' },
+                            { text: 'Coding Style', link: '/development/coding-style' },
+                            { text: 'Testing Guide', link: '/development/testing' },
+                            { text: 'Git Workflow', link: '/development/git-workflow' }
+                        ]
+                    }
+                ],
+                '/api/': [
+                    {
+                        text: 'API Documentation',
+                        items: [
+                            { text: 'Overview', link: '/api/' },
+                            { text: 'Dependencies', link: '/api/dependencies' },
+                            { text: 'NewsAPI', link: '/api/newsapi' },
+                            { text: 'Guardian API', link: '/api/guardian' },
+                            { text: 'OpenRouter', link: '/api/openrouter' },
+                            { text: 'Web Scraping', link: '/api/scraping' }
+                        ]
+                    }
+                ],
+                '/project/': [
+                    {
+                        text: 'Project Management',
+                        items: [
+                            { text: 'Overview', link: '/project/overview' },
+                            { text: 'PRD', link: '/project/prd' },
+                            { text: 'Roadmap', link: '/project/roadmap' }
+                        ]
+                    }
+                ],
+                '/weekly/': [
+                    {
+                        text: 'Weekly Reports',
+                        items: generateWeeklyItems()
+                    }
+                ],
+                '/context/': [
+                    {
+                        text: 'Context',
+                        items: [
+                            { text: 'Project Metadata', link: '/context/' }
+                        ]
+                    }
+                ],
+                '/': [
+                    {
+                        text: 'Getting Started',
+                        items: [
+                            { text: 'Introduction', link: '/' },
+                            { text: 'Quick Reference', link: '/QUICK-REFERENCE' },
+                            { text: 'Project Overview', link: '/project/overview' },
+                            { text: 'Setup Guide', link: '/development/setup' }
+                        ]
+                    },
+                    {
+                        text: 'Documentation',
+                        items: [
+                            { text: 'Architecture', link: '/architecture/' },
+                            { text: 'Development', link: '/development/' },
+                            { text: 'API Reference', link: '/api/' },
+                            { text: 'Project Info', link: '/project/' }
+                        ]
+                    },
+                    {
+                        text: 'Guides',
+                        items: [
+                            { text: 'Documentation Structure', link: '/STRUCTURE' },
+                            { text: 'Weekly Reports', link: '/weekly/' }
+                        ]
+                    }
+                ]
+            },
 
             socialLinks: [
                 { icon: 'github', link: 'https://github.com/undead2146/NexusNews' }
