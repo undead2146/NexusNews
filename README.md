@@ -46,6 +46,23 @@ This app demonstrates production-ready mobile development: offline caching, back
 | **Testing** | JUnit, Mockito, Turbine (unit tests); Compose UI Testing (instrumentation) |
 | **Other** | Timber (logging), Security-Crypto (encryption), Navigation Compose |
 
+## Architecture
+
+NexusNews follows **Clean Architecture** principles with **MVVM** pattern:
+
+- **Domain Layer:** Business logic and models (framework-independent)
+- **Data Layer:** Repository pattern with offline-first strategy
+- **Presentation Layer:** Jetpack Compose UI with ViewModels
+
+### Key Patterns
+
+- **Offline-First:** Cache data locally, sync with network
+- **Unidirectional Data Flow:** State down, events up
+- **Type-Safe Navigation:** Sealed class routes with Jetpack Navigation
+- **Error Handling:** Centralized with Result/UiState sealed classes
+
+See [Architecture Documentation](docs/architecture/core-architecture.md) for details.
+
 ## 📱 Screenshots
 
 <!-- Add actual screenshots here -->
@@ -67,13 +84,15 @@ This app demonstrates production-ready mobile development: offline caching, back
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Android Studio (Giraffe or later)
 - Android SDK API 26+ (Android 8.0+)
-- API Keys: 
+- API Keys:
   - [NewsAPI Key](https://newsapi.org) (free tier)
   - [Guardian API Key](https://open-platform.theguardian.com) (free)
   - [OpenRouter API Key](https://openrouter.ai/keys) (free tier for testing; paid for production)
 
 ### Setup
+
 1. Clone the repo:
-`git clone https://github.com/undead2146/NexusNews.git`
+   `git clone https://github.com/undead2146/NexusNews.git`
