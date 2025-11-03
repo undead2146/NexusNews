@@ -106,17 +106,20 @@ NexusNews is a modern Android news aggregator application that combines internat
 - ✅ CI/CD pipeline (GitHub Actions)
 - ✅ Documentation structure (VitePress)
 - ✅ Code quality tools (Ktlint, Detekt)
+- ✅ Core architecture implementation (MVVM + Clean Architecture)
+- ✅ Network layer foundation with monitoring, retry logic, and error handling
+- ✅ Comprehensive testing infrastructure (unit + integration tests)
+- ✅ Constants restructuring into categorized classes
 
 ### In Progress
 
-- 🔄 Core architecture implementation
-- 🔄 Documentation completion
+- 🔄 Documentation completion and updates
 
 ### Next Up
 
-- ⏳ Network layer foundation
 - ⏳ Room database setup
-- ⏳ First news source integration
+- ⏳ First news source integration (NewsAPI)
+- ⏳ Basic UI implementation
 
 ## Team
 
