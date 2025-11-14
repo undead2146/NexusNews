@@ -13,15 +13,12 @@ import com.squareup.moshi.JsonClass
 data class ApiResponse<T>(
     @Json(name = "status")
     val status: String,
-
     @Json(name = "data")
     val data: T? = null,
-
     @Json(name = "error")
     val error: ErrorResponse? = null,
-
     @Json(name = "message")
-    val message: String? = null
+    val message: String? = null,
 ) {
     /**
      * Checks if the response is successful based on status field.
@@ -41,7 +38,7 @@ data class ApiResponse<T>(
         if (!isSuccessful() || data == null) {
             throw ApiException(
                 message = error?.message ?: message ?: "Unknown API error",
-                code = error?.code
+                code = error?.code,
             )
         }
         return data
@@ -49,10 +46,67 @@ data class ApiResponse<T>(
 }
 
 /**
+ * NewsAPI specific response wrapper.
+ * Matches NewsAPI's response structure with status, totalResults, and articles.
+ */
+@JsonClass(generateAdapter = true)
+data class NewsApiResponse(
+    @Json(name = "status")
+    val status: String,
+    @Json(name = "totalResults")
+    val totalResults: Int,
+    @Json(name = "articles")
+    val articles: List<NewsApiArticle>,
+) {
+    /**
+     * Checks if the NewsAPI response is successful.
+     *
+     * @return true if status is "ok", false otherwise
+     */
+    fun isSuccessful(): Boolean = status == "ok"
+}
+
+/**
+ * NewsAPI Article DTO.
+ * Represents a single news article from NewsAPI.
+ */
+@JsonClass(generateAdapter = true)
+data class NewsApiArticle(
+    @Json(name = "source")
+    val source: NewsApiSource,
+    @Json(name = "author")
+    val author: String?,
+    @Json(name = "title")
+    val title: String,
+    @Json(name = "description")
+    val description: String?,
+    @Json(name = "url")
+    val url: String,
+    @Json(name = "urlToImage")
+    val urlToImage: String?,
+    @Json(name = "publishedAt")
+    val publishedAt: String,
+    @Json(name = "content")
+    val content: String?,
+)
+
+/**
+ * NewsAPI Source DTO.
+ * Represents the source of a news article.
+ */
+@JsonClass(generateAdapter = true)
+data class NewsApiSource(
+    @Json(name = "id")
+    val id: String?,
+    @Json(name = "name")
+    val name: String,
+)
+
+/**
  * Exception thrown when API returns an error response.
  * Contains error details from the API response.
  */
 class ApiException(
     message: String,
-    val code: String? = null
+    val code: String? = null,
 ) : Exception(message)
