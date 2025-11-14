@@ -1,0 +1,12 @@
+complexity:
+  TooManyFunctions:
+    thresholdInObjects: 15
+  LongParameterList:
+    functionThreshold: 15
+    constructorThreshold: 15
+exceptions:
+  TooGenericExceptionCaught:
+    active: false
+style:
+  MaxLineLength:
+    maxLineLength: 150
