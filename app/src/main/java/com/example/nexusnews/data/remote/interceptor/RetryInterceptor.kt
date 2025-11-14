@@ -13,69 +13,95 @@ import javax.inject.Singleton
  * Uses exponential backoff strategy to prevent overwhelming failing services.
  */
 @Singleton
-class RetryInterceptor @Inject constructor(
-    private val retryPolicy: RetryPolicy = RetryPolicy()
-) : Interceptor {
+class RetryInterceptor
+    @Inject
+    constructor(
+        private val retryPolicy: RetryPolicy,
+    ) : Interceptor {
+        @Suppress("ReturnCount")
+        override fun intercept(chain: Interceptor.Chain): Response {
+            val request = chain.request()
 
-    override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request()
+            // Check if retry is disabled for this specific request
+            if (request.header("No-Retry") != null) {
+                return chain.proceed(request)
+            }
 
-        // Check if retry is disabled for this specific request
-        if (request.header("No-Retry") != null) {
-            return chain.proceed(request)
-        }
+            var attempt = 0
+            var response: Response? = null
+            var exception: IOException? = null
 
-        var attempt = 0
-        var response: Response? = null
-        var exception: IOException? = null
+            while (attempt < retryPolicy.maxAttempts) {
+                try {
+                    response = chain.proceed(request)
 
-        while (attempt < retryPolicy.maxAttempts) {
-            try {
-                response = chain.proceed(request)
+                    // If successful or non-retryable error, return response
+                    if (response.isSuccessful || !isRetryableStatusCode(response.code)) {
+                        return response
+                    }
 
-                // If successful or non-retryable error, return response
-                if (response.isSuccessful || !isRetryableStatusCode(response.code)) {
-                    return response
+                    // Close the response body before retry to free resources
+                    response.close()
+
+                    exception = IOException("HTTP ${response.code}: ${response.message}")
+                } catch (e: IOException) {
+                    exception = e
+                    Timber.w(e, "Request failed on attempt ${attempt + 1}")
                 }
 
-                // Close the response body before retry to free resources
-                response.close()
+                // Check if we should retry based on the exception
+                if (exception != null && retryPolicy.shouldRetry(exception, attempt)) {
+                    val delay = retryPolicy.getDelayForAttempt(attempt)
+                    Timber.d(
+                        "Retrying request to ${request.url} in ${delay}ms " +
+                            "(attempt ${attempt + 1}/${retryPolicy.maxAttempts})",
+                    )
 
-                exception = IOException("HTTP ${response.code}: ${response.message}")
-
-            } catch (e: IOException) {
-                exception = e
-                Timber.w(e, "Request failed on attempt ${attempt + 1}")
+                    Thread.sleep(delay)
+                    attempt++
+                } else {
+                    break
+                }
             }
 
-            // Check if we should retry based on the exception
-            if (exception != null && retryPolicy.shouldRetry(exception, attempt)) {
-                val delay = retryPolicy.getDelayForAttempt(attempt)
-                Timber.d("Retrying request to ${request.url} in ${delay}ms (attempt ${attempt + 1}/${retryPolicy.maxAttempts})")
-
-                Thread.sleep(delay)
-                attempt++
-            } else {
-                break
+            // If we have an exception, throw it; otherwise return the last response
+            if (exception != null) {
+                throw exception
             }
+            return response ?: throw IOException("No response after $attempt attempts")
         }
 
-        // If we have an exception, throw it
-        exception?.let { throw it }
-
-        // Otherwise return the last response (shouldn't happen in normal flow)
-        return response ?: throw IOException("No response after $attempt attempts")
+        /**
+         * Determines if an HTTP status code should trigger a retry.
+         * Only certain status codes are considered retryable to avoid
+         * wasting resources on permanent failures.
+         *
+         * @param code HTTP status code
+         * @return true if the request should be retried, false otherwise
+         */
+        private fun isRetryableStatusCode(code: Int): Boolean = code in RETRYABLE_STATUS_CODES
     }
 
-    /**
-     * Determines if an HTTP status code should trigger a retry.
-     * Only certain status codes are considered retryable to avoid
-     * wasting resources on permanent failures.
-     *
-     * @param code HTTP status code
-     * @return true if the request should be retried, false otherwise
-     */
-    private fun isRetryableStatusCode(code: Int): Boolean {
-        return code in listOf(408, 429, 500, 502, 503, 504)
-    }
-}
+/**
+ * HTTP status codes that are considered retryable.
+ * These typically indicate temporary server issues or rate limiting.
+ */
+private val RETRYABLE_STATUS_CODES =
+    listOf(
+        REQUEST_TIMEOUT_CODE,
+        TOO_MANY_REQUESTS_CODE,
+        INTERNAL_SERVER_ERROR_CODE,
+        BAD_GATEWAY_CODE,
+        SERVICE_UNAVAILABLE_CODE,
+        GATEWAY_TIMEOUT_CODE,
+    )
+
+/**
+ * HTTP status code constants for retryable errors.
+ */
+private const val REQUEST_TIMEOUT_CODE = 408
+private const val TOO_MANY_REQUESTS_CODE = 429
+private const val INTERNAL_SERVER_ERROR_CODE = 500
+private const val BAD_GATEWAY_CODE = 502
+private const val SERVICE_UNAVAILABLE_CODE = 503
+private const val GATEWAY_TIMEOUT_CODE = 504
