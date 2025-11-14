@@ -10,6 +10,12 @@ import kotlin.math.min
 import kotlin.math.pow
 
 /**
+ * Percentage of delay to use as maximum jitter (0-25% of delay).
+ * Jitter prevents multiple clients from retrying simultaneously.
+ */
+private const val JITTER_PERCENTAGE = 0.25
+
+/**
  * Configurable retry policy for network requests.
  * Implements exponential backoff with jitter to prevent thundering herd problems.
  *
@@ -22,9 +28,8 @@ data class RetryPolicy(
     val maxAttempts: Int = NetworkConstants.MAX_RETRY_ATTEMPTS,
     val initialDelayMs: Long = NetworkConstants.INITIAL_RETRY_DELAY_MS,
     val maxDelayMs: Long = NetworkConstants.MAX_RETRY_DELAY_MS,
-    val backoffMultiplier: Double = NetworkConstants.RETRY_BACKOFF_MULTIPLIER
+    val backoffMultiplier: Double = NetworkConstants.RETRY_BACKOFF_MULTIPLIER,
 ) {
-
     /**
      * Calculates delay for given attempt number using exponential backoff with jitter.
      * Formula: delay = min(initialDelay * (multiplier ^ attempt), maxDelay) + jitter
@@ -38,7 +43,7 @@ data class RetryPolicy(
         val cappedDelay = min(exponentialDelay, maxDelayMs.toDouble()).toLong()
 
         // Add jitter (0-25% of delay) to prevent thundering herd
-        val jitter = (cappedDelay * 0.25 * Math.random()).toLong()
+        val jitter = (cappedDelay * JITTER_PERCENTAGE * Math.random()).toLong()
 
         return cappedDelay + jitter
     }
@@ -52,7 +57,10 @@ data class RetryPolicy(
      * @param attempt Current attempt number (0-indexed)
      * @return true if the operation should be retried, false otherwise
      */
-    fun shouldRetry(exception: Throwable, attempt: Int): Boolean {
+    fun shouldRetry(
+        exception: Throwable,
+        attempt: Int,
+    ): Boolean {
         if (attempt >= maxAttempts) {
             Timber.d("Max retry attempts ($maxAttempts) reached")
             return false
@@ -61,7 +69,8 @@ data class RetryPolicy(
         return when (exception) {
             is SocketTimeoutException,
             is UnknownHostException,
-            is IOException -> {
+            is IOException,
+            -> {
                 Timber.d("Retryable exception: ${exception::class.simpleName}")
                 true
             }
@@ -84,12 +93,13 @@ data class RetryPolicy(
  */
 suspend fun <T> withRetry(
     retryPolicy: RetryPolicy = RetryPolicy(),
-    block: suspend () -> T
+    block: suspend () -> T,
 ): T {
     var currentAttempt = 0
-    var lastException: Exception? = null
+    var lastException: Throwable? = null
 
     while (currentAttempt < retryPolicy.maxAttempts) {
+        @Suppress("TooGenericExceptionCaught")
         try {
             return block()
         } catch (e: Exception) {
@@ -107,5 +117,5 @@ suspend fun <T> withRetry(
         }
     }
 
-    throw lastException ?: IllegalStateException("Retry failed with no exception")
+    error("Retry failed: ${lastException?.message ?: "No exception occurred"}")
 }
