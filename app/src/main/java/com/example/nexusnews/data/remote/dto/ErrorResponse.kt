@@ -11,13 +11,10 @@ import com.squareup.moshi.JsonClass
 data class ErrorResponse(
     @Json(name = "code")
     val code: String? = null,
-
     @Json(name = "message")
     val message: String,
-
     @Json(name = "details")
     val details: Map<String, Any>? = null,
-
     @Json(name = "timestamp")
-    val timestamp: Long? = null
+    val timestamp: Long? = null,
 )
