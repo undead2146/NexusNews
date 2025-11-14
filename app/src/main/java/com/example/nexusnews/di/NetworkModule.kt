@@ -1,6 +1,5 @@
 package com.example.nexusnews.di
 
-import com.example.nexusnews.BuildConfig
 import com.example.nexusnews.data.remote.interceptor.AuthInterceptor
 import com.example.nexusnews.data.remote.interceptor.ErrorInterceptor
 import com.example.nexusnews.data.remote.interceptor.RetryInterceptor
@@ -27,31 +26,29 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-
     /**
      * Provides Moshi instance for JSON parsing with Kotlin support.
      */
     @Provides
     @Singleton
-    fun provideMoshi(): Moshi {
-        return Moshi.Builder()
+    fun provideMoshi(): Moshi =
+        Moshi
+            .Builder()
             .add(KotlinJsonAdapterFactory())
             .build()
-    }
 
     /**
      * Provides retry policy configuration for network requests.
      */
     @Provides
     @Singleton
-    fun provideRetryPolicy(): RetryPolicy {
-        return RetryPolicy(
+    fun provideRetryPolicy(): RetryPolicy =
+        RetryPolicy(
             maxAttempts = NetworkConstants.MAX_RETRY_ATTEMPTS,
             initialDelayMs = NetworkConstants.INITIAL_RETRY_DELAY_MS,
             maxDelayMs = NetworkConstants.MAX_RETRY_DELAY_MS,
-            backoffMultiplier = NetworkConstants.RETRY_BACKOFF_MULTIPLIER
+            backoffMultiplier = NetworkConstants.RETRY_BACKOFF_MULTIPLIER,
         )
-    }
 
     /**
      * Provides HTTP logging interceptor for debugging.
@@ -59,17 +56,12 @@ object NetworkModule {
      */
     @Provides
     @Singleton
-    fun provideLoggingInterceptor(): HttpLoggingInterceptor {
-        return HttpLoggingInterceptor { message ->
+    fun provideLoggingInterceptor(): HttpLoggingInterceptor =
+        HttpLoggingInterceptor { message ->
             Timber.tag("OkHttp").d(message)
         }.apply {
-            level = if (BuildConfig.DEBUG) {
-                HttpLoggingInterceptor.Level.BODY
-            } else {
-                HttpLoggingInterceptor.Level.NONE
-            }
+            level = HttpLoggingInterceptor.Level.BODY
         }
-    }
 
     /**
      * Provides configured OkHttpClient with all necessary interceptors.
@@ -81,9 +73,10 @@ object NetworkModule {
         loggingInterceptor: HttpLoggingInterceptor,
         authInterceptor: AuthInterceptor,
         errorInterceptor: ErrorInterceptor,
-        retryInterceptor: RetryInterceptor
-    ): OkHttpClient {
-        return OkHttpClient.Builder()
+        retryInterceptor: RetryInterceptor,
+    ): OkHttpClient =
+        OkHttpClient
+            .Builder()
             .connectTimeout(NetworkConstants.CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
             .readTimeout(NetworkConstants.READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
             .writeTimeout(NetworkConstants.WRITE_TIMEOUT_SECONDS, TimeUnit.SECONDS)
@@ -93,7 +86,6 @@ object NetworkModule {
             .addInterceptor(errorInterceptor)
             .addInterceptor(loggingInterceptor)
             .build()
-    }
 
     /**
      * Provides base Retrofit instance for API communication.
@@ -103,12 +95,12 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(
         okHttpClient: OkHttpClient,
-        moshi: Moshi
-    ): Retrofit {
-        return Retrofit.Builder()
+        moshi: Moshi,
+    ): Retrofit =
+        Retrofit
+            .Builder()
             .baseUrl(NetworkConstants.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
-    }
 }
