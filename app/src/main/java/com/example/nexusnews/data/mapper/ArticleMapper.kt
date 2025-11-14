@@ -1,0 +1,64 @@
+package com.example.nexusnews.data.mapper
+
+import com.example.nexusnews.data.remote.dto.NewsApiArticle
+import com.example.nexusnews.domain.model.Article
+import timber.log.Timber
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
+import java.util.UUID
+
+/**
+ * Mapper for converting NewsAPI DTOs to domain models.
+ */
+object ArticleMapper {
+    /**
+     * Converts a NewsApiArticle to an Article domain model.
+     */
+    fun toDomain(newsApiArticle: NewsApiArticle): Article =
+        Article(
+            id = generateId(newsApiArticle),
+            title = newsApiArticle.title,
+            description = newsApiArticle.description,
+            content = newsApiArticle.content,
+            url = newsApiArticle.url,
+            imageUrl = newsApiArticle.urlToImage,
+            author = newsApiArticle.author,
+            source = newsApiArticle.source.name,
+            publishedAt = parsePublishedAt(newsApiArticle.publishedAt),
+            category = null, // NewsAPI doesn't provide categories in article responses
+        )
+
+    /**
+     * Converts a list of NewsApiArticle to a list of Article domain models.
+     */
+    fun toDomainList(newsApiArticles: List<NewsApiArticle>): List<Article> = newsApiArticles.map { toDomain(it) }
+
+    /**
+     * Generates a unique ID for the article based on URL.
+     * Uses URL hash to ensure consistency across API calls.
+     */
+    private fun generateId(newsApiArticle: NewsApiArticle): String = UUID.nameUUIDFromBytes(newsApiArticle.url.toByteArray()).toString()
+
+    /**
+     * Parses the publishedAt string from NewsAPI to LocalDateTime.
+     * Handles ISO 8601 format with timezone offset.
+     */
+    private fun parsePublishedAt(publishedAt: String): LocalDateTime =
+        try {
+            // NewsAPI returns ISO 8601 format like "2025-11-14T12:00:02Z"
+            LocalDateTime.parse(publishedAt, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+        } catch (e: DateTimeParseException) {
+            // detekt:ignore TooGenericExceptionCaught
+            // Fallback for different formats
+            Timber.e(e, "Failed to parse publishedAt with ISO_OFFSET_DATE_TIME: $publishedAt")
+            try {
+                LocalDateTime.parse(publishedAt, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+            } catch (e2: DateTimeParseException) {
+                // detekt:ignore TooGenericExceptionCaught
+                // If parsing fails, use current time as fallback
+                Timber.e(e2, "Failed to parse publishedAt: $publishedAt")
+                LocalDateTime.now()
+            }
+        }
+}
