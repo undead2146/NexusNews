@@ -28,7 +28,7 @@ moshi = "1.15.1"
 okhttp = "4.12.0"
 
 # DI (Hilt)
-hilt = "2.50"
+hilt = "2.57.2"
 hiltNavigationCompose = "1.1.0"
 
 # Scraping & Other
@@ -37,8 +37,10 @@ jsoup = "1.17.2"
 # Testing
 coroutinesTest = "1.7.3"
 mockk = "1.13.9"
+mockito = "5.11.0"
+mockitoKotlin = "5.4.0"
 turbine = "1.0.0"
-hiltAndroidTesting = "2.50"
+hiltAndroidTesting = "2.57.2"
 
 [ libraries ]
 
@@ -102,13 +104,15 @@ androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "j
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutinesTest" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+mockito = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
+mockitoKotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
 hilt-android-testing = { group = "com.google.dagger", name = "hilt-android-testing", version.ref = "hiltAndroidTesting" }
 
 [bundles]  # Groups for easy addition (e.g., implementation(libs.bundles.room) adds all Room)
 room = ["room-runtime", "room-ktx"]
 moshiBundle = ["moshi", "moshi-kotlin"]
-testingUnit = ["junit", "kotlinx-coroutines-test", "mockk", "turbine"]
+testingUnit = ["junit", "kotlinx-coroutines-test", "mockk", "mockito", "mockitoKotlin", "turbine"]
 testing-android = ["androidx-junit", "androidx-espresso-core"]
 
 [plugins]

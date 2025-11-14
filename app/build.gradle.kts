@@ -53,6 +53,7 @@ android {
         toolVersion = libs.versions.detektGradle.get()
         buildUponDefaultConfig = true
         parallel = true
+        config = files("$rootDir/detekt.yml")
     }
 }
 
