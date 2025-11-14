@@ -84,7 +84,7 @@ class RetryInterceptorTest {
                 .build()
 
         val chain = TestChain(request, failedResponse, successResponse)
-        whenever(retryPolicy.shouldRetry(IOException("Server Error"), 1)).thenReturn(true)
+        whenever(retryPolicy.shouldRetry(IOException("HTTP 500: Internal Server Error"), 1)).thenReturn(true)
         whenever(retryPolicy.getDelayForAttempt(1)).thenReturn(100L)
 
         // When
@@ -146,9 +146,9 @@ class RetryInterceptorTest {
                 .build()
 
         val chain = TestChain(request, failedResponse, failedResponse, failedResponse)
-        whenever(retryPolicy.shouldRetry(IOException("Server Error"), 1)).thenReturn(true)
-        whenever(retryPolicy.shouldRetry(IOException("Server Error"), 2)).thenReturn(true)
-        whenever(retryPolicy.shouldRetry(IOException("Server Error"), 3)).thenReturn(false)
+        whenever(retryPolicy.shouldRetry(IOException("HTTP 500: Internal Server Error"), 1)).thenReturn(true)
+        whenever(retryPolicy.shouldRetry(IOException("HTTP 500: Internal Server Error"), 2)).thenReturn(true)
+        whenever(retryPolicy.shouldRetry(IOException("HTTP 500: Internal Server Error"), 3)).thenReturn(false)
         whenever(retryPolicy.getDelayForAttempt(1)).thenReturn(100L)
         whenever(retryPolicy.getDelayForAttempt(2)).thenReturn(200L)
 
@@ -163,7 +163,7 @@ class RetryInterceptorTest {
 
         // Then
         assertTrue(exception is IOException)
-        assertEquals("Server Error", exception?.message)
+        assertEquals("HTTP 500: Internal Server Error", exception?.message)
         assertEquals(3, chain.callCount)
     }
 
@@ -187,7 +187,7 @@ class RetryInterceptorTest {
                 .build()
 
         val chain = TestChain(request, response)
-        whenever(retryPolicy.shouldRetry(IOException("Unauthorized"), 1)).thenReturn(false)
+        whenever(retryPolicy.shouldRetry(IOException("HTTP 401: Unauthorized"), 1)).thenReturn(false)
 
         // When
         val exception =
@@ -200,7 +200,7 @@ class RetryInterceptorTest {
 
         // Then
         assertTrue(exception is IOException)
-        assertEquals("Unauthorized", exception?.message)
+        assertEquals("HTTP 401: Unauthorized", exception?.message)
         assertEquals(1, chain.callCount)
     }
 
@@ -234,9 +234,9 @@ class RetryInterceptorTest {
                 .build()
 
         val chain = TestChain(request, failedResponse, failedResponse, successResponse)
-        whenever(retryPolicy.shouldRetry(IOException("Service Unavailable"), 1)).thenReturn(true)
-        whenever(retryPolicy.shouldRetry(IOException("Service Unavailable"), 2)).thenReturn(true)
-        whenever(retryPolicy.shouldRetry(IOException("Service Unavailable"), 3)).thenReturn(false)
+        whenever(retryPolicy.shouldRetry(IOException("HTTP 503: Service Unavailable"), 1)).thenReturn(true)
+        whenever(retryPolicy.shouldRetry(IOException("HTTP 503: Service Unavailable"), 2)).thenReturn(true)
+        whenever(retryPolicy.shouldRetry(IOException("HTTP 503: Service Unavailable"), 3)).thenReturn(false)
         whenever(retryPolicy.getDelayForAttempt(1)).thenReturn(100L)
         whenever(retryPolicy.getDelayForAttempt(2)).thenReturn(200L)
 
