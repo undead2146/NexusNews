@@ -93,8 +93,8 @@ class AuthInterceptorTest {
         org.mockito.kotlin.verify(chain).proceed(
             org.mockito.kotlin.check { modifiedRequest ->
                 assertEquals(
-                    "Bearer test-api-key",
-                    modifiedRequest.header(ApiConstants.AUTHORIZATION_HEADER),
+                    "https://api.example.com/test?apiKey=test-api-key",
+                    modifiedRequest.url.toString(),
                 )
             },
         )
@@ -161,8 +161,11 @@ class AuthInterceptorTest {
             org.mockito.kotlin.check { modifiedRequest ->
                 assertEquals("custom-value", modifiedRequest.header("Custom-Header"))
                 assertNotNull(modifiedRequest.header(ApiConstants.USER_AGENT_HEADER))
-                assertNotNull(modifiedRequest.header(ApiConstants.AUTHORIZATION_HEADER))
                 assertNotNull(modifiedRequest.header(ApiConstants.ACCEPT_HEADER))
+                assertEquals(
+                    "https://api.example.com/test?apiKey=test-key",
+                    modifiedRequest.url.toString(),
+                )
             },
         )
     }
@@ -175,7 +178,7 @@ class AuthInterceptorTest {
         // When
         authInterceptor.setApiKey(newApiKey)
 
-        // Then - Verify by checking that authorization header is added
+        // Then - Verify by checking that API key is added as query parameter
         val request =
             Request
                 .Builder()
@@ -188,8 +191,8 @@ class AuthInterceptorTest {
         org.mockito.kotlin.verify(chain).proceed(
             org.mockito.kotlin.check { modifiedRequest ->
                 assertEquals(
-                    "Bearer new-api-key",
-                    modifiedRequest.header(ApiConstants.AUTHORIZATION_HEADER),
+                    "https://api.example.com/test?apiKey=new-api-key",
+                    modifiedRequest.url.toString(),
                 )
             },
         )
