@@ -12,13 +12,13 @@ import java.net.UnknownHostException
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RetryPolicyTest {
-
-    private val retryPolicy = RetryPolicy(
-        maxAttempts = 3,
-        initialDelayMs = 100,
-        maxDelayMs = 1000,
-        backoffMultiplier = 2.0
-    )
+    private val retryPolicy =
+        RetryPolicy(
+            maxAttempts = 3,
+            initialDelayMs = 100,
+            maxDelayMs = 1000,
+            backoffMultiplier = 2.0,
+        )
 
     @Test
     fun `getDelayForAttempt returns increasing delays with exponential backoff`() {
@@ -129,93 +129,102 @@ class RetryPolicyTest {
     }
 
     @Test
-    fun `withRetry succeeds on first attempt`() = runTest {
-        // Given
-        var attempts = 0
+    fun `withRetry succeeds on first attempt`() =
+        runTest {
+            // Given
+            var attempts = 0
 
-        // When
-        val result = withRetry(retryPolicy) {
-            attempts++
-            "success"
+            // When
+            val result =
+                withRetry(retryPolicy) {
+                    attempts++
+                    "success"
+                }
+
+            // Then
+            assertEquals("success", result)
+            assertEquals(1, attempts)
         }
-
-        // Then
-        assertEquals("success", result)
-        assertEquals(1, attempts)
-    }
 
     @Test
-    fun `withRetry retries on failure then succeeds`() = runTest {
-        // Given
-        var attempts = 0
+    fun `withRetry retries on failure then succeeds`() =
+        runTest {
+            // Given
+            var attempts = 0
 
-        // When
-        val result = withRetry(retryPolicy) {
-            attempts++
-            if (attempts < 2) {
-                throw IOException("Network error")
-            }
-            "success"
+            // When
+            val result =
+                withRetry(retryPolicy) {
+                    attempts++
+                    if (attempts < 2) {
+                        throw IOException("Network error")
+                    }
+                    "success"
+                }
+
+            // Then
+            assertEquals("success", result)
+            assertEquals(2, attempts)
         }
-
-        // Then
-        assertEquals("success", result)
-        assertEquals(2, attempts)
-    }
 
     @Test
-    fun `withRetry throws exception after max attempts`() = runTest {
-        // Given
-        var attempts = 0
-        val policy = RetryPolicy(maxAttempts = 2)
+    fun `withRetry throws exception after max attempts`() =
+        runTest {
+            // Given
+            var attempts = 0
+            val policy = RetryPolicy(maxAttempts = 2)
 
-        // When
-        val exception = try {
-            withRetry(policy) {
-                attempts++
-                throw IOException("Persistent error")
-            }
-            null
-        } catch (e: Exception) {
-            e
+            // When
+            val exception =
+                try {
+                    withRetry(policy) {
+                        attempts++
+                        throw IOException("Persistent error")
+                    }
+                    null
+                } catch (e: Exception) {
+                    e
+                }
+
+            // Then
+            assertTrue(exception is IOException)
+            assertEquals("Persistent error", exception?.message)
+            assertEquals(2, attempts)
         }
-
-        // Then
-        assertTrue(exception is IOException)
-        assertEquals("Persistent error", exception?.message)
-        assertEquals(2, attempts)
-    }
 
     @Test
-    fun `withRetry does not retry non-retryable exceptions`() = runTest {
-        // Given
-        var attempts = 0
+    fun `withRetry does not retry non-retryable exceptions`() =
+        runTest {
+            // Given
+            var attempts = 0
 
-        // When
-        val exception = try {
-            withRetry(retryPolicy) {
-                attempts++
-                throw IllegalArgumentException("Bad argument")
-            }
-            null
-        } catch (e: Exception) {
-            e
+            // When
+            val exception =
+                try {
+                    withRetry(retryPolicy) {
+                        attempts++
+                        throw IllegalArgumentException("Bad argument")
+                    }
+                    null
+                } catch (e: Exception) {
+                    e
+                }
+
+            // Then
+            assertTrue(exception is IllegalArgumentException)
+            assertEquals(1, attempts) // Only one attempt, no retries
         }
-
-        // Then
-        assertTrue(exception is IllegalArgumentException)
-        assertEquals(1, attempts) // Only one attempt, no retries
-    }
 
     @Test
     fun `custom retry policy parameters are respected`() {
         // Given
-        val customPolicy = RetryPolicy(
-            maxAttempts = 5,
-            initialDelayMs = 50,
-            maxDelayMs = 500,
-            backoffMultiplier = 3.0
-        )
+        val customPolicy =
+            RetryPolicy(
+                maxAttempts = 5,
+                initialDelayMs = 50,
+                maxDelayMs = 500,
+                backoffMultiplier = 3.0,
+            )
 
         // When
         val delay0 = customPolicy.getDelayForAttempt(0)

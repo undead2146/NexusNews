@@ -1,6 +1,7 @@
 package com.example.nexusnews.data.remote.interceptor
 
-import com.example.nexusnews.data.remote.network.RetryPolicy
+import com.example.nexusnews.data.util.RetryPolicy
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.Protocol
 import okhttp3.Request
 import okhttp3.Response
@@ -12,9 +13,9 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 class RetryInterceptorTest {
-
     private lateinit var retryPolicy: RetryPolicy
     private lateinit var retryInterceptor: RetryInterceptor
 
@@ -27,17 +28,21 @@ class RetryInterceptorTest {
     @Test
     fun `intercept returns response on first successful call`() {
         // Given
-        val request = Request.Builder()
-            .url("https://api.example.com/test")
-            .build()
+        val request =
+            Request
+                .Builder()
+                .url("https://api.example.com/test")
+                .build()
 
-        val response = Response.Builder()
-            .request(request)
-            .protocol(Protocol.HTTP_2)
-            .code(200)
-            .message("OK")
-            .body("{}".toResponseBody("application/json".toMediaTypeOrNull()))
-            .build()
+        val response =
+            Response
+                .Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_2)
+                .code(200)
+                .message("OK")
+                .body("{}".toResponseBody("application/json".toMediaTypeOrNull()))
+                .build()
 
         val chain = TestChain(request, response)
 
@@ -52,25 +57,31 @@ class RetryInterceptorTest {
     @Test
     fun `intercept retries on retryable status code and succeeds on second attempt`() {
         // Given
-        val request = Request.Builder()
-            .url("https://api.example.com/test")
-            .build()
+        val request =
+            Request
+                .Builder()
+                .url("https://api.example.com/test")
+                .build()
 
-        val failedResponse = Response.Builder()
-            .request(request)
-            .protocol(Protocol.HTTP_2)
-            .code(500)
-            .message("Internal Server Error")
-            .body("{}".toResponseBody("application/json".toMediaTypeOrNull()))
-            .build()
+        val failedResponse =
+            Response
+                .Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_2)
+                .code(500)
+                .message("Internal Server Error")
+                .body("{}".toResponseBody("application/json".toMediaTypeOrNull()))
+                .build()
 
-        val successResponse = Response.Builder()
-            .request(request)
-            .protocol(Protocol.HTTP_2)
-            .code(200)
-            .message("OK")
-            .body("{}".toResponseBody("application/json".toMediaTypeOrNull()))
-            .build()
+        val successResponse =
+            Response
+                .Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_2)
+                .code(200)
+                .message("OK")
+                .body("{}".toResponseBody("application/json".toMediaTypeOrNull()))
+                .build()
 
         val chain = TestChain(request, failedResponse, successResponse)
         whenever(retryPolicy.shouldRetry(IOException("Server Error"), 1)).thenReturn(true)
@@ -87,17 +98,21 @@ class RetryInterceptorTest {
     @Test
     fun `intercept retries on IOException and succeeds after retry`() {
         // Given
-        val request = Request.Builder()
-            .url("https://api.example.com/test")
-            .build()
+        val request =
+            Request
+                .Builder()
+                .url("https://api.example.com/test")
+                .build()
 
-        val successResponse = Response.Builder()
-            .request(request)
-            .protocol(Protocol.HTTP_2)
-            .code(200)
-            .message("OK")
-            .body("{}".toResponseBody("application/json".toMediaTypeOrNull()))
-            .build()
+        val successResponse =
+            Response
+                .Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_2)
+                .code(200)
+                .message("OK")
+                .body("{}".toResponseBody("application/json".toMediaTypeOrNull()))
+                .build()
 
         val chain = TestChain(request, IOException("Network error"), successResponse)
         whenever(retryPolicy.shouldRetry(IOException("Network error"), 1)).thenReturn(true)
@@ -114,17 +129,21 @@ class RetryInterceptorTest {
     @Test
     fun `intercept throws exception after max retries exceeded`() {
         // Given
-        val request = Request.Builder()
-            .url("https://api.example.com/test")
-            .build()
+        val request =
+            Request
+                .Builder()
+                .url("https://api.example.com/test")
+                .build()
 
-        val failedResponse = Response.Builder()
-            .request(request)
-            .protocol(Protocol.HTTP_2)
-            .code(500)
-            .message("Internal Server Error")
-            .body("{}".toResponseBody("application/json".toMediaTypeOrNull()))
-            .build()
+        val failedResponse =
+            Response
+                .Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_2)
+                .code(500)
+                .message("Internal Server Error")
+                .body("{}".toResponseBody("application/json".toMediaTypeOrNull()))
+                .build()
 
         val chain = TestChain(request, failedResponse, failedResponse, failedResponse)
         whenever(retryPolicy.shouldRetry(IOException("Server Error"), 1)).thenReturn(true)
@@ -134,12 +153,13 @@ class RetryInterceptorTest {
         whenever(retryPolicy.getDelayForAttempt(2)).thenReturn(200L)
 
         // When
-        val exception = try {
-            retryInterceptor.intercept(chain)
-            null
-        } catch (e: Exception) {
-            e
-        }
+        val exception =
+            try {
+                retryInterceptor.intercept(chain)
+                null
+            } catch (e: Exception) {
+                e
+            }
 
         // Then
         assertTrue(exception is IOException)
@@ -150,28 +170,33 @@ class RetryInterceptorTest {
     @Test
     fun `intercept does not retry on non-retryable status codes`() {
         // Given
-        val request = Request.Builder()
-            .url("https://api.example.com/test")
-            .build()
+        val request =
+            Request
+                .Builder()
+                .url("https://api.example.com/test")
+                .build()
 
-        val response = Response.Builder()
-            .request(request)
-            .protocol(Protocol.HTTP_2)
-            .code(401)
-            .message("Unauthorized")
-            .body("{}".toResponseBody("application/json".toMediaTypeOrNull()))
-            .build()
+        val response =
+            Response
+                .Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_2)
+                .code(401)
+                .message("Unauthorized")
+                .body("{}".toResponseBody("application/json".toMediaTypeOrNull()))
+                .build()
 
         val chain = TestChain(request, response)
         whenever(retryPolicy.shouldRetry(IOException("Unauthorized"), 1)).thenReturn(false)
 
         // When
-        val exception = try {
-            retryInterceptor.intercept(chain)
-            null
-        } catch (e: Exception) {
-            e
-        }
+        val exception =
+            try {
+                retryInterceptor.intercept(chain)
+                null
+            } catch (e: Exception) {
+                e
+            }
 
         // Then
         assertTrue(exception is IOException)
@@ -182,25 +207,31 @@ class RetryInterceptorTest {
     @Test
     fun `intercept handles multiple retry attempts with increasing delays`() {
         // Given
-        val request = Request.Builder()
-            .url("https://api.example.com/test")
-            .build()
+        val request =
+            Request
+                .Builder()
+                .url("https://api.example.com/test")
+                .build()
 
-        val failedResponse = Response.Builder()
-            .request(request)
-            .protocol(Protocol.HTTP_2)
-            .code(503)
-            .message("Service Unavailable")
-            .body("{}".toResponseBody("application/json".toMediaTypeOrNull()))
-            .build()
+        val failedResponse =
+            Response
+                .Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_2)
+                .code(503)
+                .message("Service Unavailable")
+                .body("{}".toResponseBody("application/json".toMediaTypeOrNull()))
+                .build()
 
-        val successResponse = Response.Builder()
-            .request(request)
-            .protocol(Protocol.HTTP_2)
-            .code(200)
-            .message("OK")
-            .body("{}".toResponseBody("application/json".toMediaTypeOrNull()))
-            .build()
+        val successResponse =
+            Response
+                .Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_2)
+                .code(200)
+                .message("OK")
+                .body("{}".toResponseBody("application/json".toMediaTypeOrNull()))
+                .build()
 
         val chain = TestChain(request, failedResponse, failedResponse, successResponse)
         whenever(retryPolicy.shouldRetry(IOException("Service Unavailable"), 1)).thenReturn(true)
@@ -220,9 +251,8 @@ class RetryInterceptorTest {
     // Helper class for testing
     private class TestChain(
         private val request: Request,
-        private vararg val responses: Any // Can be Response or IOException
+        private vararg val responses: Any, // Can be Response or IOException
     ) : okhttp3.Interceptor.Chain {
-
         var callCount = 0
         private var currentIndex = 0
 
@@ -234,17 +264,33 @@ class RetryInterceptorTest {
             return when (current) {
                 is Response -> current
                 is IOException -> throw current
-                else -> throw IllegalStateException("Unexpected response type")
+                else -> error("Unexpected response type")
             }
         }
 
         override fun connection() = null
+
         override fun call() = throw NotImplementedError()
-        override fun connectTimeoutMillis() = 0
-        override fun withConnectTimeout(timeout: Int, unit: java.util.concurrent.TimeUnit) = this
-        override fun readTimeoutMillis() = 0
-        override fun withReadTimeout(timeout: Int, unit: java.util.concurrent.TimeUnit) = this
-        override fun writeTimeoutMillis() = 0
-        override fun withWriteTimeout(timeout: Int, unit: java.util.concurrent.TimeUnit) = this
+
+        override fun connectTimeoutMillis(): Int = 10000
+
+        override fun withConnectTimeout(
+            timeout: Int,
+            unit: TimeUnit,
+        ) = this
+
+        override fun readTimeoutMillis(): Int = 10000
+
+        override fun withReadTimeout(
+            timeout: Int,
+            unit: TimeUnit,
+        ) = this
+
+        override fun writeTimeoutMillis(): Int = 10000
+
+        override fun withWriteTimeout(
+            timeout: Int,
+            unit: TimeUnit,
+        ) = this
     }
 }

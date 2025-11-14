@@ -14,7 +14,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 class AuthInterceptorTest {
-
     private lateinit var authInterceptor: AuthInterceptor
     private lateinit var chain: Interceptor.Chain
     private lateinit var response: Response
@@ -31,9 +30,11 @@ class AuthInterceptorTest {
     @Test
     fun `intercept adds user agent header`() {
         // Given
-        val request = Request.Builder()
-            .url("https://api.example.com/test")
-            .build()
+        val request =
+            Request
+                .Builder()
+                .url("https://api.example.com/test")
+                .build()
         whenever(chain.request()).thenReturn(request)
 
         // When
@@ -44,18 +45,20 @@ class AuthInterceptorTest {
             org.mockito.kotlin.check { modifiedRequest ->
                 assertEquals(
                     "NexusNews-Android/1.0",
-                    modifiedRequest.header(ApiConstants.USER_AGENT_HEADER)
+                    modifiedRequest.header(ApiConstants.USER_AGENT_HEADER),
                 )
-            }
+            },
         )
     }
 
     @Test
     fun `intercept adds accept header`() {
         // Given
-        val request = Request.Builder()
-            .url("https://api.example.com/test")
-            .build()
+        val request =
+            Request
+                .Builder()
+                .url("https://api.example.com/test")
+                .build()
         whenever(chain.request()).thenReturn(request)
 
         // When
@@ -66,9 +69,9 @@ class AuthInterceptorTest {
             org.mockito.kotlin.check { modifiedRequest ->
                 assertEquals(
                     ApiConstants.APPLICATION_JSON,
-                    modifiedRequest.header(ApiConstants.ACCEPT_HEADER)
+                    modifiedRequest.header(ApiConstants.ACCEPT_HEADER),
                 )
-            }
+            },
         )
     }
 
@@ -76,9 +79,11 @@ class AuthInterceptorTest {
     fun `intercept adds authorization header when API key is set`() {
         // Given
         authInterceptor.setApiKey("test-api-key")
-        val request = Request.Builder()
-            .url("https://api.example.com/test")
-            .build()
+        val request =
+            Request
+                .Builder()
+                .url("https://api.example.com/test")
+                .build()
         whenever(chain.request()).thenReturn(request)
 
         // When
@@ -89,18 +94,20 @@ class AuthInterceptorTest {
             org.mockito.kotlin.check { modifiedRequest ->
                 assertEquals(
                     "Bearer test-api-key",
-                    modifiedRequest.header(ApiConstants.AUTHORIZATION_HEADER)
+                    modifiedRequest.header(ApiConstants.AUTHORIZATION_HEADER),
                 )
-            }
+            },
         )
     }
 
     @Test
     fun `intercept does not add authorization header when API key is not set`() {
         // Given
-        val request = Request.Builder()
-            .url("https://api.example.com/test")
-            .build()
+        val request =
+            Request
+                .Builder()
+                .url("https://api.example.com/test")
+                .build()
         whenever(chain.request()).thenReturn(request)
 
         // When
@@ -110,34 +117,40 @@ class AuthInterceptorTest {
         org.mockito.kotlin.verify(chain).proceed(
             org.mockito.kotlin.check { modifiedRequest ->
                 assertNull(modifiedRequest.header(ApiConstants.AUTHORIZATION_HEADER))
-            }
+            },
         )
     }
 
     @Test
     fun `intercept skips authentication when No-Authentication header present`() {
         // Given
-        val request = Request.Builder()
-            .url("https://api.example.com/test")
-            .header("No-Authentication", "true")
-            .build()
+        val request =
+            Request
+                .Builder()
+                .url("https://api.example.com/test")
+                .header("No-Authentication", "true")
+                .build()
         whenever(chain.request()).thenReturn(request)
 
         // When
         authInterceptor.intercept(chain)
 
         // Then
-        org.mockito.kotlin.verify(chain).proceed(request) // Original request unchanged
+        org.mockito.kotlin
+            .verify(chain)
+            .proceed(request) // Original request unchanged
     }
 
     @Test
     fun `intercept preserves existing headers while adding new ones`() {
         // Given
         authInterceptor.setApiKey("test-key")
-        val request = Request.Builder()
-            .url("https://api.example.com/test")
-            .header("Custom-Header", "custom-value")
-            .build()
+        val request =
+            Request
+                .Builder()
+                .url("https://api.example.com/test")
+                .header("Custom-Header", "custom-value")
+                .build()
         whenever(chain.request()).thenReturn(request)
 
         // When
@@ -150,7 +163,7 @@ class AuthInterceptorTest {
                 assertNotNull(modifiedRequest.header(ApiConstants.USER_AGENT_HEADER))
                 assertNotNull(modifiedRequest.header(ApiConstants.AUTHORIZATION_HEADER))
                 assertNotNull(modifiedRequest.header(ApiConstants.ACCEPT_HEADER))
-            }
+            },
         )
     }
 
@@ -163,9 +176,11 @@ class AuthInterceptorTest {
         authInterceptor.setApiKey(newApiKey)
 
         // Then - Verify by checking that authorization header is added
-        val request = Request.Builder()
-            .url("https://api.example.com/test")
-            .build()
+        val request =
+            Request
+                .Builder()
+                .url("https://api.example.com/test")
+                .build()
         whenever(chain.request()).thenReturn(request)
 
         authInterceptor.intercept(chain)
@@ -174,9 +189,9 @@ class AuthInterceptorTest {
             org.mockito.kotlin.check { modifiedRequest ->
                 assertEquals(
                     "Bearer new-api-key",
-                    modifiedRequest.header(ApiConstants.AUTHORIZATION_HEADER)
+                    modifiedRequest.header(ApiConstants.AUTHORIZATION_HEADER),
                 )
-            }
+            },
         )
     }
 }
