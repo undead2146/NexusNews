@@ -10,6 +10,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.io.IOException
@@ -22,6 +24,7 @@ class RetryInterceptorTest {
     @Before
     fun setup() {
         retryPolicy = mock()
+        whenever(retryPolicy.maxAttempts).thenReturn(3)
         retryInterceptor = RetryInterceptor(retryPolicy)
     }
 
@@ -38,10 +41,10 @@ class RetryInterceptorTest {
             Response
                 .Builder()
                 .request(request)
-                .protocol(Protocol.HTTP_2)
+                .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")
-                .body("{}".toResponseBody("application/json".toMediaTypeOrNull()))
+                .body(null)
                 .build()
 
         val chain = TestChain(request, response)
@@ -67,7 +70,7 @@ class RetryInterceptorTest {
             Response
                 .Builder()
                 .request(request)
-                .protocol(Protocol.HTTP_2)
+                .protocol(Protocol.HTTP_1_1)
                 .code(500)
                 .message("Internal Server Error")
                 .body("{}".toResponseBody("application/json".toMediaTypeOrNull()))
@@ -77,14 +80,14 @@ class RetryInterceptorTest {
             Response
                 .Builder()
                 .request(request)
-                .protocol(Protocol.HTTP_2)
+                .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")
                 .body("{}".toResponseBody("application/json".toMediaTypeOrNull()))
                 .build()
 
         val chain = TestChain(request, failedResponse, successResponse)
-        whenever(retryPolicy.shouldRetry(IOException("HTTP 500: Internal Server Error"), 1)).thenReturn(true)
+        whenever(retryPolicy.shouldRetry(any(), any())).thenReturn(true)
         whenever(retryPolicy.getDelayForAttempt(1)).thenReturn(100L)
 
         // When
@@ -115,7 +118,7 @@ class RetryInterceptorTest {
                 .build()
 
         val chain = TestChain(request, IOException("Network error"), successResponse)
-        whenever(retryPolicy.shouldRetry(IOException("Network error"), 1)).thenReturn(true)
+        whenever(retryPolicy.shouldRetry(any(), any())).thenReturn(true)
         whenever(retryPolicy.getDelayForAttempt(1)).thenReturn(100L)
 
         // When
@@ -139,16 +142,15 @@ class RetryInterceptorTest {
             Response
                 .Builder()
                 .request(request)
-                .protocol(Protocol.HTTP_2)
+                .protocol(Protocol.HTTP_1_1)
                 .code(500)
                 .message("Internal Server Error")
                 .body("{}".toResponseBody("application/json".toMediaTypeOrNull()))
                 .build()
 
         val chain = TestChain(request, failedResponse, failedResponse, failedResponse)
-        whenever(retryPolicy.shouldRetry(IOException("HTTP 500: Internal Server Error"), 1)).thenReturn(true)
-        whenever(retryPolicy.shouldRetry(IOException("HTTP 500: Internal Server Error"), 2)).thenReturn(true)
-        whenever(retryPolicy.shouldRetry(IOException("HTTP 500: Internal Server Error"), 3)).thenReturn(false)
+        whenever(retryPolicy.shouldRetry(any(), any())).thenReturn(true)
+        whenever(retryPolicy.shouldRetry(any(), eq(3))).thenReturn(false)
         whenever(retryPolicy.getDelayForAttempt(1)).thenReturn(100L)
         whenever(retryPolicy.getDelayForAttempt(2)).thenReturn(200L)
 
@@ -180,14 +182,13 @@ class RetryInterceptorTest {
             Response
                 .Builder()
                 .request(request)
-                .protocol(Protocol.HTTP_2)
+                .protocol(Protocol.HTTP_1_1)
                 .code(401)
                 .message("Unauthorized")
                 .body("{}".toResponseBody("application/json".toMediaTypeOrNull()))
                 .build()
 
         val chain = TestChain(request, response)
-        whenever(retryPolicy.shouldRetry(IOException("HTTP 401: Unauthorized"), 1)).thenReturn(false)
 
         // When
         val exception =
@@ -217,7 +218,7 @@ class RetryInterceptorTest {
             Response
                 .Builder()
                 .request(request)
-                .protocol(Protocol.HTTP_2)
+                .protocol(Protocol.HTTP_1_1)
                 .code(503)
                 .message("Service Unavailable")
                 .body("{}".toResponseBody("application/json".toMediaTypeOrNull()))
@@ -227,16 +228,15 @@ class RetryInterceptorTest {
             Response
                 .Builder()
                 .request(request)
-                .protocol(Protocol.HTTP_2)
+                .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")
                 .body("{}".toResponseBody("application/json".toMediaTypeOrNull()))
                 .build()
 
         val chain = TestChain(request, failedResponse, failedResponse, successResponse)
-        whenever(retryPolicy.shouldRetry(IOException("HTTP 503: Service Unavailable"), 1)).thenReturn(true)
-        whenever(retryPolicy.shouldRetry(IOException("HTTP 503: Service Unavailable"), 2)).thenReturn(true)
-        whenever(retryPolicy.shouldRetry(IOException("HTTP 503: Service Unavailable"), 3)).thenReturn(false)
+        whenever(retryPolicy.shouldRetry(any(), any())).thenReturn(true)
+        whenever(retryPolicy.shouldRetry(any(), eq(3))).thenReturn(false)
         whenever(retryPolicy.getDelayForAttempt(1)).thenReturn(100L)
         whenever(retryPolicy.getDelayForAttempt(2)).thenReturn(200L)
 
