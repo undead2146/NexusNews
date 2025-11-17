@@ -117,5 +117,6 @@ suspend fun <T> withRetry(
         }
     }
 
-    error("Retry failed: ${lastException?.message ?: "No exception occurred"}")
+    // Throw the last exception if all retries failed
+    throw lastException ?: IllegalStateException("Retry failed with no exception")
 }

@@ -35,14 +35,14 @@ class ErrorInterceptor
             val errorResponse =
                 try {
                     errorBody?.let { errorAdapter.fromJson(it) }
-                } catch (e: IOException) {
+                } catch (e: Exception) {
                     Timber.e(e, "Failed to parse error response body")
                     null
                 }
 
             val errorMessage =
                 errorResponse?.message
-                    ?: response.message
+                    ?: response.message.takeIf { it.isNotBlank() }
                     ?: "HTTP ${response.code}"
 
             Timber.e("API Error [${response.code}]: $errorMessage for ${request.url}")
