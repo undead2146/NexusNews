@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -20,6 +22,11 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Load API key from local.properties
+        val properties = Properties()
+        properties.load(project.rootProject.file("local.properties").inputStream())
+        buildConfigField("String", "NEWS_API_KEY", "\"${properties.getProperty("NEWS_API_KEY", "")}\"")
     }
 
     buildTypes {
@@ -40,6 +47,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     // Added ktlint configuration for code style checking
@@ -119,6 +127,11 @@ dependencies {
     testImplementation(libs.bundles.testingUnit)
     testImplementation(libs.hilt.android.testing)
     kaptTest(libs.hilt.compiler) // kapt for tests
+
+    // Android Test Hilt dependencies
+    androidTestImplementation(libs.hilt.android.testing)
+    kaptAndroidTest(libs.hilt.compiler) // kapt for android tests
+    androidTestImplementation(libs.okhttp.mockwebserver)
 }
 
 // Added by user to enable HTML reports for Detekt static code analysis

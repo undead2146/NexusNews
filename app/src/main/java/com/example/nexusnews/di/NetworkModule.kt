@@ -1,5 +1,6 @@
 package com.example.nexusnews.di
 
+import com.example.nexusnews.BuildConfig
 import com.example.nexusnews.data.remote.interceptor.AuthInterceptor
 import com.example.nexusnews.data.remote.interceptor.ErrorInterceptor
 import com.example.nexusnews.data.remote.interceptor.RetryInterceptor
@@ -38,6 +39,14 @@ object NetworkModule {
             .build()
 
     /**
+     * Provides NewsAPI key from BuildConfig.
+     * API key should be configured in local.properties as NEWS_API_KEY.
+     */
+    @Provides
+    @Singleton
+    fun provideNewsApiKey(): String = BuildConfig.NEWS_API_KEY
+
+    /**
      * Provides retry policy configuration for network requests.
      */
     @Provides
@@ -74,8 +83,12 @@ object NetworkModule {
         authInterceptor: AuthInterceptor,
         errorInterceptor: ErrorInterceptor,
         retryInterceptor: RetryInterceptor,
-    ): OkHttpClient =
-        OkHttpClient
+        newsApiKey: String,
+    ): OkHttpClient {
+        // Configure API key in AuthInterceptor
+        authInterceptor.setApiKey(newsApiKey)
+
+        return OkHttpClient
             .Builder()
             .connectTimeout(NetworkConstants.CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
             .readTimeout(NetworkConstants.READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
@@ -86,6 +99,7 @@ object NetworkModule {
             .addInterceptor(errorInterceptor)
             .addInterceptor(loggingInterceptor)
             .build()
+    }
 
     /**
      * Provides base Retrofit instance for API communication.
