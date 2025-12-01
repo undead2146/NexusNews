@@ -46,13 +46,30 @@ class AuthInterceptor
                     .header(ApiConstants.ACCEPT_HEADER, ApiConstants.APPLICATION_JSON)
 
             // Add API key as query parameter for NewsAPI
+            // Remove any existing apiKey parameter first to avoid duplicates
             apiKey?.let { key ->
-                val url =
-                    originalRequest.url
-                        .newBuilder()
-                        .addQueryParameter("apiKey", key)
-                        .build()
-                requestBuilder.url(url)
+                val originalUrl = originalRequest.url
+                val urlBuilder = originalUrl.newBuilder()
+
+                // Remove existing apiKey parameters (may be empty string from method call)
+                val querySize = originalUrl.querySize
+                val paramsToKeep = mutableListOf<Pair<String, String>>()
+                for (i in 0 until querySize) {
+                    val name = originalUrl.queryParameterName(i)
+                    val value = originalUrl.queryParameterValue(i)
+                    if (name != "apiKey" && value != null) {
+                        paramsToKeep.add(name to value)
+                    }
+                }
+
+                // Rebuild URL without apiKey, then add the real one
+                urlBuilder.query(null) // Clear all query params
+                paramsToKeep.forEach { (name, value) ->
+                    urlBuilder.addQueryParameter(name, value)
+                }
+                urlBuilder.addQueryParameter("apiKey", key)
+
+                requestBuilder.url(urlBuilder.build())
                 Timber.d("Added API key as query parameter to ${originalRequest.url}")
             } ?: Timber.w("No API key configured - requests may fail")
 
