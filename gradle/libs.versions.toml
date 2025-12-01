@@ -35,8 +35,8 @@ hiltNavigationCompose = "1.1.0"
 # Scraping & Other
 jsoup = "1.17.2"
 
-# Core library desugaring for java.time APIs
-desugarJdkLibs = "1.1.5"
+# Core library desugaring for java.time APIs  
+desugarJdkLibs = "2.1.5"
 
 # Testing
 coroutinesTest = "1.7.3"
