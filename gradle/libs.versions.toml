@@ -11,6 +11,7 @@ lifecycleRuntimeKtx = "2.9.4"
 activityCompose = "1.11.0"
 navigationCompose = "2.7.6"
 coilCompose = "2.5.0"
+accompanistSwipeRefresh = "0.32.0"
 workRuntimeKtx = "2.9.0"
 timber = "5.0.1"
 ktlintGradle = "13.1.0"
@@ -33,6 +34,9 @@ hiltNavigationCompose = "1.1.0"
 
 # Scraping & Other
 jsoup = "1.17.2"
+
+# Core library desugaring for java.time APIs
+desugarJdkLibs = "1.1.5"
 
 # Testing
 coroutinesTest = "1.7.3"
@@ -93,11 +97,17 @@ jsoup = { group = "org.jsoup", name = "jsoup", version.ref = "jsoup" }
 # Images (Coil)
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coilCompose" }
 
+# Swipe Refresh (Accompanist)
+google-accompanist-swiperefresh = { group = "com.google.accompanist", name = "accompanist-swiperefresh", version.ref = "accompanistSwipeRefresh" }
+
 # Background (WorkManager)
 work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtx" }
 
 # Logging (Timber)
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
+
+# Core library desugaring
+desugar-jdk-libs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugarJdkLibs" }
 
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }

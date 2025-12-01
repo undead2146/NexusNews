@@ -41,6 +41,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
     }
     kotlinOptions {
         jvmTarget = "11"
@@ -61,11 +62,14 @@ android {
         toolVersion = libs.versions.detektGradle.get()
         buildUponDefaultConfig = true
         parallel = true
-        config = files("$rootDir/detekt.yml")
+        config.setFrom(files("$rootDir/detekt.yml"))
     }
 }
 
 dependencies {
+    // Core library desugaring for java.time APIs
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
+
     // Existing (keep these)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -113,6 +117,24 @@ dependencies {
 
     // Logging (Timber)
     implementation(libs.timber)
+
+    // **Jetpack Compose**
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.graphics)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.activity.compose)
+
+    // **Navigation Compose**
+    implementation(libs.androidx.navigation.compose)
+
+    // **Image Loading (Coil)**
+    implementation(libs.coil.compose)
+
+    // **Pull-to-Refresh**
+    implementation(libs.google.accompanist.swiperefresh)
 
     // **Existing Testing (keep)**
     testImplementation(libs.junit)

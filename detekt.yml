@@ -4,9 +4,16 @@ complexity:
   LongParameterList:
     functionThreshold: 15
     constructorThreshold: 15
+  LongMethod:
+    active: false  # Disable for Compose functions which can be longer
 exceptions:
   TooGenericExceptionCaught:
     active: false
 style:
   MaxLineLength:
     maxLineLength: 150
+naming:
+  FunctionNaming:
+    active: false  # Disable for Compose functions which use PascalCase
+  TopLevelPropertyNaming:
+    active: false  # Allow various naming patterns

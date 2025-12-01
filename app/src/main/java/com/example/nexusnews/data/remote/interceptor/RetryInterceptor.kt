@@ -18,71 +18,70 @@ class RetryInterceptor
     constructor(
         private val retryPolicy: RetryPolicy,
     ) : Interceptor {
-    @Suppress("ReturnCount")
-    override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request()
+        @Suppress("ReturnCount")
+        override fun intercept(chain: Interceptor.Chain): Response {
+            val request = chain.request()
 
-        // Check if retry is disabled for this specific request
-        if (request.header("No-Retry") != null) {
-            return chain.proceed(request)
-        }
-
-        var attempt = 0
-        var lastException: IOException? = null
-
-        while (attempt < retryPolicy.maxAttempts) {
-            try {
-                val response = chain.proceed(request)
-
-                if (response.isSuccessful) {
-                    return response
-                }
-
-                if (!isRetryableStatusCode(response.code)) {
-                    response.close()
-                    throw IOException("HTTP ${response.code}: ${response.message}")
-                }
-
-                // Retryable failure
-                response.close()
-                val exception = IOException("HTTP ${response.code}: ${response.message}")
-                lastException = exception
-
-                if (!retryPolicy.shouldRetry(exception, attempt)) {
-                    throw exception
-                }
-
-                // Retry
-                val delay = retryPolicy.getDelayForAttempt(attempt)
-                Timber.d(
-                    "Retrying request to ${request.url} in ${delay}ms " +
-                        "(attempt ${attempt + 1}/${retryPolicy.maxAttempts})",
-                )
-                Thread.sleep(delay)
-                attempt++
-
-            } catch (e: IOException) {
-                lastException = e
-                Timber.w(e, "Request failed on attempt ${attempt + 1}")
-
-                if (!retryPolicy.shouldRetry(e, attempt)) {
-                    throw e
-                }
-
-                // Retry
-                val delay = retryPolicy.getDelayForAttempt(attempt)
-                Timber.d(
-                    "Retrying request to ${request.url} in ${delay}ms " +
-                        "(attempt ${attempt + 1}/${retryPolicy.maxAttempts})",
-                )
-                Thread.sleep(delay)
-                attempt++
+            // Check if retry is disabled for this specific request
+            if (request.header("No-Retry") != null) {
+                return chain.proceed(request)
             }
-        }
 
-        // If we get here, all retries exhausted
-        throw lastException ?: IOException("Request failed after ${retryPolicy.maxAttempts} attempts")
-    }
+            var attempt = 0
+            var lastException: IOException? = null
+
+            while (attempt < retryPolicy.maxAttempts) {
+                try {
+                    val response = chain.proceed(request)
+
+                    if (response.isSuccessful) {
+                        return response
+                    }
+
+                    if (!isRetryableStatusCode(response.code)) {
+                        response.close()
+                        throw IOException("HTTP ${response.code}: ${response.message}")
+                    }
+
+                    // Retryable failure
+                    response.close()
+                    val exception = IOException("HTTP ${response.code}: ${response.message}")
+                    lastException = exception
+
+                    if (!retryPolicy.shouldRetry(exception, attempt)) {
+                        throw exception
+                    }
+
+                    // Retry
+                    val delay = retryPolicy.getDelayForAttempt(attempt)
+                    Timber.d(
+                        "Retrying request to ${request.url} in ${delay}ms " +
+                            "(attempt ${attempt + 1}/${retryPolicy.maxAttempts})",
+                    )
+                    Thread.sleep(delay)
+                    attempt++
+                } catch (e: IOException) {
+                    lastException = e
+                    Timber.w(e, "Request failed on attempt ${attempt + 1}")
+
+                    if (!retryPolicy.shouldRetry(e, attempt)) {
+                        throw e
+                    }
+
+                    // Retry
+                    val delay = retryPolicy.getDelayForAttempt(attempt)
+                    Timber.d(
+                        "Retrying request to ${request.url} in ${delay}ms " +
+                            "(attempt ${attempt + 1}/${retryPolicy.maxAttempts})",
+                    )
+                    Thread.sleep(delay)
+                    attempt++
+                }
+            }
+
+            // If we get here, all retries exhausted
+            throw lastException ?: IOException("Request failed after ${retryPolicy.maxAttempts} attempts")
+        }
 
         /**
          * Determines if an HTTP status code should trigger a retry.

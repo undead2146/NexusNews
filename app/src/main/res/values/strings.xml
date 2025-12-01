@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">NexusNews</string>
+    <string name="loading_news">Loading news...</string>
+    <string name="error_loading_news">Error loading news</string>
+    <string name="retry">Retry</string>
+    <string name="no_articles_found">No articles found</string>
+    <string name="check_connection_and_retry">Please check your connection and try again</string>
+    <string name="welcome_to_nexus_news">Welcome to Nexus News</string>
+    <string name="loading_article">Loading article...</string>
+    <string name="error_loading_article">Error loading article</string>
+    <string name="go_back">Go Back</string>
+    <string name="by_author">By %s</string>
+    <string name="source_colon">Source: %s</string>
 </resources>

@@ -7,6 +7,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.nexusnews.presentation.screens.NewsDetailScreen
+import com.example.nexusnews.presentation.screens.NewsListScreen
 
 /**
  * Main navigation graph for the application.
@@ -23,9 +25,13 @@ fun nexusNewsNavGraph(
         startDestination = startDestination,
         modifier = modifier,
     ) {
-        // Home Screen
+        // Home Screen - News List
         composable(Screen.Home.route) {
-            // HomeScreen() - Implement later
+            NewsListScreen(
+                onArticleClick = { articleId ->
+                    navController.navigate(Screen.ArticleDetail.createRoute(articleId))
+                },
+            )
         }
 
         // Search Screen
@@ -57,7 +63,11 @@ fun nexusNewsNavGraph(
                 backStackEntry.arguments?.getString("articleId")
 
             check(articleId != null) { "articleId is required" }
-            // ArticleDetailScreen(articleId) - Implement later
+
+            NewsDetailScreen(
+                articleId = articleId,
+                onBackClick = { navController.popBackStack() },
+            )
         }
     }
 }
