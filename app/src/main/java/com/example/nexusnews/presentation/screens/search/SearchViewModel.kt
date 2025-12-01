@@ -1,6 +1,7 @@
 package com.example.nexusnews.presentation.screens.search
 
 import androidx.lifecycle.viewModelScope
+import com.example.nexusnews.data.local.datastore.SearchHistoryDataStore
 import com.example.nexusnews.domain.model.Article
 import com.example.nexusnews.domain.model.NewsCategory
 import com.example.nexusnews.domain.model.SortType
@@ -11,11 +12,13 @@ import com.example.nexusnews.presentation.common.toUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -23,7 +26,7 @@ import javax.inject.Inject
 
 /**
  * ViewModel for the Search screen.
- * Manages search state with debouncing and filtering.
+ * Manages search state with debouncing, filtering, and search history.
  */
 @OptIn(FlowPreview::class)
 @HiltViewModel
@@ -31,6 +34,7 @@ class SearchViewModel
     @Inject
     constructor(
         private val newsRepository: NewsRepository,
+        private val searchHistoryDataStore: SearchHistoryDataStore,
     ) : BaseViewModel() {
         private val _searchQuery = MutableStateFlow("")
         val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
@@ -43,6 +47,16 @@ class SearchViewModel
 
         private val _uiState = MutableStateFlow<UiState<List<Article>>>(UiState.Idle)
         val uiState: StateFlow<UiState<List<Article>>> = _uiState.asStateFlow()
+
+        /**
+         * Search history as a StateFlow.
+         */
+        val searchHistory: StateFlow<List<String>> =
+            searchHistoryDataStore.searchHistory.stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = emptyList(),
+            )
 
         init {
             // Set up debounced search
@@ -64,6 +78,32 @@ class SearchViewModel
             _searchQuery.update { query }
             if (query.isBlank()) {
                 _uiState.update { UiState.Idle }
+            }
+        }
+
+        /**
+         * Select a query from history and trigger search.
+         */
+        fun selectHistoryItem(query: String) {
+            _searchQuery.update { query }
+            performSearch(query)
+        }
+
+        /**
+         * Remove a query from search history.
+         */
+        fun removeFromHistory(query: String) {
+            viewModelScope.launch(exceptionHandler) {
+                searchHistoryDataStore.removeSearchQuery(query)
+            }
+        }
+
+        /**
+         * Clear all search history.
+         */
+        fun clearHistory() {
+            viewModelScope.launch(exceptionHandler) {
+                searchHistoryDataStore.clearSearchHistory()
             }
         }
 
@@ -108,6 +148,9 @@ class SearchViewModel
                 Timber.d("Performing search with query: $query, category: ${_selectedCategory.value}, sort: ${_selectedSort.value}")
 
                 _uiState.update { UiState.Loading }
+
+                // Save to search history
+                searchHistoryDataStore.addSearchQuery(query)
 
                 newsRepository
                     .searchArticles(query)
