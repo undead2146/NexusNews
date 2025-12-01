@@ -9,13 +9,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.nexusnews.presentation.screens.NewsDetailScreen
 import com.example.nexusnews.presentation.screens.NewsListScreen
+import com.example.nexusnews.presentation.screens.search.SearchScreen
 
 /**
  * Main navigation graph for the application.
  * Defines all composable destinations and navigation logic.
  */
 @Composable
-fun nexusNewsNavGraph(
+fun NexusNewsNavGraph(
     navController: NavHostController,
     modifier: Modifier = Modifier,
     startDestination: String = Screen.Home.route,
@@ -36,7 +37,11 @@ fun nexusNewsNavGraph(
 
         // Search Screen
         composable(Screen.Search.route) {
-            // SearchScreen() - Implement later
+            SearchScreen(
+                onArticleClick = { articleId ->
+                    navController.navigate(Screen.ArticleDetail.createRoute(articleId))
+                },
+            )
         }
 
         // Bookmarks Screen
