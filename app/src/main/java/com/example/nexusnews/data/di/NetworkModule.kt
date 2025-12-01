@@ -1,5 +1,6 @@
 package com.example.nexusnews.data.di
 
+import com.example.nexusnews.BuildConfig
 import com.example.nexusnews.data.remote.NewsRemoteDataSource
 import com.example.nexusnews.data.remote.RemoteDataSource
 import com.example.nexusnews.data.remote.api.NewsApiService
@@ -26,7 +27,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-    private const val NEWS_API_BASE_URL = "https://newsapi.org/v2/"
+    private const val NEWS_API_BASE_URL = "https://newsapi.org/"
     private const val TIMEOUT_SECONDS = 30L
 
     @Provides
@@ -42,7 +43,10 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideAuthInterceptor(): AuthInterceptor = AuthInterceptor()
+    fun provideAuthInterceptor(): AuthInterceptor =
+        AuthInterceptor().apply {
+            setApiKey(BuildConfig.NEWS_API_KEY)
+        }
 
     @Provides
     @Singleton
