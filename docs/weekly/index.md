@@ -15,4 +15,4 @@ See [week-6.md](week-6.md) for details.
 Week 7 (08/12): ..... hours:  
 Week 8 and following weeks (15/12): ..... hours:  
 
-Total: 9 hours.
+Total: 12 hours.
