@@ -4,18 +4,24 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -58,7 +64,7 @@ fun NewsListScreen(
                 is UiState.Success -> {
                     val articles = (uiState as UiState.Success).data
                     if (articles.isEmpty()) {
-                        EmptyState(onRetry = { viewModel.retryLoadNews() })
+                        EmptyState()
                     } else {
                         ArticleList(
                             articles = articles,
@@ -143,7 +149,7 @@ private fun ErrorState(
             modifier = Modifier.padding(32.dp),
         ) {
             Text(
-                text = stringResource(R.string.error_loading_news),
+                text = stringResource(R.string.error_fetching_news),
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.error,
             )
@@ -165,30 +171,32 @@ private fun ErrorState(
  * Displays empty state.
  */
 @Composable
-private fun EmptyState(onRetry: () -> Unit) {
+private fun EmptyState() {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.padding(32.dp),
+            verticalArrangement = Arrangement.Center,
         ) {
+            Icon(
+                imageVector = Icons.Default.Info,
+                contentDescription = null,
+                modifier = Modifier.size(48.dp),
+                tint = MaterialTheme.colorScheme.secondary,
+            )
+            Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(R.string.no_articles_found),
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
             )
-
             Text(
                 text = stringResource(R.string.check_connection_and_retry),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-
-            Button(onClick = onRetry) {
-                Text(text = stringResource(R.string.retry))
-            }
         }
     }
 }
@@ -203,7 +211,7 @@ private fun IdleState() {
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text = stringResource(R.string.welcome_to_nexus_news),
+            text = stringResource(R.string.welcome_message),
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
