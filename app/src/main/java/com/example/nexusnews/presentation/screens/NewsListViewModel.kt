@@ -1,7 +1,9 @@
 package com.example.nexusnews.presentation.screens
 
 import androidx.lifecycle.viewModelScope
+import com.example.nexusnews.data.local.datastore.CategoryPreferencesDataStore
 import com.example.nexusnews.domain.model.Article
+import com.example.nexusnews.domain.model.NewsCategory
 import com.example.nexusnews.domain.repository.NewsRepository
 import com.example.nexusnews.presentation.common.BaseViewModel
 import com.example.nexusnews.presentation.common.UiState
@@ -24,6 +26,7 @@ class NewsListViewModel
     @Inject
     constructor(
         private val newsRepository: NewsRepository,
+        private val categoryPreferences: CategoryPreferencesDataStore,
     ) : BaseViewModel() {
         private val _uiState = MutableStateFlow<UiState<List<Article>>>(UiState.Idle)
         val uiState: StateFlow<UiState<List<Article>>> = _uiState.asStateFlow()
@@ -31,8 +34,17 @@ class NewsListViewModel
         private val _isRefreshing = MutableStateFlow(false)
         val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
+        private val _selectedCategory = MutableStateFlow<NewsCategory?>(null)
+        val selectedCategory: StateFlow<NewsCategory?> = _selectedCategory.asStateFlow()
+
         init {
-            loadNews()
+            // Observe category preference changes
+            viewModelScope.launch {
+                categoryPreferences.selectedCategory.collect { category ->
+                    _selectedCategory.value = category
+                    loadNews()
+                }
+            }
         }
 
         /**
@@ -74,6 +86,17 @@ class NewsListViewModel
             _isRefreshing.update { true }
             loadNews(forceRefresh = true)
             _isRefreshing.update { false }
+        }
+
+        /**
+         * Select a category to filter news articles.
+         *
+         * @param category The category to select, or null for "All"
+         */
+        fun selectCategory(category: NewsCategory?) {
+            viewModelScope.launch {
+                categoryPreferences.setSelectedCategory(category)
+            }
         }
 
         /**
