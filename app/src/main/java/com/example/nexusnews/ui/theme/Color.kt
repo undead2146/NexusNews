@@ -23,3 +23,12 @@ val AlertRed = Color(0xFFF44336)
 val ErrorRed = Color(0xFFEF5350)
 val SuccessMint = Color(0xFF81C784)
 val DisabledGray = Color(0xFFBDBDBD)
+
+// Category-specific colors
+val BusinessBlue = Color(0xFF1976D2)
+val EntertainmentPurple = Color(0xFF7B1FA2)
+val GeneralGray = Color(0xFF616161)
+val HealthGreen = Color(0xFF388E3C)
+val ScienceTeal = Color(0xFF00796B)
+val SportsOrange = Color(0xFFF57C00)
+val TechnologyIndigo = Color(0xFF303F9F)
