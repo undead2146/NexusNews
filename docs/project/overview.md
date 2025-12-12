@@ -95,12 +95,13 @@ NexusNews is a modern Android news aggregator application that combines internat
 
 ## Current Status
 
-**Phase**: Phase 0 - Project Foundation & Setup  
+**Phase**: Phase 2 - Enhanced News Features & UI Polish  
 **Status**: In Progress  
-**Last Updated**: November 3, 2025
+**Last Updated**: December 12, 2025
 
 ### Completed
 
+**Phase 0 & 1:**
 - ✅ Project structure setup
 - ✅ Gradle configuration with version catalogs
 - ✅ CI/CD pipeline (GitHub Actions)
@@ -110,16 +111,34 @@ NexusNews is a modern Android news aggregator application that combines internat
 - ✅ Network layer foundation with monitoring, retry logic, and error handling
 - ✅ Comprehensive testing infrastructure (unit + integration tests)
 - ✅ Constants restructuring into categorized classes
+- ✅ NewsAPI integration
+- ✅ Room database for offline caching
+- ✅ Basic news list UI with pull-to-refresh
+- ✅ News detail screen
+- ✅ Bottom navigation (Home, Search, Bookmarks, Settings)
+
+**Phase 2 - Epic 2.1 (Week 6):**
+- ✅ Search functionality with debounced input
+- ✅ Search history with DataStore
+- ✅ Category filtering
+- ✅ Sort options
+
+**Phase 2 - Epic 2.2 (Week 7):**
+- ✅ Category navigation with horizontal selector
+- ✅ Enhanced NewsCategory enum (icons, colors, descriptions)
+- ✅ Topic/tag system with automatic extraction
+- ✅ Tag display UI components
+- ✅ Category preferences persistence (DataStore)
 
 ### In Progress
 
-- 🔄 Documentation completion and updates
+- 🔄 Epic 2.3: Bookmarks & Favorites
 
 ### Next Up
 
-- ⏳ Room database setup
-- ⏳ First news source integration (NewsAPI)
-- ⏳ Basic UI implementation
+- ⏳ Epic 2.4: UI/UX Enhancements
+- ⏳ Epic 2.5: Settings & Preferences
+- ⏳ Phase 3: AI Integration Foundation (OpenRouter)
 
 ## Team
 

@@ -12,7 +12,8 @@ Week 5 (24/11): 0 hours:
 See [week-5.md](week-5.md) for no details.  
 Week 6 (01/12): 3 hours: 
 See [week-6.md](week-6.md) for details.  
-Week 7 (08/12): ..... hours:  
+Week 7 (08/12): 3 hours:  
+See [week-7.md](week-7.md) for details.  
 Week 8 and following weeks (15/12): ..... hours:  
 
-Total: 12 hours.
+Total: 15 hours.
