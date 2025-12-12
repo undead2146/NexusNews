@@ -45,46 +45,49 @@ fun MainScreen() {
     val currentDestination = navBackStackEntry?.destination
 
     // Define bottom navigation items
-    val bottomNavItems = listOf(
-        BottomNavItem(
-            screen = Screen.Home,
-            label = "Home",
-            selectedIcon = Icons.Filled.Home,
-            unselectedIcon = Icons.Outlined.Home,
-        ),
-        BottomNavItem(
-            screen = Screen.Search,
-            label = "Search",
-            selectedIcon = Icons.Filled.Search,
-            unselectedIcon = Icons.Outlined.Search,
-        ),
-        BottomNavItem(
-            screen = Screen.Bookmarks,
-            label = "Bookmarks",
-            selectedIcon = Icons.Filled.Favorite,
-            unselectedIcon = Icons.Outlined.FavoriteBorder,
-        ),
-        BottomNavItem(
-            screen = Screen.Settings,
-            label = "Settings",
-            selectedIcon = Icons.Filled.Settings,
-            unselectedIcon = Icons.Outlined.Settings,
-        ),
-    )
+    val bottomNavItems =
+        listOf(
+            BottomNavItem(
+                screen = Screen.Home,
+                label = "Home",
+                selectedIcon = Icons.Filled.Home,
+                unselectedIcon = Icons.Outlined.Home,
+            ),
+            BottomNavItem(
+                screen = Screen.Search,
+                label = "Search",
+                selectedIcon = Icons.Filled.Search,
+                unselectedIcon = Icons.Outlined.Search,
+            ),
+            BottomNavItem(
+                screen = Screen.Bookmarks,
+                label = "Bookmarks",
+                selectedIcon = Icons.Filled.Favorite,
+                unselectedIcon = Icons.Outlined.FavoriteBorder,
+            ),
+            BottomNavItem(
+                screen = Screen.Settings,
+                label = "Settings",
+                selectedIcon = Icons.Filled.Settings,
+                unselectedIcon = Icons.Outlined.Settings,
+            ),
+        )
 
     // Determine if bottom bar should be shown (hide on detail screens)
-    val showBottomBar = currentDestination?.hierarchy?.any { dest ->
-        Screen.bottomNavScreens().any { screen -> screen.route == dest.route }
-    } == true
+    val showBottomBar =
+        currentDestination?.hierarchy?.any { dest ->
+            Screen.bottomNavScreens().any { screen -> screen.route == dest.route }
+        } == true
 
     Scaffold(
         bottomBar = {
             if (showBottomBar) {
                 NavigationBar {
                     bottomNavItems.forEach { item ->
-                        val selected = currentDestination?.hierarchy?.any {
-                            it.route == item.screen.route
-                        } == true
+                        val selected =
+                            currentDestination?.hierarchy?.any {
+                                it.route == item.screen.route
+                            } == true
 
                         NavigationBarItem(
                             selected = selected,
