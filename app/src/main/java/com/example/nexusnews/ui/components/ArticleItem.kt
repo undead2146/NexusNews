@@ -123,6 +123,15 @@ fun ArticleItem(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
+
+                // Tags
+                if (article.tags.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    TagRow(
+                        tags = article.tags,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
             }
         }
     }
