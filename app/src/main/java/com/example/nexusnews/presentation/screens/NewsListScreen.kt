@@ -10,9 +10,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -20,8 +25,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -44,41 +47,50 @@ fun NewsListScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
+    val selectedCategory by viewModel.selectedCategory.collectAsStateWithLifecycle()
 
     Scaffold(modifier = modifier) { paddingValues ->
-        PullToRefreshBox(
-            isRefreshing = isRefreshing,
-            onRefresh = { viewModel.refreshNews() },
-            modifier = Modifier.padding(paddingValues),
-        ) {
-            when (uiState) {
-                is UiState.Idle -> {
-                    // Initial state - could show welcome message
-                    IdleState()
-                }
+        Column(modifier = Modifier.padding(paddingValues)) {
+            // Category selector
+            CategorySelector(
+                selectedCategory = selectedCategory,
+                onCategorySelected = { viewModel.selectCategory(it) },
+            )
 
-                is UiState.Loading -> {
-                    LoadingState()
-                }
+            // News content with pull-to-refresh
+            PullToRefreshBox(
+                isRefreshing = isRefreshing,
+                onRefresh = { viewModel.refreshNews() },
+            ) {
+                when (uiState) {
+                    is UiState.Idle -> {
+                        // Initial state - could show welcome message
+                        IdleState()
+                    }
 
-                is UiState.Success -> {
-                    val articles = (uiState as UiState.Success).data
-                    if (articles.isEmpty()) {
-                        EmptyState()
-                    } else {
-                        ArticleList(
-                            articles = articles,
-                            onArticleClick = onArticleClick,
+                    is UiState.Loading -> {
+                        LoadingState()
+                    }
+
+                    is UiState.Success -> {
+                        val articles = (uiState as UiState.Success).data
+                        if (articles.isEmpty()) {
+                            EmptyState()
+                        } else {
+                            ArticleList(
+                                articles = articles,
+                                onArticleClick = onArticleClick,
+                            )
+                        }
+                    }
+
+                    is UiState.Error -> {
+                        val error = uiState as UiState.Error
+                        ErrorState(
+                            message = error.message,
+                            onRetry = { viewModel.retryLoadNews() },
                         )
                     }
-                }
-
-                is UiState.Error -> {
-                    val error = uiState as UiState.Error
-                    ErrorState(
-                        message = error.message,
-                        onRetry = { viewModel.retryLoadNews() },
-                    )
                 }
             }
         }
@@ -104,6 +116,60 @@ private fun ArticleList(
             ArticleItem(
                 article = article,
                 onClick = { onArticleClick(article.id) },
+            )
+        }
+    }
+}
+
+/**
+ * Horizontal category selector with FilterChips.
+ */
+@Composable
+private fun CategorySelector(
+    selectedCategory: com.example.nexusnews.domain.model.NewsCategory?,
+    onCategorySelected: (com.example.nexusnews.domain.model.NewsCategory?) -> Unit,
+) {
+    androidx.compose.foundation.lazy.LazyRow(
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        // "All" option
+        item {
+            androidx.compose.material3.FilterChip(
+                selected = selectedCategory == null,
+                onClick = { onCategorySelected(null) },
+                label = { Text("All") },
+                leadingIcon = {
+                    if (selectedCategory == null) {
+                        Icon(
+                            imageVector = androidx.compose.material.icons.Icons.Filled.Check,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                        )
+                    }
+                },
+            )
+        }
+
+        // Category options
+        items(com.example.nexusnews.domain.model.NewsCategory.entries) { category ->
+            androidx.compose.material3.FilterChip(
+                selected = selectedCategory == category,
+                onClick = { onCategorySelected(category) },
+                label = { Text(category.displayName) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = category.icon,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp),
+                        tint =
+                            if (selectedCategory == category) {
+                                category.accentColor
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            },
+                    )
+                },
             )
         }
     }
