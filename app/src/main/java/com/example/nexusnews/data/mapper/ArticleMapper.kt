@@ -27,6 +27,7 @@ object ArticleMapper {
             source = newsApiArticle.source.name,
             publishedAt = parsePublishedAt(newsApiArticle.publishedAt),
             category = null, // NewsAPI doesn't provide categories in article responses
+            tags = extractTags(newsApiArticle.title, newsApiArticle.description),
         )
 
     /**
@@ -39,6 +40,31 @@ object ArticleMapper {
      * Uses URL hash to ensure consistency across API calls.
      */
     private fun generateId(newsApiArticle: NewsApiArticle): String = UUID.nameUUIDFromBytes(newsApiArticle.url.toByteArray()).toString()
+
+    /**
+     * Extracts tags from article title and description.
+     * Uses simple pattern matching to identify capitalized words/phrases as potential tags.
+     *
+     * @param title Article title
+     * @param description Article description (nullable)
+     * @return List of up to 5 unique tags
+     */
+    private fun extractTags(
+        title: String,
+        description: String?,
+    ): List<String> {
+        val text = "$title ${description ?: ""}"
+        // Pattern matches capitalized words and multi-word phrases (e.g., "Climate Change", "United States")
+        val tagPattern = "\\b[A-Z][a-z]+(?:\\s+[A-Z][a-z]+)*\\b".toRegex()
+
+        return tagPattern
+            .findAll(text)
+            .map { it.value }
+            .distinct()
+            .filter { it.length > 2 } // Filter out very short tags
+            .take(5)
+            .toList()
+    }
 
     /**
      * Parses the publishedAt string from NewsAPI to LocalDateTime.
