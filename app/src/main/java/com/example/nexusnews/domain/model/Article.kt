@@ -17,4 +17,5 @@ data class Article(
     val source: String,
     val publishedAt: LocalDateTime,
     val category: String?,
+    val tags: List<String> = emptyList(),
 )
