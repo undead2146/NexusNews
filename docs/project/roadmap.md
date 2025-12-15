@@ -120,43 +120,85 @@ This roadmap follows an incremental approach, building from foundation to advanc
 - ✅ Implement dark/light theme
 - ✅ Add accessibility features (content descriptions, scaling)
 
-### Epic 2.5: Settings & Preferences
+### Epic 2.5: Settings & Preferences (67% Complete)
 
-- Create settings screen
-- Implement notification preferences
-- Add language/region settings
-- Create app theme customization
-- Add cache management options
+- ✅ Create settings screen (Basic - from Epic 2.4)
+- ✅ Implement notification preferences
+- ⏳ Add language/region settings (Deferred)
+- ✅ Create app theme customization (from Epic 2.4)
+- ✅ Add cache management options
+
+**Status**: Core features implemented (Notifications, Cache Management, Feed/Privacy DataStores). Language/Region and UI integration deferred.
 
 ---
 
 ## **PHASE 3: AI Integration Foundation (OpenRouter)**
 
+**Goal**: Integrate OpenRouter API to provide AI-powered features, starting with article summarization using free models.
+
 ### Epic 3.1: OpenRouter Setup
 
-- Research OpenRouter API and pricing
-- Setup OpenRouter API client
-- Implement authentication
-- Create API wrapper/service
-- Handle rate limiting and quotas
+**User Story**: As a developer, I want to securely manage my OpenRouter API key so I can use AI features.
+
+- Setup OpenRouter API client (Retrofit)
+- Implement secure API key storage (EncryptedSharedPreferences)
+- Create API key input UI in Settings
+- Add connection test functionality
+- Handle authentication errors
+
+**Acceptance Criteria**:
+- API key can be entered and saved in Settings
+- Key is encrypted and stored securely
+- Connection test validates the key
+- Error messages for invalid keys
 
 ### Epic 3.2: AI Service Architecture
 
-- Design AI interaction layer
-- Create prompt engineering utilities
-- Implement response parsing
-- Add streaming support (if needed)
+**User Story**: As a user, I want AI-generated article summaries so I can quickly understand news without reading full articles.
+
+- Design AI service interface (domain layer)
+- Create OpenRouterAiService implementation
+- Implement prompt engineering for summarization
+- Add AI usage tracking (tokens, requests)
 - Setup error handling for AI calls
+
+**Acceptance Criteria**:
+- Article summarization works end-to-end
+- Summaries are concise (~150 chars)
+- Usage tracked in database
+- Errors handled gracefully
 
 ### Epic 3.3: Model Selection & Configuration
 
-- Select default AI model
-- Implement model switching capability
-- Add model configuration options
-- Create fallback mechanisms
-- Implement cost tracking
+**User Story**: As a user, I want to choose from free AI models so I can select the best one for my needs.
 
-### Epic 3.4: Basic AI Feature - Article Summarization
+- Configure free models (Llama 3.3 70B, Gemma 2 27B, Mistral Small)
+- Implement model selection UI in Settings
+- Add model preferences DataStore
+- Create fallback mechanism (primary → fallback → error)
+- Display model capabilities and limits
+
+**Acceptance Criteria**:
+- 3+ free models available
+- Model selection persists
+- Fallback works when primary fails
+- Rate limits (50/day) respected
+
+### Epic 3.4: Article Summarization Feature
+
+**User Story**: As a user, I want to see summaries in article detail view so I can decide if I want to read more.
+
+- Add "Summarize" button to article detail
+- Implement summary caching (Room database)
+- Display summary with loading states
+- Show model used and timestamp
+- Handle offline scenarios (show cached)
+
+**Acceptance Criteria**:
+- Summary button visible on articles
+- Summaries cached to avoid re-generation
+- Loading/error states clear
+- Offline mode shows cached summaries
 
 - Design summary UI component
 - Implement summarization prompt
