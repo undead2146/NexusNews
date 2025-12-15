@@ -51,7 +51,30 @@ import com.example.nexusnews.util.constants.DatabaseConstants.ARTICLES_TABLE
 **Patterns:**
 - Repository Pattern: Single source of truth
 - Offline-First: Cache-then-network strategy
-- Preferences Persistence: Type-safe DataStore for user settings (Theme, Accessibility)
+- Preferences Persistence: Type-safe DataStore for user settings
+  - Theme & Accessibility
+  - Notifications & Privacy
+  - Feed Customization
+  - AI Model Configuration
+- Secure Storage: EncryptedSharedPreferences for API keys
+
+### 2.5. AI Service Layer
+
+- **Location:** `app/src/main/java/com/example/nexusnews/data/ai/`
+- **Purpose:** Integrates AI-powered features via OpenRouter API
+- **Components:**
+  - **AiService Interface:** Domain contract for AI operations
+  - **OpenRouterAiService:** Implementation with Retrofit
+  - **FreeAiModel:** Configuration for 6 free models
+  - **Prompt Engineering:** Optimized prompts for summarization, sentiment, translation
+  - **ApiKeyDataStore:** Secure encrypted storage for API keys
+
+**Features:**
+- Article summarization (150 chars)
+- Sentiment analysis (POSITIVE/NEUTRAL/NEGATIVE)
+- Translation support
+- Free tier: 50 requests/day, 20 requests/minute
+
 
 ### 3. Presentation Layer (UI)
 

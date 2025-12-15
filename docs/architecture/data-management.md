@@ -41,14 +41,43 @@ data class ArticleEntity(
 
 Used for lightweight user settings and flags.
 
+**Theme & Accessibility:**
 - **ThemePreferencesDataStore**:
   - `theme_mode`: LIGHT, DARK, or SYSTEM
 - **AccessibilityPreferencesDataStore**:
   - `font_scale`: Float multiplier (0.8x - 2.0x)
   - `reduce_animations`: Boolean
   - `high_contrast`: Boolean
-- **SearchPreferencesDataStore**:
-  - `search_history`: Recent query list
+
+**Notifications & Privacy:**
+- **NotificationPreferencesDataStore**:
+  - `breaking_news_enabled`: Boolean
+  - `daily_digest_enabled`: Boolean
+  - `digest_time_hour`: Int (0-23)
+  - `enabled_categories`: Set<NewsCategory>
+  - `sound_enabled`, `vibration_enabled`: Boolean
+- **PrivacyPreferencesDataStore**:
+  - `analytics_enabled`: Boolean
+  - `crash_reporting_enabled`: Boolean
+  - `personalization_enabled`: Boolean
+
+**Feed Customization:**
+- **FeedPreferencesDataStore**:
+  - `default_category`: NewsCategory
+  - `articles_per_page`: Int
+  - `auto_refresh_minutes`: Int
+  - `show_images`: Boolean
+
+**AI Settings:**
+- **AiModelPreferencesDataStore**:
+  - `default_model`: String (model ID)
+  - `fallback_model`: String
+  - `max_tokens_per_request`: Int
+  - `temperature`: Double
+
+**Secure Storage:**
+- **ApiKeyDataStore** (EncryptedSharedPreferences):
+  - `openrouter_api_key`: String (AES256_GCM encrypted)
 
 **Why DataStore?**
 - Asynchronous (Flow-based)
@@ -81,9 +110,40 @@ graph LR
 
     DS[(DataStore)] <-->|Read/Write| Prefs[Preferences Repo]
     Prefs -->|Flow<Settings>| VM
+
+    AI[OpenRouter API] -->|AI Features| AiService[AiService]
+    AiService -->|Summaries| Repo
 ```
+
+## 🤖 AI Integration
+
+### OpenRouter API Client
+
+NexusNews integrates with OpenRouter for AI-powered features:
+
+- **API Client**: Retrofit-based `OpenRouterApi`
+- **Models**: 6 free models (Llama 3.3 70B, Gemma 2 27B, Mistral Small, etc.)
+- **Features**:
+  - Article summarization
+  - Sentiment analysis
+  - Translation support
+- **Security**: API keys stored in `ApiKeyDataStore` with AES256_GCM encryption
+- **Rate Limits**: Free tier - 50 requests/day, 20 requests/minute
+
+### AI Service Architecture
+
+```kotlin
+interface AiService {
+    suspend fun summarizeArticle(content: String, maxLength: Int): Result<String>
+    suspend fun analyzeSentiment(content: String): Result<Sentiment>
+    suspend fun translateArticle(content: String, targetLang: String): Result<String>
+}
+```
+
+Implementation: `OpenRouterAiService` with prompt engineering and error handling.
 
 ## 🔐 Security
 
-- **API Keys**: Stored in `EncryptedFile` or equivalent secure storage on supported devices.
-- **Database**: Standard Room (Encryption can be added via SQLCipher).
+- **API Keys**: Stored in `EncryptedSharedPreferences` with AES256_GCM encryption
+- **Database**: Standard Room (Encryption can be added via SQLCipher)
+- **Network**: HTTPS only for all API calls
