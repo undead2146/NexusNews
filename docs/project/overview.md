@@ -148,22 +148,24 @@ NexusNews is a modern Android news aggregator application that combines internat
 
 ### In Progress
 
-- 🔄 Phase 3: AI Integration Foundation (Planning Complete)
-  - Epic 3.1: OpenRouter Setup (API key management, Retrofit client)
-  - Epic 3.2: AI Service Architecture (summarization, usage tracking)
-  - Epic 3.3: Model Selection (free models: Llama, Gemma, Mistral)
-  - Epic 3.4: Article Summarization (caching, UI integration)
+- 🔄 Phase 3: AI Integration Foundation (90% Complete - Backend Done)
+  - ✅ Epic 3.1: OpenRouter Setup (API client, secure key storage)
+  - ✅ Epic 3.2: AI Service Architecture (summarization, sentiment, translation)
+  - ✅ Epic 3.3: Model Selection (6 free models, Settings UI complete)
+  - ⏳ Epic 3.4: Article Summarization UI (pending)
 
 ### Recently Completed
 
-- ✅ Epic 2.5: Settings & Preferences (67% - core features done)
-  - Notification preferences
-  - Cache management
+- ✅ Epic 2.5: Settings & Preferences (67% - core features)
+  - Notification preferences with DataStore
+  - Cache management with statistics
   - Feed/Privacy DataStores
+  - 5 new DataStores created
 
 ### Next Up
 
-- ⏳ Epic 3.5: Advanced AI Features (sentiment analysis, translation)
+- ⏳ Epic 3.4: Complete Article Summarization UI
+- ⏳ Epic 3.5: Advanced AI Features (optional)
 - ⏳ Phase 4: Production Polish & Testing
 
 ## Team
