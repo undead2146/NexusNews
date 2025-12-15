@@ -33,3 +33,15 @@
 | Created AccessibilityUtils with helper functions for custom actions and screen reader formatting. | `feat(ui): create accessibility utilities` |
 | Enhanced ArticleItem with comprehensive TalkBack support including custom accessibility actions and semantic properties. | `feat(ui): enhance ArticleItem accessibility` |
 
+## Epic 2.5: Advanced Settings & Preferences (Phases 1-2)
+
+| Description | Commit Message |
+|-------------|----------------|
+| Created NotificationPreferencesDataStore with all notification settings including breaking news, daily digest, categories, sound, and vibration. | `feat(data): add notification preferences DataStore` |
+| Extended SettingsViewModel with notification state flows and setter methods for all notification preferences. | `feat(presentation): extend SettingsViewModel with notifications` |
+| Added Notifications section to SettingsScreen with toggle switches for breaking news, daily digest, sound, and vibration. | `feat(ui): add Notifications section to Settings screen` |
+| Created CacheManager interface and CacheManagerImpl for cache statistics calculation and clearing operations. | `feat(data): create CacheManager for cache operations` |
+| Added getArticleCount method to ArticleDao and created CacheModule for Hilt dependency injection. | `feat(data): add cache statistics support to ArticleDao` |
+| Extended SettingsViewModel with cache management state and clear cache methods with automatic statistics refresh. | `feat(presentation): add cache management to SettingsViewModel` |
+| Added Storage section to SettingsScreen displaying cache statistics and clear cache button. | `feat(ui): add Storage section to Settings screen` |
+
