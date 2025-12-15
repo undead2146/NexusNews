@@ -69,6 +69,30 @@ fun SettingsScreen(
                 }
             }
 
+            // Notifications Section
+            item {
+                val breakingNewsEnabled by viewModel.breakingNewsEnabled.collectAsStateWithLifecycle()
+                val dailyDigestEnabled by viewModel.dailyDigestEnabled.collectAsStateWithLifecycle()
+                val digestTimeHour by viewModel.digestTimeHour.collectAsStateWithLifecycle()
+                val soundEnabled by viewModel.soundEnabled.collectAsStateWithLifecycle()
+                val vibrationEnabled by viewModel.vibrationEnabled.collectAsStateWithLifecycle()
+
+                SettingsSection(title = "Notifications") {
+                    NotificationSettings(
+                        breakingNewsEnabled = breakingNewsEnabled,
+                        onBreakingNewsToggle = { viewModel.setBreakingNewsEnabled(it) },
+                        dailyDigestEnabled = dailyDigestEnabled,
+                        onDailyDigestToggle = { viewModel.setDailyDigestEnabled(it) },
+                        digestTimeHour = digestTimeHour,
+                        onDigestTimeChange = { viewModel.setDigestTime(java.time.LocalTime.of(it, 0)) },
+                        soundEnabled = soundEnabled,
+                        onSoundToggle = { viewModel.setSoundEnabled(it) },
+                        vibrationEnabled = vibrationEnabled,
+                        onVibrationToggle = { viewModel.setVibrationEnabled(it) },
+                    )
+                }
+            }
+
             // About Section
             item {
                 SettingsSection(title = "About") {
@@ -162,6 +186,96 @@ private fun ThemeSelector(
                 )
             }
         }
+    }
+}
+
+/**
+ * Notification settings with toggles and time picker.
+ */
+@Composable
+private fun NotificationSettings(
+    breakingNewsEnabled: Boolean,
+    onBreakingNewsToggle: (Boolean) -> Unit,
+    dailyDigestEnabled: Boolean,
+    onDailyDigestToggle: (Boolean) -> Unit,
+    digestTimeHour: Int,
+    onDigestTimeChange: (Int) -> Unit,
+    soundEnabled: Boolean,
+    onSoundToggle: (Boolean) -> Unit,
+    vibrationEnabled: Boolean,
+    onVibrationToggle: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        // Breaking News Toggle
+        SettingToggleItem(
+            label = "Breaking News",
+            description = "Get notified about breaking news",
+            checked = breakingNewsEnabled,
+            onCheckedChange = onBreakingNewsToggle,
+        )
+
+        // Daily Digest Toggle
+        SettingToggleItem(
+            label = "Daily Digest",
+            description = "Receive a daily summary at ${digestTimeHour}:00",
+            checked = dailyDigestEnabled,
+            onCheckedChange = onDailyDigestToggle,
+        )
+
+        // Sound Toggle
+        SettingToggleItem(
+            label = "Sound",
+            description = "Play sound for notifications",
+            checked = soundEnabled,
+            onCheckedChange = onSoundToggle,
+        )
+
+        // Vibration Toggle
+        SettingToggleItem(
+            label = "Vibration",
+            description = "Vibrate for notifications",
+            checked = vibrationEnabled,
+            onCheckedChange = onVibrationToggle,
+        )
+    }
+}
+
+/**
+ * Setting toggle item with label, description, and switch.
+ */
+@Composable
+private fun SettingToggleItem(
+    label: String,
+    description: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium,
+            )
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        androidx.compose.material3.Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+        )
     }
 }
 
