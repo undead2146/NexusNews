@@ -95,9 +95,9 @@ NexusNews is a modern Android news aggregator application that combines internat
 
 ## Current Status
 
-**Phase**: Phase 2 - Enhanced News Features & UI Polish  
-**Status**: In Progress  
-**Last Updated**: December 12, 2025
+**Phase**: Phase 2 - Enhanced News Features & UI Polish
+**Status**: In Progress
+**Last Updated**: December 15, 2025
 
 ### Completed
 
@@ -130,9 +130,18 @@ NexusNews is a modern Android news aggregator application that combines internat
 - ✅ Tag display UI components
 - ✅ Category preferences persistence (DataStore)
 
+**Phase 2 - Epic 2.3 (Week 8 - In Progress):**
+- ✅ Room database infrastructure setup
+- ✅ Bookmark entities and DAOs
+- ✅ Bookmark repository layer
+- ✅ BookmarksViewModel with favorites filtering
+- ✅ BookmarksScreen UI
+- ✅ Navigation integration
+- 🔄 Final integration and testing
+
 ### In Progress
 
-- 🔄 Epic 2.3: Bookmarks & Favorites
+- 🔄 Epic 2.3: Bookmarks & Favorites (75% complete)
 
 ### Next Up
 
@@ -142,8 +151,8 @@ NexusNews is a modern Android news aggregator application that combines internat
 
 ## Team
 
-**Developer**: undead2146  
-**Repository**: [github.com/undead2146/NexusNews](https://github.com/undead2146/NexusNews)  
+**Developer**: undead2146
+**Repository**: [github.com/undead2146/NexusNews](https://github.com/undead2146/NexusNews)
 **Documentation**: [undead2146.github.io/NexusNews](https://undead2146.github.io/NexusNews/)
 
 ## Resources
