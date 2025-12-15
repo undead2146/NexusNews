@@ -5,13 +5,29 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import com.example.nexusnews.data.local.datastore.ThemeMode
 
+/**
+ * NexusNews theme with support for user-controlled theme modes.
+ *
+ * @param themeMode The theme mode to use (LIGHT, DARK, or SYSTEM)
+ * @param content The composable content to theme
+ */
 @Composable
 fun NexusNewsTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    themeMode: ThemeMode = ThemeMode.SYSTEM,
     content: @Composable () -> Unit,
 ) {
+    val systemInDarkTheme = isSystemInDarkTheme()
+
+    // Resolve actual dark theme based on mode
+    val darkTheme =
+        when (themeMode) {
+            ThemeMode.LIGHT -> false
+            ThemeMode.DARK -> true
+            ThemeMode.SYSTEM -> systemInDarkTheme
+        }
+
     val colors =
         if (darkTheme) {
             darkColorScheme(
