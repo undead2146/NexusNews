@@ -153,26 +153,28 @@ fun ArticleItem(
                     onClick = onBookmarkClick,
                     modifier = Modifier.align(Alignment.Top),
                 ) {
-                    Icon(
-                        imageVector =
-                            if (isBookmarked) {
-                                Icons.Filled.Favorite
-                            } else {
-                                Icons.Outlined.FavoriteBorder
-                            },
-                        contentDescription =
-                            if (isBookmarked) {
-                                "Remove bookmark"
-                            } else {
-                                "Add bookmark"
-                            },
-                        tint =
-                            if (isBookmarked) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                MaterialTheme.colorScheme.onSurfaceVariant
-                            },
-                    )
+                    androidx.compose.animation.AnimatedVisibility(
+                        visible = isBookmarked,
+                        enter = com.example.nexusnews.ui.animations.NexusAnimations.bookmarkToggle,
+                        exit = com.example.nexusnews.ui.animations.NexusAnimations.bookmarkExit,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Favorite,
+                            contentDescription = "Remove bookmark",
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    }
+                    androidx.compose.animation.AnimatedVisibility(
+                        visible = !isBookmarked,
+                        enter = com.example.nexusnews.ui.animations.NexusAnimations.fadeIn,
+                        exit = com.example.nexusnews.ui.animations.NexusAnimations.fadeOut,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.FavoriteBorder,
+                            contentDescription = "Add bookmark",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
             }
         }
