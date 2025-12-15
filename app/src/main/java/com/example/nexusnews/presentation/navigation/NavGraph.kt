@@ -1,5 +1,3 @@
-package com.example.nexusnews.presentation.navigation
-
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -9,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.nexusnews.presentation.screens.NewsDetailScreen
 import com.example.nexusnews.presentation.screens.NewsListScreen
+import com.example.nexusnews.presentation.screens.bookmarks.BookmarksScreen
 import com.example.nexusnews.presentation.screens.search.SearchScreen
 
 /**
@@ -46,7 +45,11 @@ fun NexusNewsNavGraph(
 
         // Bookmarks Screen
         composable(Screen.Bookmarks.route) {
-            // BookmarksScreen() - Implement later
+            BookmarksScreen(
+                onArticleClick = { articleId ->
+                    navController.navigate(Screen.ArticleDetail.createRoute(articleId))
+                },
+            )
         }
 
         // Settings Screen

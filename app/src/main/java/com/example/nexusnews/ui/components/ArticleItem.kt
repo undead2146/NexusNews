@@ -9,8 +9,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,12 +37,20 @@ import java.util.Locale
 
 /**
  * Composable for displaying a news article item in a list.
+ *
+ * @param article The article to display
+ * @param onClick Callback when article is clicked
+ * @param isBookmarked Whether the article is bookmarked
+ * @param onBookmarkClick Callback when bookmark icon is clicked
+ * @param modifier Modifier for customization
  */
 @Composable
 fun ArticleItem(
     article: Article,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    isBookmarked: Boolean = false,
+    onBookmarkClick: (() -> Unit)? = null,
 ) {
     Card(
         modifier =
@@ -130,6 +143,35 @@ fun ArticleItem(
                     TagRow(
                         tags = article.tags,
                         modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            }
+
+            // Bookmark icon button
+            if (onBookmarkClick != null) {
+                IconButton(
+                    onClick = onBookmarkClick,
+                    modifier = Modifier.align(Alignment.Top),
+                ) {
+                    Icon(
+                        imageVector =
+                            if (isBookmarked) {
+                                Icons.Filled.Favorite
+                            } else {
+                                Icons.Outlined.FavoriteBorder
+                            },
+                        contentDescription =
+                            if (isBookmarked) {
+                                "Remove bookmark"
+                            } else {
+                                "Add bookmark"
+                            },
+                        tint =
+                            if (isBookmarked) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            },
                     )
                 }
             }
