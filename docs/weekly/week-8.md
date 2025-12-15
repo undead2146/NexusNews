@@ -30,3 +30,11 @@
 | Added animated bookmark icon toggle to ArticleItem with scale and bounce effects using AnimatedVisibility. | `feat(ui): add animated bookmark toggle` |
 | Added list item placement animations to NewsListScreen for smooth enter/exit transitions. | `feat(ui): add list item placement animations` |
 
+## Epic 2.4: UI/UX Enhancements (Phase 5 - Accessibility)
+
+| Description | Commit Message |
+|-------------|----------------|
+| Created AccessibilityPreferencesDataStore for managing reduce animations, high contrast mode, and font size multiplier settings. | `feat(data): add accessibility preferences DataStore` |
+| Created AccessibilityUtils with helper functions for custom actions and screen reader formatting. | `feat(ui): create accessibility utilities` |
+| Enhanced ArticleItem with comprehensive TalkBack support including custom accessibility actions and semantic properties. | `feat(ui): enhance ArticleItem accessibility` |
+
