@@ -25,4 +25,37 @@ interface NewsRepository {
      * Searches articles by query.
      */
     fun searchArticles(query: String): Flow<Result<List<Article>>>
+
+    // Bookmark operations
+
+    /**
+     * Gets all bookmarked articles.
+     */
+    fun getBookmarks(): Flow<Result<List<Article>>>
+
+    /**
+     * Gets only favorite articles.
+     */
+    fun getFavorites(): Flow<Result<List<Article>>>
+
+    /**
+     * Checks if an article is bookmarked.
+     * Returns Flow for reactive UI updates.
+     */
+    fun isBookmarked(articleId: String): Flow<Boolean>
+
+    /**
+     * Adds an article to bookmarks.
+     */
+    suspend fun addBookmark(article: Article)
+
+    /**
+     * Removes an article from bookmarks.
+     */
+    suspend fun removeBookmark(articleId: String)
+
+    /**
+     * Toggles the favorite status of a bookmarked article.
+     */
+    suspend fun toggleFavorite(articleId: String)
 }
