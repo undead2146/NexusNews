@@ -57,9 +57,39 @@ fun ArticleItem(
             modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp)
-                .clickable(onClick = onClick)
-                .semantics {
-                    contentDescription = "Article: ${article.title}"
+                .clickable(
+                    onClick = onClick,
+                    onClickLabel = "Read article",
+                ).semantics(mergeDescendants = true) {
+                    contentDescription =
+                        buildString {
+                            append("Article: ${article.title}. ")
+                            article.description?.let { append("$it. ") }
+                            append(
+                                com.example.nexusnews.ui.accessibility.AccessibilityUtils.formatArticleMetadata(
+                                    article.source,
+                                    formatPublishedDate(article.publishedAt),
+                                ),
+                            )
+                            append(". ")
+                            append(
+                                com.example.nexusnews.ui.accessibility.AccessibilityUtils.formatBookmarkStatus(
+                                    isBookmarked,
+                                ),
+                            )
+                        }
+
+                    // Add custom accessibility actions
+                    if (onBookmarkClick != null) {
+                        com.example.nexusnews.ui.accessibility.AccessibilityUtils.run {
+                            addCustomActions(
+                                (if (isBookmarked) "Remove bookmark" else "Add bookmark") to {
+                                    onBookmarkClick()
+                                    true
+                                },
+                            )
+                        }
+                    }
                 },
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
