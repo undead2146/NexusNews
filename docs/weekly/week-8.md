@@ -47,3 +47,16 @@
 | Created FeedPreferencesDataStore for feed customization including default category, articles per page, auto-refresh, and show images settings. | `feat(data): add feed preferences DataStore` |
 | Created PrivacyPreferencesDataStore for privacy settings including analytics, crash reporting, and personalization toggles. | `feat(data): add privacy preferences DataStore` |
 
+## Phase 3: AI Integration Foundation (Epic 3.1-3.2)
+
+| Description | Commit Message |
+|-------------|----------------|
+| Created OpenRouter API models (ChatCompletionRequest, ChatCompletionResponse, Message, Usage) with Moshi JSON annotations. | `feat(data): add OpenRouter API client (Epic 3.1)` |
+| Created OpenRouterApi Retrofit interface with chat completion endpoint and proper headers. | `feat(data): add OpenRouter API client (Epic 3.1)` |
+| Created ApiKeyDataStore with EncryptedSharedPreferences for secure API key storage using AES256_GCM encryption. | `feat(data): add OpenRouter API client (Epic 3.1)` |
+| Created NetworkModule for Hilt dependency injection with separate Retrofit instances for News API and OpenRouter. | `feat(data): add OpenRouter API client (Epic 3.1)` |
+| Created AiService domain interface with methods for summarization, sentiment analysis, and translation. | `feat(domain): add AI service architecture (Epic 3.2)` |
+| Created FreeAiModel enum with 6 free OpenRouter models (Llama 3.3 70B, Gemma 2 27B, Mistral Small, etc.). | `feat(domain): add AI service architecture (Epic 3.2)` |
+| Implemented OpenRouterAiService with article summarization, sentiment analysis, and translation using prompt engineering. | `feat(domain): add AI service architecture (Epic 3.2)` |
+| Created AiModule for Hilt dependency injection of AiService. | `feat(domain): add AI service architecture (Epic 3.2)` |
+
