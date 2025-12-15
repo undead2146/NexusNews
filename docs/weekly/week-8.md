@@ -59,4 +59,7 @@
 | Created FreeAiModel enum with 6 free OpenRouter models (Llama 3.3 70B, Gemma 2 27B, Mistral Small, etc.). | `feat(domain): add AI service architecture (Epic 3.2)` |
 | Implemented OpenRouterAiService with article summarization, sentiment analysis, and translation using prompt engineering. | `feat(domain): add AI service architecture (Epic 3.2)` |
 | Created AiModule for Hilt dependency injection of AiService. | `feat(domain): add AI service architecture (Epic 3.2)` |
+| Created AiModelPreferencesDataStore for AI model configuration with default model, fallback, max tokens, and temperature settings. | `feat(data): add AI model preferences DataStore` |
+| Extended SettingsViewModel with AI settings state (API key management, model selection) and methods. | `feat(data): add AI model preferences DataStore` |
+| Added AI Settings section to SettingsScreen with API key input (password field with visibility toggle), model selector (3 recommended free models), connection status indicator, and Save/Clear buttons. | `feat(ui): add AI Settings section to SettingsScreen` |
 
