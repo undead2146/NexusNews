@@ -34,6 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.nexusnews.R
 import com.example.nexusnews.presentation.common.UiState
 import com.example.nexusnews.ui.components.ArticleItem
+import com.example.nexusnews.ui.components.SwipeableArticleItem
 
 /**
  * Screen displaying a list of news articles.
@@ -98,12 +99,13 @@ fun NewsListScreen(
 }
 
 /**
- * Displays the article list.
+ * Displays the article list with swipeable items.
  */
 @Composable
 private fun ArticleList(
     articles: List<com.example.nexusnews.domain.model.Article>,
     onArticleClick: (String) -> Unit,
+    viewModel: NewsListViewModel = hiltViewModel(),
 ) {
     LazyColumn(
         contentPadding = PaddingValues(vertical = 8.dp),
@@ -113,9 +115,16 @@ private fun ArticleList(
             items = articles,
             key = { it.id },
         ) { article ->
-            ArticleItem(
+            val isBookmarked by viewModel.isBookmarked(article.id).collectAsStateWithLifecycle(initialValue = false)
+
+            SwipeableArticleItem(
                 article = article,
+                isBookmarked = isBookmarked,
+                isFavorite = false, // TODO: Track favorite state
+                onBookmarkToggle = { viewModel.toggleBookmark(article) },
+                onFavoriteToggle = { viewModel.toggleFavorite(article.id) },
                 onClick = { onArticleClick(article.id) },
+                modifier = Modifier.animateItem(),
             )
         }
     }
