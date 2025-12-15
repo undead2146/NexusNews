@@ -148,10 +148,11 @@ NexusNews is a modern Android news aggregator application that combines internat
 
 ### In Progress
 
-- 🔄 Epic 2.5: Settings & Preferences (Planned)
+- 🔄 Epic 2.5: Settings & Preferences (67% complete - Phases 1-2 done, 4-5 partial)
 
 ### Next Up
 
+- ⏳ Epic 2.5: Complete remaining UI integration
 - ⏳ Phase 3: AI Integration Foundation (OpenRouter)
 - ⏳ Phase 4: Advanced AI Features
 

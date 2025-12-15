@@ -44,4 +44,6 @@
 | Added getArticleCount method to ArticleDao and created CacheModule for Hilt dependency injection. | `feat(data): add cache statistics support to ArticleDao` |
 | Extended SettingsViewModel with cache management state and clear cache methods with automatic statistics refresh. | `feat(presentation): add cache management to SettingsViewModel` |
 | Added Storage section to SettingsScreen displaying cache statistics and clear cache button. | `feat(ui): add Storage section to Settings screen` |
+| Created FeedPreferencesDataStore for feed customization including default category, articles per page, auto-refresh, and show images settings. | `feat(data): add feed preferences DataStore` |
+| Created PrivacyPreferencesDataStore for privacy settings including analytics, crash reporting, and personalization toggles. | `feat(data): add privacy preferences DataStore` |
 
