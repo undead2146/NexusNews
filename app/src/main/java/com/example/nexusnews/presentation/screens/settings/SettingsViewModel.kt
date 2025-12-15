@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.nexusnews.data.cache.CacheManager
 import com.example.nexusnews.data.cache.CacheStatistics
+import com.example.nexusnews.data.local.datastore.AiModelPreferencesDataStore
+import com.example.nexusnews.data.local.datastore.ApiKeyDataStore
 import com.example.nexusnews.data.local.datastore.NotificationPreferencesDataStore
 import com.example.nexusnews.data.local.datastore.ThemeMode
 import com.example.nexusnews.data.local.datastore.ThemePreferencesDataStore
@@ -28,6 +30,8 @@ class SettingsViewModel
         private val themePreferences: ThemePreferencesDataStore,
         private val notificationPreferences: NotificationPreferencesDataStore,
         private val cacheManager: CacheManager,
+        private val apiKeyDataStore: ApiKeyDataStore,
+        private val aiModelPreferences: AiModelPreferencesDataStore,
     ) : ViewModel() {
         // Theme preferences
         /**
@@ -260,6 +264,50 @@ class SettingsViewModel
                     Timber.d("All cache cleared")
                 } catch (e: Exception) {
                     Timber.e(e, "Failed to clear all cache")
+                }
+            }
+        }
+
+        // AI settings
+        val hasApiKey: Boolean
+            get() = apiKeyDataStore.hasApiKey()
+
+        val defaultAiModel: StateFlow<String> =
+            aiModelPreferences.defaultModel.stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                com.example.nexusnews.domain.ai.FreeAiModel.getDefault().id
+            )
+
+        fun setApiKey(key: String) {
+            viewModelScope.launch {
+                try {
+                    apiKeyDataStore.setOpenRouterApiKey(key)
+                    Timber.d("API key saved")
+                } catch (e: Exception) {
+                    Timber.e(e, "Failed to save API key")
+                }
+            }
+        }
+
+        fun clearApiKey() {
+            viewModelScope.launch {
+                try {
+                    apiKeyDataStore.clearOpenRouterApiKey()
+                    Timber.d("API key cleared")
+                } catch (e: Exception) {
+                    Timber.e(e, "Failed to clear API key")
+                }
+            }
+        }
+
+        fun setDefaultAiModel(modelId: String) {
+            viewModelScope.launch {
+                try {
+                    aiModelPreferences.setDefaultModel(modelId)
+                    Timber.d("Default AI model set to: $modelId")
+                } catch (e: Exception) {
+                    Timber.e(e, "Failed to set default AI model")
                 }
             }
         }
