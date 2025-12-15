@@ -9,6 +9,7 @@ import com.example.nexusnews.presentation.screens.NewsDetailScreen
 import com.example.nexusnews.presentation.screens.NewsListScreen
 import com.example.nexusnews.presentation.screens.bookmarks.BookmarksScreen
 import com.example.nexusnews.presentation.screens.search.SearchScreen
+import com.example.nexusnews.presentation.screens.settings.SettingsScreen
 
 /**
  * Main navigation graph for the application.
@@ -54,7 +55,7 @@ fun NexusNewsNavGraph(
 
         // Settings Screen
         composable(Screen.Settings.route) {
-            // SettingsScreen() - Implement later
+            SettingsScreen()
         }
 
         // Article Detail Screen
