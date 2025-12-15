@@ -2,6 +2,8 @@ package com.example.nexusnews.presentation.screens.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.nexusnews.data.cache.CacheManager
+import com.example.nexusnews.data.cache.CacheStatistics
 import com.example.nexusnews.data.local.datastore.NotificationPreferencesDataStore
 import com.example.nexusnews.data.local.datastore.ThemeMode
 import com.example.nexusnews.data.local.datastore.ThemePreferencesDataStore
@@ -25,6 +27,7 @@ class SettingsViewModel
     constructor(
         private val themePreferences: ThemePreferencesDataStore,
         private val notificationPreferences: NotificationPreferencesDataStore,
+        private val cacheManager: CacheManager,
     ) : ViewModel() {
         // Theme preferences
         /**
@@ -193,6 +196,70 @@ class SettingsViewModel
                     Timber.d("Notification vibration: $enabled")
                 } catch (e: Exception) {
                     Timber.e(e, "Failed to set notification vibration")
+                }
+            }
+        }
+
+        // Cache management
+        private val _cacheStatistics = kotlinx.coroutines.flow.MutableStateFlow<CacheStatistics?>(null)
+        val cacheStatistics: StateFlow<CacheStatistics?> = _cacheStatistics
+
+        /**
+         * Refreshes cache statistics.
+         */
+        fun refreshCacheStatistics() {
+            viewModelScope.launch {
+                try {
+                    val stats = cacheManager.getCacheStatistics()
+                    _cacheStatistics.value = stats
+                    Timber.d("Cache statistics refreshed: $stats")
+                } catch (e: Exception) {
+                    Timber.e(e, "Failed to refresh cache statistics")
+                }
+            }
+        }
+
+        /**
+         * Clears article cache.
+         */
+        fun clearArticleCache() {
+            viewModelScope.launch {
+                try {
+                    cacheManager.clearArticleCache()
+                    refreshCacheStatistics()
+                    Timber.d("Article cache cleared")
+                } catch (e: Exception) {
+                    Timber.e(e, "Failed to clear article cache")
+                }
+            }
+        }
+
+        /**
+         * Clears image cache.
+         */
+        fun clearImageCache() {
+            viewModelScope.launch {
+                try {
+                    cacheManager.clearImageCache()
+                    refreshCacheStatistics()
+                    Timber.d("Image cache cleared")
+                } catch (e: Exception) {
+                    Timber.e(e, "Failed to clear image cache")
+                }
+            }
+        }
+
+        /**
+         * Clears all cache.
+         */
+        fun clearAllCache() {
+            viewModelScope.launch {
+                try {
+                    cacheManager.clearAllCache()
+                    refreshCacheStatistics()
+                    Timber.d("All cache cleared")
+                } catch (e: Exception) {
+                    Timber.e(e, "Failed to clear all cache")
                 }
             }
         }

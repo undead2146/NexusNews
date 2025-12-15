@@ -46,8 +46,19 @@ interface ArticleDao {
     suspend fun deleteOldArticles(threshold: LocalDateTime)
 
     /**
+     * Gets the total count of cached articles.
+     */
+    @Query("SELECT COUNT(*) FROM articles")
+    suspend fun getArticleCount(): Int
+
+    /**
      * Clears all cached articles.
      */
     @Query("DELETE FROM articles")
     suspend fun clearAll()
+
+    /**
+     * Clears all cached articles (alias for cache management).
+     */
+    suspend fun clearAllArticles() = clearAll()
 }

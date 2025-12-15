@@ -93,6 +93,25 @@ fun SettingsScreen(
                 }
             }
 
+            // Storage Section
+            item {
+                val cacheStats by viewModel.cacheStatistics.collectAsStateWithLifecycle()
+
+                androidx.compose.runtime.LaunchedEffect(Unit) {
+                    viewModel.refreshCacheStatistics()
+                }
+
+                SettingsSection(title = "Storage") {
+                    StorageSettings(
+                        cacheStatistics = cacheStats,
+                        onClearArticleCache = { viewModel.clearArticleCache() },
+                        onClearImageCache = { viewModel.clearImageCache() },
+                        onClearAllCache = { viewModel.clearAllCache() },
+                        onRefresh = { viewModel.refreshCacheStatistics() },
+                    )
+                }
+            }
+
             // About Section
             item {
                 SettingsSection(title = "About") {
@@ -276,6 +295,75 @@ private fun SettingToggleItem(
             checked = checked,
             onCheckedChange = onCheckedChange,
         )
+    }
+}
+
+/**
+ * Storage settings with cache statistics and clear buttons.
+ */
+@Composable
+private fun StorageSettings(
+    cacheStatistics: com.example.nexusnews.data.cache.CacheStatistics?,
+    onClearArticleCache: () -> Unit,
+    onClearImageCache: () -> Unit,
+    onClearAllCache: () -> Unit,
+    onRefresh: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        if (cacheStatistics != null) {
+            // Total cache size
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    text = "Total Cache",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium,
+                )
+                Text(
+                    text = String.format("%.2f MB", cacheStatistics.totalSizeMB),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+
+            // Article count
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    text = "Cached Articles",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    text = "${cacheStatistics.articleCount} articles",
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Clear buttons
+            androidx.compose.material3.Button(
+                onClick = onClearAllCache,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text("Clear All Cache")
+            }
+        } else {
+            Text(
+                text = "Loading cache statistics...",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }
 
