@@ -11,6 +11,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,6 +29,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -108,6 +114,22 @@ fun SettingsScreen(
                         onClearImageCache = { viewModel.clearImageCache() },
                         onClearAllCache = { viewModel.clearAllCache() },
                         onRefresh = { viewModel.refreshCacheStatistics() },
+                    )
+                }
+            }
+
+            // AI Settings Section
+            item {
+                val hasApiKey = viewModel.hasApiKey
+                val defaultModel by viewModel.defaultAiModel.collectAsStateWithLifecycle()
+
+                SettingsSection(title = "AI Features") {
+                    AiSettings(
+                        hasApiKey = hasApiKey,
+                        currentModel = defaultModel,
+                        onSaveApiKey = { viewModel.setApiKey(it) },
+                        onClearApiKey = { viewModel.clearApiKey() },
+                        onModelSelected = { viewModel.setDefaultAiModel(it) },
                     )
                 }
             }
@@ -364,6 +386,150 @@ private fun StorageSettings(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
+    }
+}
+
+/**
+ * AI settings with API key input and model selection.
+ */
+@Composable
+private fun AiSettings(
+    hasApiKey: Boolean,
+    currentModel: String,
+    onSaveApiKey: (String) -> Unit,
+    onClearApiKey: () -> Unit,
+    onModelSelected: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var keyInput by remember { mutableStateOf("") }
+    var showPassword by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        // API Key Section
+        Text(
+            text = "OpenRouter API Key",
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.Medium,
+        )
+
+        OutlinedTextField(
+            value = keyInput,
+            onValueChange = { keyInput = it },
+            label = { Text("API Key") },
+            placeholder = { Text("sk-or-v1-...") },
+            visualTransformation =
+                if (showPassword) {
+                    VisualTransformation.None
+                } else {
+                    PasswordVisualTransformation()
+                },
+            trailingIcon = {
+                IconButton(onClick = { showPassword = !showPassword }) {
+                    Icon(
+                        imageVector =
+                            if (showPassword) {
+                                Icons.Filled.Visibility
+                            } else {
+                                Icons.Filled.VisibilityOff
+                            },
+                        contentDescription = if (showPassword) "Hide password" else "Show password",
+                    )
+                }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+        )
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Button(
+                onClick = {
+                    if (keyInput.isNotBlank()) {
+                        onSaveApiKey(keyInput)
+                        keyInput = ""
+                    }
+                },
+                enabled = keyInput.isNotBlank(),
+            ) {
+                Text("Save Key")
+            }
+
+            if (hasApiKey) {
+                OutlinedButton(onClick = onClearApiKey) {
+                    Text("Clear Key")
+                }
+            }
+        }
+
+        // Status indicator
+        if (hasApiKey) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.CheckCircle,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(16.dp),
+                )
+                Text(
+                    text = "API Key Configured",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Model Selection
+        Text(
+            text = "AI Model",
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.Medium,
+        )
+
+        val models = com.example.nexusnews.domain.ai.FreeAiModel.getRecommended()
+        models.forEach { model ->
+            val isSelected = model.id == currentModel
+            FilterChip(
+                selected = isSelected,
+                onClick = { onModelSelected(model.id) },
+                label = {
+                    Column {
+                        Text(model.displayName)
+                        Text(
+                            text = model.description,
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
+                },
+                leadingIcon =
+                    if (isSelected) {
+                        {
+                            Icon(
+                                imageVector = Icons.Filled.Check,
+                                contentDescription = null,
+                            )
+                        }
+                    } else {
+                        null
+                    },
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+
+        // Info text
+        Text(
+            text = "Free tier: 50 requests/day • All models are free",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 
