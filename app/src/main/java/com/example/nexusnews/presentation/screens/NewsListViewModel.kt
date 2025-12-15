@@ -132,4 +132,18 @@ class NewsListViewModel
          * Checks if an article is bookmarked.
          */
         fun isBookmarked(articleId: String) = newsRepository.isBookmarked(articleId)
+
+        /**
+         * Toggles favorite status for a bookmarked article.
+         */
+        fun toggleFavorite(articleId: String) {
+            viewModelScope.launch(exceptionHandler) {
+                try {
+                    newsRepository.toggleFavorite(articleId)
+                    Timber.d("Favorite toggled for: $articleId")
+                } catch (e: Exception) {
+                    Timber.e(e, "Failed to toggle favorite for: $articleId")
+                }
+            }
+        }
     }
