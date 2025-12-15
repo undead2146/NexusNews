@@ -12,6 +12,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -105,4 +106,30 @@ class NewsListViewModel
         fun retryLoadNews() {
             loadNews(forceRefresh = false)
         }
+
+        // Bookmark operations
+
+        /**
+         * Toggles bookmark status for an article.
+         */
+        fun toggleBookmark(article: Article) {
+            viewModelScope.launch(exceptionHandler) {
+                try {
+                    if (newsRepository.isBookmarked(article.id).first()) {
+                        newsRepository.removeBookmark(article.id)
+                        Timber.d("Bookmark removed: ${article.id}")
+                    } else {
+                        newsRepository.addBookmark(article)
+                        Timber.d("Bookmark added: ${article.id}")
+                    }
+                } catch (e: Exception) {
+                    Timber.e(e, "Failed to toggle bookmark for: ${article.id}")
+                }
+            }
+        }
+
+        /**
+         * Checks if an article is bookmarked.
+         */
+        fun isBookmarked(articleId: String) = newsRepository.isBookmarked(articleId)
     }
