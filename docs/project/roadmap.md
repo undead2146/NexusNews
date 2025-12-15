@@ -112,13 +112,13 @@ This roadmap follows an incremental approach, building from foundation to advanc
 - ⏳ Implement bookmark sync logic (deferred to Phase 3)
 - ⏳ Add bookmark notifications (deferred)
 
-### Epic 2.4: UI/UX Enhancements
+### Epic 2.4: UI/UX Enhancements ✅
 
-- Implement pull-to-refresh
-- Add swipe gestures
-- Create custom animations
-- Implement dark/light theme
-- Add accessibility features (content descriptions, scaling)
+- ✅ Implement pull-to-refresh (Existing)
+- ✅ Add swipe gestures
+- ✅ Create custom animations
+- ✅ Implement dark/light theme
+- ✅ Add accessibility features (content descriptions, scaling)
 
 ### Epic 2.5: Settings & Preferences
 

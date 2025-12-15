@@ -9,7 +9,7 @@ NexusNews follows Clean Architecture principles with MVVM pattern for the presen
 Constants are organized into separate classes by category for better maintainability:
 
 - **NetworkConstants:** Network configuration, timeouts, retry policies
-- **ApiConstants:** HTTP headers, status codes, API response formats  
+- **ApiConstants:** HTTP headers, status codes, API response formats
 - **DatabaseConstants:** Database schema, table/column names
 - **UiConstants:** UI dimensions, animations, layout values
 - **AppConstants:** General application settings and preferences
@@ -42,31 +42,31 @@ import com.example.nexusnews.util.constants.DatabaseConstants.ARTICLES_TABLE
 ### 2. Data Layer (Data Management)
 
 - **Location:** `app/src/main/java/com/example/nexusnews/data/`
-- **Purpose:** Manages data from various sources (API, database, cache)
+- **Purpose:** Manages data from various sources (API, database, cache, preferences)
 - **Components:**
   - **Repositories:** Implement domain repository interfaces
-  - **Data Sources:** Local (Room) and Remote (Retrofit)
+  - **Data Sources:** Local (Room, DataStore) and Remote (Retrofit)
   - **Mappers:** Convert between data models and domain models
 
 **Patterns:**
-
 - Repository Pattern: Single source of truth
 - Offline-First: Cache-then-network strategy
-- NetworkBoundResource: Coordinated cache + network
+- Preferences Persistence: Type-safe DataStore for user settings (Theme, Accessibility)
 
 ### 3. Presentation Layer (UI)
 
 - **Location:** `app/src/main/java/com/example/nexusnews/presentation/`
-- **Purpose:** Handles UI logic and user interactions
+- **Purpose:** Handles UI logic, user interactions, and visual presentation
 - **Components:**
-  - **Composables:** Jetpack Compose UI components
-  - **ViewModels:** UI state management
-  - **Navigation:** Screen routing
+  - **Composables:** Jetpack Compose UI components with Material Design 3
+  - **ViewModels:** UI state management and persistence logic
+  - **Navigation:** Type-safe screen routing
+  - **Animations:** Material Motion transitions (Shared Element, Fade, Scale)
 
 **Patterns:**
-
 - MVVM: Separation of UI and business logic
 - Unidirectional Data Flow: State flows down, events flow up
+- Accessibility-First: TalkBack support, dynamic scaling, and semantic properties
 - State Management: StateFlow for reactive UI updates
 
 ## Network Layer Architecture
