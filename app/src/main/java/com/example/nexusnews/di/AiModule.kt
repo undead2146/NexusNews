@@ -10,6 +10,7 @@ import javax.inject.Singleton
 
 /**
  * Hilt module for AI-related dependencies.
+ * Uses the clean architecture implementation.
  */
 @Module
 @InstallIn(SingletonComponent::class)
