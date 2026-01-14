@@ -171,6 +171,7 @@ app/
 
 - [OpenRouter AI Integration](/architecture/ai-integration) - AI-powered features architecture (Phase 3)
 - [Advanced AI Features](/architecture/phase4-advanced-ai-features) - Advanced AI features architecture (Phase 4)
+- [AI Service Refactoring](/architecture/ai-refactoring) - Clean architecture refactoring (Phase 4)
 - [Data Management](/architecture/data-management) - Database and caching strategies
 - [Dependency Injection](/architecture/dependency-injection) - Hilt modules and providers
 - [Core Architecture](/architecture/core-architecture) - MVVM and Clean Architecture
