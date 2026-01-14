@@ -9,8 +9,10 @@ import com.example.nexusnews.data.local.datastore.ApiKeyDataStore
 import com.example.nexusnews.data.local.datastore.NotificationPreferencesDataStore
 import com.example.nexusnews.data.local.datastore.ThemeMode
 import com.example.nexusnews.data.local.datastore.ThemePreferencesDataStore
+import com.example.nexusnews.domain.ai.AiService
 import com.example.nexusnews.domain.model.NewsCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -32,7 +34,11 @@ class SettingsViewModel
         private val cacheManager: CacheManager,
         private val apiKeyDataStore: ApiKeyDataStore,
         private val aiModelPreferences: AiModelPreferencesDataStore,
+        private val aiService: AiService,
     ) : ViewModel() {
+        // Connection test state
+        private val _connectionTestState = MutableStateFlow<ConnectionTestState>(ConnectionTestState.Idle)
+        val connectionTestState: StateFlow<ConnectionTestState> = _connectionTestState
         // Theme preferences
         /**
          * Current theme mode.
@@ -311,4 +317,56 @@ class SettingsViewModel
                 }
             }
         }
+
+        // Connection test
+        /**
+         * Tests the OpenRouter API connection with the current API key.
+         */
+        fun testConnection() {
+            viewModelScope.launch {
+                _connectionTestState.value = ConnectionTestState.Loading
+
+                try {
+                    val apiKey = apiKeyDataStore.getOpenRouterApiKey()
+                    if (apiKey.isNullOrBlank()) {
+                        _connectionTestState.value = ConnectionTestState.Error("No API key configured")
+                        return@launch
+                    }
+
+                    // Test with a simple summarization request
+                    val result = aiService.summarizeArticle("Test article content", maxLength = 10)
+                    when (result) {
+                        is com.example.nexusnews.util.Result.Success<*> -> {
+                            _connectionTestState.value = ConnectionTestState.Success
+                            Timber.d("API connection test successful")
+                        }
+                        is com.example.nexusnews.util.Result.Error -> {
+                            _connectionTestState.value =
+                                ConnectionTestState.Error(
+                                    result.exception.localizedMessage ?: "Connection test failed",
+                                )
+                            Timber.e(result.exception, "API connection test failed")
+                        }
+                    }
+                } catch (e: Exception) {
+                    _connectionTestState.value = ConnectionTestState.Error(e.localizedMessage ?: "Connection test failed")
+                    Timber.e(e, "API connection test failed")
+                }
+            }
+        }
     }
+
+/**
+ * State for API connection test.
+ */
+sealed class ConnectionTestState {
+    data object Idle : ConnectionTestState()
+
+    data object Loading : ConnectionTestState()
+
+    data object Success : ConnectionTestState()
+
+    data class Error(
+        val message: String,
+    ) : ConnectionTestState()
+}

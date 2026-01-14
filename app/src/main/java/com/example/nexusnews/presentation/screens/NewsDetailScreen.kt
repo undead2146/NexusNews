@@ -3,14 +3,20 @@ package com.example.nexusnews.presentation.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -29,6 +35,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.nexusnews.R
 import com.example.nexusnews.presentation.common.UiState
+import com.example.nexusnews.ui.components.SummaryCard
 import com.example.nexusnews.ui.components.formatPublishedDate
 
 /**
@@ -42,6 +49,7 @@ fun NewsDetailScreen(
     viewModel: NewsDetailViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val summaryState by viewModel.summaryState.collectAsStateWithLifecycle()
 
     Scaffold(modifier = modifier) { paddingValues ->
         when (uiState) {
@@ -59,6 +67,8 @@ fun NewsDetailScreen(
                 val article = (uiState as UiState.Success).data
                 ArticleDetailContent(
                     article = article,
+                    summaryState = summaryState,
+                    onGenerateSummary = { viewModel.generateSummary(article) },
                     modifier = Modifier.padding(paddingValues),
                 )
             }
@@ -82,6 +92,8 @@ fun NewsDetailScreen(
 @Composable
 private fun ArticleDetailContent(
     article: com.example.nexusnews.domain.model.Article,
+    summaryState: SummaryState,
+    onGenerateSummary: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -91,6 +103,12 @@ private fun ArticleDetailContent(
                 .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+        // Summary section
+        SummarySection(
+            summaryState = summaryState,
+            onGenerateSummary = onGenerateSummary,
+        )
+
         // Article image
         if (article.imageUrl != null) {
             AsyncImage(
@@ -164,6 +182,122 @@ private fun ArticleDetailContent(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 8.dp),
             )
+        }
+    }
+}
+
+/**
+ * Displays summary section with generate button and summary card.
+ */
+@Composable
+private fun SummarySection(
+    summaryState: SummaryState,
+    onGenerateSummary: () -> Unit,
+) {
+    when (summaryState) {
+        is SummaryState.Success -> {
+            SummaryCard(
+                summary = summaryState.summary,
+            )
+        }
+        is SummaryState.Error -> {
+            ErrorSummaryCard(
+                message = summaryState.message,
+                onRetry = onGenerateSummary,
+            )
+        }
+        is SummaryState.Loading -> {
+            LoadingSummaryCard()
+        }
+        SummaryState.Idle -> {
+            GenerateSummaryButton(onClick = onGenerateSummary)
+        }
+    }
+}
+
+/**
+ * Button to generate AI summary.
+ */
+@Composable
+private fun GenerateSummaryButton(onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                imageVector = Icons.Default.Star,
+                contentDescription = null,
+                modifier = Modifier.size(20.dp),
+            )
+            Spacer(modifier = Modifier.size(8.dp))
+            Text(text = "Generate AI Summary")
+        }
+    }
+}
+
+/**
+ * Loading state for summary generation.
+ */
+@Composable
+private fun LoadingSummaryCard() {
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(24.dp),
+        ) {
+            CircularProgressIndicator()
+            Text(
+                text = "Generating summary...",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+/**
+ * Error state for summary generation.
+ */
+@Composable
+private fun ErrorSummaryCard(
+    message: String,
+    onRetry: () -> Unit,
+) {
+    androidx.compose.material3.Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors =
+            androidx.compose.material3.CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.errorContainer,
+            ),
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Text(
+                text = "Summary Failed",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onErrorContainer,
+            )
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onErrorContainer,
+            )
+            Button(
+                onClick = onRetry,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(text = "Retry")
+            }
         }
     }
 }

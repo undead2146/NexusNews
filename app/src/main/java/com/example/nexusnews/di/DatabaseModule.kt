@@ -3,6 +3,8 @@ package com.example.nexusnews.di
 import android.content.Context
 import androidx.room.Room
 import com.example.nexusnews.data.local.dao.ArticleDao
+import com.example.nexusnews.data.local.dao.ArticleSummaryDao
+import com.example.nexusnews.data.local.dao.AiUsageDao
 import com.example.nexusnews.data.local.dao.BookmarkDao
 import com.example.nexusnews.data.local.database.AppDatabase
 import com.example.nexusnews.util.constants.DatabaseConstants
@@ -32,7 +34,8 @@ object DatabaseModule {
                 context,
                 AppDatabase::class.java,
                 DatabaseConstants.DATABASE_NAME,
-            ).build()
+            ).fallbackToDestructiveMigration()
+            .build()
 
     /**
      * Provides ArticleDao from the database.
@@ -45,4 +48,16 @@ object DatabaseModule {
      */
     @Provides
     fun provideBookmarkDao(database: AppDatabase): BookmarkDao = database.bookmarkDao()
+
+    /**
+     * Provides ArticleSummaryDao from the database.
+     */
+    @Provides
+    fun provideArticleSummaryDao(database: AppDatabase): ArticleSummaryDao = database.articleSummaryDao()
+
+    /**
+     * Provides AiUsageDao from the database.
+     */
+    @Provides
+    fun provideAiUsageDao(database: AppDatabase): AiUsageDao = database.aiUsageDao()
 }

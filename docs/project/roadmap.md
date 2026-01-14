@@ -132,87 +132,86 @@ This roadmap follows an incremental approach, building from foundation to advanc
 
 ---
 
-## **PHASE 3: AI Integration Foundation (OpenRouter)**
+## **PHASE 3: AI Integration Foundation (OpenRouter)** ✅
 
 **Goal**: Integrate OpenRouter API to provide AI-powered features, starting with article summarization using free models.
 
-### Epic 3.1: OpenRouter Setup
+### Epic 3.1: OpenRouter Setup ✅
 
 **User Story**: As a developer, I want to securely manage my OpenRouter API key so I can use AI features.
 
-- Setup OpenRouter API client (Retrofit)
-- Implement secure API key storage (EncryptedSharedPreferences)
-- Create API key input UI in Settings
-- Add connection test functionality
-- Handle authentication errors
+- ✅ Setup OpenRouter API client (Retrofit)
+- ✅ Implement secure API key storage (EncryptedSharedPreferences)
+- ✅ Create API key input UI in Settings
+- ✅ Add connection test functionality
+- ✅ Handle authentication errors
 
 **Acceptance Criteria**:
-- API key can be entered and saved in Settings
-- Key is encrypted and stored securely
-- Connection test validates the key
-- Error messages for invalid keys
+- ✅ API key can be entered and saved in Settings
+- ✅ Key is encrypted and stored securely
+- ✅ Connection test validates the key
+- ✅ Error messages for invalid keys
 
-### Epic 3.2: AI Service Architecture
+### Epic 3.2: AI Service Architecture ✅
 
 **User Story**: As a user, I want AI-generated article summaries so I can quickly understand news without reading full articles.
 
-- Design AI service interface (domain layer)
-- Create OpenRouterAiService implementation
-- Implement prompt engineering for summarization
-- Add AI usage tracking (tokens, requests)
-- Setup error handling for AI calls
+- ✅ Design AI service interface (domain layer)
+- ✅ Create OpenRouterAiService implementation
+- ✅ Implement prompt engineering for summarization
+- ✅ Add AI usage tracking (tokens, requests)
+- ✅ Setup error handling for AI calls
 
 **Acceptance Criteria**:
-- Article summarization works end-to-end
-- Summaries are concise (~150 chars)
-- Usage tracked in database
-- Errors handled gracefully
+- ✅ Article summarization works end-to-end
+- ✅ Summaries are concise (~150 chars)
+- ✅ Usage tracked in database
+- ✅ Errors handled gracefully
 
-### Epic 3.3: Model Selection & Configuration
+### Epic 3.3: Model Selection & Configuration ✅
 
 **User Story**: As a user, I want to choose from free AI models so I can select the best one for my needs.
 
-- Configure free models (Llama 3.3 70B, Gemma 2 27B, Mistral Small)
-- Implement model selection UI in Settings
-- Add model preferences DataStore
-- Create fallback mechanism (primary → fallback → error)
-- Display model capabilities and limits
+- ✅ Configure free models (Llama 3.3 70B, Gemma 2 27B, Mistral Small)
+- ✅ Implement model selection UI in Settings
+- ✅ Add model preferences DataStore
+- ✅ Create fallback mechanism (primary → fallback → error)
+- ✅ Display model capabilities and limits
 
 **Acceptance Criteria**:
-- 3+ free models available
-- Model selection persists
-- Fallback works when primary fails
-- Rate limits (50/day) respected
+- ✅ 3+ free models available (6 models implemented)
+- ✅ Model selection persists
+- ✅ Fallback works when primary fails
+- ✅ Rate limits (50/day) respected
 
-### Epic 3.4: Article Summarization Feature
+### Epic 3.4: Article Summarization Feature ✅
 
 **User Story**: As a user, I want to see summaries in article detail view so I can decide if I want to read more.
 
-- Add "Summarize" button to article detail
-- Implement summary caching (Room database)
-- Display summary with loading states
-- Show model used and timestamp
-- Handle offline scenarios (show cached)
+- ✅ Add "Summarize" button to article detail
+- ✅ Implement summary caching (Room database)
+- ✅ Display summary with loading states
+- ✅ Show model used and timestamp
+- ✅ Handle offline scenarios (show cached)
 
 **Acceptance Criteria**:
-- Summary button visible on articles
-- Summaries cached to avoid re-generation
-- Loading/error states clear
-- Offline mode shows cached summaries
+- ✅ Summary button visible on articles
+- ✅ Summaries cached to avoid re-generation
+- ✅ Loading/error states clear
+- ✅ Offline mode shows cached summaries
+- ✅ Design summary UI component
+- ✅ Implement summarization prompt
+- ✅ Add summary caching
+- ✅ Create loading states for AI operations
+- ✅ Implement retry logic
 
-- Design summary UI component
-- Implement summarization prompt
-- Add summary caching
-- Create loading states for AI operations
-- Implement retry logic
+### Epic 3.5: AI Response Management ✅
 
-### Epic 3.5: AI Response Management
-
-- Cache AI-generated content
-- Implement response validation
-- Add content moderation checks
-- Create AI response metadata storage
-- Handle partial/incomplete responses
+- ✅ Cache AI-generated content
+- ✅ Implement response validation
+- ⏳ Add content moderation checks (deferred)
+- ✅ Create AI response metadata storage
+- ✅ Handle partial/incomplete responses
 
 ---
 

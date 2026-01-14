@@ -169,10 +169,10 @@ app/
 
 ## 📚 Related Documentation
 
-- [Multi-Source News Architecture](/architecture/news-sources)
-- [OpenRouter AI Integration](/architecture/ai-integration)
-- [Data Management](/architecture/data-management)
-- [Dependency Injection](/architecture/dependency-injection)
+- [OpenRouter AI Integration](/architecture/ai-integration) - AI-powered features architecture
+- [Data Management](/architecture/data-management) - Database and caching strategies
+- [Dependency Injection](/architecture/dependency-injection) - Hilt modules and providers
+- [Core Architecture](/architecture/core-architecture) - MVVM and Clean Architecture
 
 ## 🔗 External References
 

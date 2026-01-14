@@ -8,27 +8,37 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -122,14 +132,17 @@ fun SettingsScreen(
             item {
                 val hasApiKey = viewModel.hasApiKey
                 val defaultModel by viewModel.defaultAiModel.collectAsStateWithLifecycle()
+                val connectionTestState by viewModel.connectionTestState.collectAsStateWithLifecycle()
 
                 SettingsSection(title = "AI Features") {
                     AiSettings(
                         hasApiKey = hasApiKey,
                         currentModel = defaultModel,
+                        connectionTestState = connectionTestState,
                         onSaveApiKey = { viewModel.setApiKey(it) },
                         onClearApiKey = { viewModel.clearApiKey() },
                         onModelSelected = { viewModel.setDefaultAiModel(it) },
+                        onTestConnection = { viewModel.testConnection() },
                     )
                 }
             }
@@ -396,9 +409,11 @@ private fun StorageSettings(
 private fun AiSettings(
     hasApiKey: Boolean,
     currentModel: String,
+    connectionTestState: ConnectionTestState,
     onSaveApiKey: (String) -> Unit,
     onClearApiKey: () -> Unit,
     onModelSelected: (String) -> Unit,
+    onTestConnection: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var keyInput by remember { mutableStateOf("") }
@@ -461,6 +476,25 @@ private fun AiSettings(
             if (hasApiKey) {
                 OutlinedButton(onClick = onClearApiKey) {
                     Text("Clear Key")
+                }
+            }
+
+            if (hasApiKey) {
+                OutlinedButton(
+                    onClick = onTestConnection,
+                    enabled = connectionTestState !is ConnectionTestState.Loading,
+                ) {
+                    when (connectionTestState) {
+                        is ConnectionTestState.Loading -> {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(16.dp),
+                                strokeWidth = 2.dp,
+                            )
+                        }
+                        else -> {
+                            Text("Test")
+                        }
+                    }
                 }
             }
         }
@@ -530,7 +564,54 @@ private fun AiSettings(
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+
+        // Connection test result
+        when (connectionTestState) {
+            is ConnectionTestState.Success -> {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.CheckCircle,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(16.dp),
+                    )
+                    Text(
+                        text = "Connection successful",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            }
+            is ConnectionTestState.Error -> {
+                Text(
+                    text = "Connection failed: ${connectionTestState.message}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
+            else -> {
+                // No message for Idle or Loading states
+            }
+        }
     }
+}
+
+/**
+ * State for API connection test.
+ */
+sealed class ConnectionTestState {
+    data object Idle : ConnectionTestState()
+
+    data object Loading : ConnectionTestState()
+
+    data object Success : ConnectionTestState()
+
+    data class Error(
+        val message: String,
+    ) : ConnectionTestState()
 }
 
 /**
