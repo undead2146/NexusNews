@@ -82,6 +82,36 @@
 | Updated architecture index with Phase 4 documentation link. | `docs(architecture): add Phase 4 documentation link to architecture index` |
 | Updated project roadmap with Phase 4 completion status. | `docs(project): mark Phase 4 epics as complete` |
 
+## Clean Architecture Refactoring
+
+| Description | Commit Message |
+|-------------|----------------|
+| Extracted prompt builders into separate classes (Strategy Pattern). | `refactor(ai): extract prompt builders and parsers into separate classes (Clean Architecture)` |
+| Created AiPromptBuilder interface for prompt building contract. | `refactor(ai): extract prompt builders and parsers into separate classes (Clean Architecture)` |
+| Created PromptConfig data class for common parameters. | `refactor(ai): extract prompt builders and parsers into separate classes (Clean Architecture)` |
+| Created KeyPointsPromptBuilder for key points extraction. | `refactor(ai): extract prompt builders and parsers into separate classes (Clean Architecture)` |
+| Created EntityRecognitionPromptBuilder for entity recognition. | `refactor(ai): extract prompt builders and parsers into separate classes (Clean Architecture)` |
+| Created TopicClassificationPromptBuilder for topic classification. | `refactor(ai): extract prompt builders and parsers into separate classes (Clean Architecture)` |
+| Created BiasDetectionPromptBuilder for bias detection. | `refactor(ai): extract prompt builders and parsers into separate classes (Clean Architecture)` |
+| Created RecommendationsPromptBuilder for smart recommendations. | `refactor(ai): extract prompt builders and parsers into separate classes (Clean Architecture)` |
+| Created ChatPromptBuilder and ChatMessageBuilder for chat assistant. | `refactor(ai): extract prompt builders and parsers into separate classes (Clean Architecture)` |
+| Created ContentGenerationPromptBuilder for content generation. | `refactor(ai): extract prompt builders and parsers into separate classes (Clean Architecture)` |
+| Extracted response parsers into separate classes (Template Method Pattern). | `refactor(ai): extract prompt builders and parsers into separate classes (Clean Architecture)` |
+| Created AiResponseParser interface for parsing contract. | `refactor(ai): extract prompt builders and parsers into separate classes (Clean Architecture)` |
+| Created BaseMoshiParser for common parsing logic. | `refactor(ai): extract prompt builders and parsers into separate classes (Clean Architecture)` |
+| Created KeyPointsResponseParser for key points parsing. | `refactor(ai): extract prompt builders and parsers into separate classes (Clean Architecture)` |
+| Created EntityRecognitionResponseParser for entity parsing. | `refactor(ai): extract prompt builders and parsers into separate classes (Clean Architecture)` |
+| Created TopicClassificationResponseParser for topic parsing. | `refactor(ai): extract prompt builders and parsers into separate classes (Clean Architecture)` |
+| Created BiasDetectionResponseParser for bias parsing. | `refactor(ai): extract prompt builders and parsers into separate classes (Clean Architecture)` |
+| Created RecommendationResponseParser for recommendations parsing. | `refactor(ai): extract prompt builders and parsers into separate classes (Clean Architecture)` |
+| Created ContentGenerationResponseParser for content parsing. | `refactor(ai): extract prompt builders and parsers into separate classes (Clean Architecture)` |
+| Created ChatResponseParser for chat response parsing. | `refactor(ai): extract prompt builders and parsers into separate classes (Clean Architecture)` |
+| Created AiServiceConfig for service configuration. | `refactor(ai): extract prompt builders and parsers into separate classes (Clean Architecture)` |
+| Created AiRequestConfig for request parameters. | `refactor(ai): extract prompt builders and parsers into separate classes (Clean Architecture)` |
+| Created OpenRouterAiServiceRefactored using new components. | `refactor(ai): extract prompt builders and parsers into separate classes (Clean Architecture)` |
+| Created comprehensive AI refactoring documentation. | `docs(architecture): add AI refactoring documentation (Clean Architecture)` |
+| Updated architecture index with AI refactoring documentation link. | `docs(architecture): update index with AI refactoring documentation link` |
+
 ## Total Hours: 12
 
 ## Summary
