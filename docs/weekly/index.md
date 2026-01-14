@@ -18,5 +18,7 @@ Week 8 (15/12): 4 hours:
 See [week-8.md](week-8.md) for details.
 Week 9 (22/12 - 28/12): 8 hours:
 See [week-9.md](week-9.md) for details. **Phase 3: AI Integration Foundation** - Implemented OpenRouter API integration, article summarization with caching, AI usage tracking, model fallback logic, and AI settings UI.
+Week 10 (29/12 - 04/01): 12 hours:
+See [week-10.md](week-10.md) for details. **Phase 4: Advanced AI Features** - Implemented AI-powered article analysis (key points, entities, topics, bias), smart recommendations, AI chat assistant, content generation, and AI settings/customization.
 
-Total: 27 hours.
+Total: 39 hours.
