@@ -46,6 +46,7 @@ graph TB
 ## 📐 Layer Responsibilities
 
 ### Presentation Layer
+
 - **Location**: `app/src/main/java/com/example/nexusnews/presentation/`
 - **Purpose**: UI components and state management
 - **Components**:
@@ -55,6 +56,7 @@ graph TB
   - Navigation logic
 
 ### Domain Layer
+
 - **Location**: `app/src/main/java/com/example/nexusnews/domain/`
 - **Purpose**: Business logic and entities
 - **Components**:
@@ -64,6 +66,7 @@ graph TB
   - Domain-specific exceptions
 
 ### Data Layer
+
 - **Location**: `app/src/main/java/com/example/nexusnews/data/`
 - **Purpose**: Data management and sources
 - **Components**:
@@ -105,26 +108,31 @@ sequenceDiagram
 ## 🎯 Design Patterns
 
 ### 1. **MVVM (Model-View-ViewModel)**
+
 - **View**: Compose UI components
 - **ViewModel**: State management with StateFlow
 - **Model**: Domain entities and repositories
 
 ### 2. **Repository Pattern**
+
 - Single source of truth
 - Abstracts data sources
 - Handles caching strategy
 
 ### 3. **Use Case Pattern**
+
 - Single responsibility per use case
 - Encapsulates business logic
 - Reusable across ViewModels
 
 ### 4. **Adapter Pattern (News Sources)**
+
 - Unified interface for different sources
 - API-based sources (NewsAPI, Guardian)
 - Scraper-based sources (HBVL, GvA)
 
 ### 5. **Strategy Pattern (AI Models)**
+
 - Model selection based on task
 - Cost optimization
 - Fallback mechanisms
@@ -160,6 +168,7 @@ app/
 **Framework**: Hilt (Dagger)
 
 **Modules**:
+
 - `AppModule` - Application-level dependencies
 - `DatabaseModule` - Room database
 - `NetworkModule` - Retrofit, OkHttp

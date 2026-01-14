@@ -112,7 +112,26 @@
 | Created comprehensive AI refactoring documentation. | `docs(architecture): add AI refactoring documentation (Clean Architecture)` |
 | Updated architecture index with AI refactoring documentation link. | `docs(architecture): update index with AI refactoring documentation link` |
 
-## Total Hours: 12
+## Migration & Use Cases
+
+| Description | Commit Message |
+|-------------|----------------|
+| Created SummarizeArticleUseCase for article summarization. | `feat(domain): create SummarizeArticleUseCase (Clean Architecture)` |
+| Created AnalyzeSentimentUseCase for sentiment analysis. | `feat(domain): create AnalyzeSentimentUseCase (Clean Architecture)` |
+| Created TranslateArticleUseCase for article translation. | `feat(domain): create TranslateArticleUseCase (Clean Architecture)` |
+| Created ExtractKeyPointsUseCase for key points extraction. | `feat(domain): create ExtractKeyPointsUseCase (Clean Architecture)` |
+| Created RecognizeEntitiesUseCase for entity recognition. | `feat(domain): create RecognizeEntitiesUseCase (Clean Architecture)` |
+| Created ClassifyTopicUseCase for topic classification. | `feat(domain): create ClassifyTopicUseCase (Clean Architecture)` |
+| Created DetectBiasUseCase for bias detection. | `feat(domain): create DetectBiasUseCase (Clean Architecture)` |
+| Created GenerateRecommendationsUseCase for smart recommendations. | `feat(domain): create GenerateRecommendationsUseCase (Clean Architecture)` |
+| Created ChatWithAssistantUseCase for AI chat assistant. | `feat(domain): create ChatWithAssistantUseCase (Clean Architecture)` |
+| Created GenerateContentUseCase for content generation. | `feat(domain): create GenerateContentUseCase (Clean Architecture)` |
+| Updated AiModule to use OpenRouterAiService (clean architecture). | `refactor(di): update AiModule to use clean architecture service` |
+| Removed original OpenRouterAiService (944 lines). | `refactor(ai): remove original implementation after migration` |
+| Renamed OpenRouterAiServiceRefactored to OpenRouterAiService. | `refactor(ai): rename refactored service to main service` |
+| Updated AI refactoring documentation with migration completion. | `docs(architecture): update AI refactoring docs with migration status` |
+
+## Total Hours: 15
 
 ## Summary
 
