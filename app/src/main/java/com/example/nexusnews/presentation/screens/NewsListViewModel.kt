@@ -28,9 +28,9 @@ class NewsListViewModel
     constructor(
         private val newsRepository: NewsRepository,
         private val categoryPreferences: CategoryPreferencesDataStore,
-    ) : BaseViewModel() {
-        private val _uiState = MutableStateFlow<UiState<List<Article>>>(UiState.Idle)
-        val uiState: StateFlow<UiState<List<Article>>> = _uiState.asStateFlow()
+    ) : BaseViewModel<UiState<List<Article>>>(UiState.Idle) {
+        // Alias state to uiState for compatibility with View
+        val uiState: StateFlow<UiState<List<Article>>> = state
 
         private val _isRefreshing = MutableStateFlow(false)
         val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
@@ -52,18 +52,18 @@ class NewsListViewModel
          * Load news articles from the repository.
          */
         fun loadNews(forceRefresh: Boolean = false) {
-            if (_uiState.value.isLoading()) return // Prevent multiple simultaneous loads
+            if (currentState.isLoading()) return // Prevent multiple simultaneous loads
 
             viewModelScope.launch(exceptionHandler) {
                 Timber.d("Loading news articles (forceRefresh: $forceRefresh)")
 
-                _uiState.update { UiState.Loading }
+                updateState { UiState.Loading }
 
                 newsRepository
                     .getArticles(forceRefresh)
                     .collect { result ->
                         val uiState = result.toUiState()
-                        _uiState.update { uiState }
+                        updateState { uiState }
 
                         when (uiState) {
                             is UiState.Success -> {

@@ -35,7 +35,7 @@ class SearchViewModel
     constructor(
         private val newsRepository: NewsRepository,
         private val searchHistoryDataStore: SearchHistoryDataStore,
-    ) : BaseViewModel() {
+    ) : BaseViewModel<UiState<List<Article>>>(UiState.Idle) {
         private val _searchQuery = MutableStateFlow("")
         val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
@@ -45,8 +45,8 @@ class SearchViewModel
         private val _selectedSort = MutableStateFlow(SortType.RELEVANCY)
         val selectedSort: StateFlow<SortType> = _selectedSort.asStateFlow()
 
-        private val _uiState = MutableStateFlow<UiState<List<Article>>>(UiState.Idle)
-        val uiState: StateFlow<UiState<List<Article>>> = _uiState.asStateFlow()
+        // Alias state to uiState for compatibility with View
+        val uiState: StateFlow<UiState<List<Article>>> = state
 
         /**
          * Search history as a StateFlow.
@@ -77,7 +77,7 @@ class SearchViewModel
         fun updateSearchQuery(query: String) {
             _searchQuery.update { query }
             if (query.isBlank()) {
-                _uiState.update { UiState.Idle }
+                updateState { UiState.Idle }
             }
         }
 
@@ -147,7 +147,7 @@ class SearchViewModel
             viewModelScope.launch(exceptionHandler) {
                 Timber.d("Performing search with query: $query, category: ${_selectedCategory.value}, sort: ${_selectedSort.value}")
 
-                _uiState.update { UiState.Loading }
+                updateState { UiState.Loading }
 
                 // Save to search history
                 searchHistoryDataStore.addSearchQuery(query)
@@ -156,7 +156,7 @@ class SearchViewModel
                     .searchArticles(query)
                     .collect { result ->
                         val uiState = result.toUiState()
-                        _uiState.update { uiState }
+                        updateState { uiState }
 
                         when (uiState) {
                             is UiState.Success -> {
@@ -166,7 +166,7 @@ class SearchViewModel
                                         _selectedCategory.value,
                                         _selectedSort.value,
                                     )
-                                _uiState.update { UiState.Success(filteredArticles) }
+                                updateState { UiState.Success(filteredArticles) }
                                 Timber.d("Search successful: ${filteredArticles.size} articles found")
                             }
                             is UiState.Error -> {

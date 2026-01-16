@@ -28,7 +28,7 @@ class BookmarksViewModel
     @Inject
     constructor(
         private val newsRepository: NewsRepository,
-    ) : BaseViewModel() {
+    ) : BaseViewModel<Unit>(Unit) {
         private val _showFavoritesOnly = MutableStateFlow(false)
         val showFavoritesOnly: StateFlow<Boolean> = _showFavoritesOnly.asStateFlow()
 

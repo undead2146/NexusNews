@@ -56,8 +56,9 @@ class NewsDetailViewModel
         private val aiService: AiService,
         private val articleSummaryDao: ArticleSummaryDao,
     ) : BaseViewModel<NewsDetailUiState>(NewsDetailUiState()) {
-        private val _uiState = MutableStateFlow<NewsDetailUiState>(NewsDetailUiState())
-        val uiState: StateFlow<NewsDetailUiState> = _uiState.asStateFlow()
+        // uiState is now provided by BaseViewModel
+        // Alias state to uiState for compatibility with View
+        val uiState: StateFlow<NewsDetailUiState> = state
 
         private val _summaryState = MutableStateFlow<SummaryState>(SummaryState.Idle)
         val summaryState: StateFlow<SummaryState> = _summaryState.asStateFlow()
