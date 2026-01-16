@@ -18,7 +18,7 @@ Week 12 focuses on stabilizing the application, resolving persistent network iss
 | Description | Commit Message | Files |
 |-------------|----------------|-------|
 | Removed debug metadata banner from AI summary cards. | `fix(ui): remove debug metadata from SummaryCard` | `SummaryCard.kt` |
-| Added "Read Full Article" button since NewsAPI only provides previews. | `feat(ui): add Read Full Article button to detail screen` | `NewsDetailScreen.kt` |
+| **Implemented web scraping to fetch full article content** using JSoup. | `feat(scraper): implement ArticleScraperService for full content` | `ArticleScraperService.kt`, `NewsDetailViewModel.kt`, `NewsDetailScreen.kt` |
 
 ---
 *End of Report*

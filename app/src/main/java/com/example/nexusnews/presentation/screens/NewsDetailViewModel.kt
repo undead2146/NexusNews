@@ -3,6 +3,7 @@ package com.example.nexusnews.presentation.screens
 import androidx.lifecycle.viewModelScope
 import com.example.nexusnews.data.local.dao.ArticleSummaryDao
 import com.example.nexusnews.data.local.entity.ArticleSummaryEntity
+import com.example.nexusnews.data.scraper.ArticleScraperService
 import com.example.nexusnews.domain.ai.AiService
 import com.example.nexusnews.domain.ai.FreeAiModel
 import com.example.nexusnews.domain.model.Article
@@ -25,6 +26,7 @@ data class NewsDetailUiState(
     val isLoading: Boolean = false,
     val article: Article? = null,
     val error: String? = null,
+    val isLoadingFullContent: Boolean = false,
 )
 
 /**
@@ -55,6 +57,7 @@ class NewsDetailViewModel
         private val newsRepository: NewsRepository,
         private val aiService: AiService,
         private val articleSummaryDao: ArticleSummaryDao,
+        private val articleScraperService: ArticleScraperService,
     ) : BaseViewModel<NewsDetailUiState>(NewsDetailUiState()) {
         // uiState is now provided by BaseViewModel
         // Alias state to uiState for compatibility with View
@@ -77,9 +80,15 @@ class NewsDetailViewModel
                                 // Keep loading state
                             }
                             is com.example.nexusnews.util.Result.Success -> {
-                                updateState { it.copy(isLoading = false, article = result.data) }
+                                val article = result.data
+                                updateState { it.copy(isLoading = false, article = article) }
                                 // Load cached summary if available
                                 loadCachedSummary(articleId)
+
+                                // Fetch full content if article content is truncated
+                                if (article.content == null || (article.content.contains("[+") && article.content.contains("chars]"))) {
+                                    fetchFullArticleContent(article)
+                                }
                             }
                             is com.example.nexusnews.util.Result.Error -> {
                                 updateState { it.copy(isLoading = false, error = result.exception.localizedMessage ?: "Failed to load article") }
@@ -93,6 +102,25 @@ class NewsDetailViewModel
                             error = e.localizedMessage ?: "Failed to load article",
                         )
                     }
+                }
+            }
+        }
+
+        /**
+         * Fetches full article content from the web.
+         */
+        private fun fetchFullArticleContent(article: Article) {
+            viewModelScope.launch {
+                updateState { it.copy(isLoadingFullContent = true) }
+
+                val result = articleScraperService.fetchFullContent(article.url)
+                result.onSuccess { fullContent ->
+                    val updatedArticle = article.copy(content = fullContent)
+                    updateState { it.copy(article = updatedArticle, isLoadingFullContent = false) }
+                    Timber.d("Full content loaded: ${fullContent.length} characters")
+                }.onFailure { exception ->
+                    Timber.w(exception, "Failed to fetch full content, keeping preview")
+                    updateState { it.copy(isLoadingFullContent = false) }
                 }
             }
         }
