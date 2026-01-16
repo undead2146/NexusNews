@@ -17,8 +17,8 @@ import javax.inject.Singleton
 class AuthInterceptor
     @Inject
     constructor() : Interceptor {
-        // NOTE: API key injection from secure storage will be implemented in future updates
-        private var apiKey: String? = null
+        // Initialize with key from BuildConfig
+        private var apiKey: String? = com.example.nexusnews.BuildConfig.NEWS_API_KEY.takeIf { it.isNotBlank() }
 
         /**
          * Sets the API key for authentication.

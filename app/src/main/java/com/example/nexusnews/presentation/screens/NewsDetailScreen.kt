@@ -52,36 +52,26 @@ fun NewsDetailScreen(
     val summaryState by viewModel.summaryState.collectAsStateWithLifecycle()
 
     Scaffold(modifier = modifier) { paddingValues ->
-        when (uiState) {
-            is UiState.Idle -> {
-                // Trigger loading when screen opens
-                viewModel.loadArticle(articleId)
-                LoadingState()
-            }
-
-            is UiState.Loading -> {
-                LoadingState()
-            }
-
-            is UiState.Success -> {
-                val article = (uiState as UiState.Success).data
-                ArticleDetailContent(
-                    article = article,
-                    summaryState = summaryState,
-                    onGenerateSummary = { viewModel.generateSummary(article) },
-                    modifier = Modifier.padding(paddingValues),
-                )
-            }
-
-            is UiState.Error -> {
-                val error = uiState as UiState.Error
-                ErrorState(
-                    message = error.message,
-                    onRetry = { viewModel.loadArticle(articleId) },
-                    onBack = onBackClick,
-                    modifier = Modifier.padding(paddingValues),
-                )
-            }
+        if (uiState.isLoading) {
+            LoadingState()
+        } else if (uiState.error != null) {
+            ErrorState(
+                message = uiState.error!!,
+                onRetry = { viewModel.loadArticle(articleId) },
+                onBack = onBackClick,
+                modifier = Modifier.padding(paddingValues),
+            )
+        } else if (uiState.article != null) {
+            ArticleDetailContent(
+                article = uiState.article!!,
+                summaryState = summaryState,
+                onGenerateSummary = { viewModel.generateSummary(uiState.article!!) },
+                modifier = Modifier.padding(paddingValues),
+            )
+        } else {
+            // Idle state, trigger load
+            viewModel.loadArticle(articleId)
+            LoadingState()
         }
     }
 }

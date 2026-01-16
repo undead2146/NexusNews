@@ -1,5 +1,7 @@
 package com.example.nexusnews.presentation.screens.recommendations
 
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -57,7 +59,7 @@ fun RecommendationsScreen(
     onNavigateBack: () -> Unit,
     onArticleClick: (String) -> Unit,
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.state.collectAsState()
     val listState = rememberLazyListState()
 
     Scaffold(
@@ -374,17 +376,19 @@ class RecommendationsViewModel(
     fun bookmarkArticle(articleId: String) {
         viewModelScope.launch {
             try {
-                val article = newsRepository.getArticleById(articleId)
-                if (article != null) {
-                    if (currentState.bookmarkedArticles.contains(articleId)) {
-                        newsRepository.removeBookmark(articleId)
-                        updateState {
-                            it.copy(bookmarkedArticles = it.bookmarkedArticles - articleId)
-                        }
-                    } else {
-                        newsRepository.addBookmark(articleId)
-                        updateState {
-                            it.copy(bookmarkedArticles = it.bookmarkedArticles + articleId)
+                newsRepository.getArticleById(articleId).collect { result ->
+                     if (result is com.example.nexusnews.util.Result.Success<*>) {
+                        val article = result.data as com.example.nexusnews.domain.model.Article
+                        if (currentState.bookmarkedArticles.contains(articleId)) {
+                            newsRepository.removeBookmark(articleId)
+                            updateState {
+                                it.copy(bookmarkedArticles = it.bookmarkedArticles - articleId)
+                            }
+                        } else {
+                            newsRepository.addBookmark(article)
+                            updateState {
+                                it.copy(bookmarkedArticles = it.bookmarkedArticles + articleId)
+                            }
                         }
                     }
                 }
@@ -408,37 +412,51 @@ class RecommendationsViewModel(
                     )
 
                 // Get available articles
-                val articles = newsRepository.getAllArticles()
-                val availableArticles =
-                    articles.associate { article ->
-                        article.id to "${article.title}\n${article.description}"
-                    }
+                newsRepository.getArticles().collect { result ->
+                    if (result is com.example.nexusnews.util.Result.Success<*>) {
+                        @Suppress("UNCHECKED_CAST")
+                        val articles = result.data as List<com.example.nexusnews.domain.model.Article>
+                        val availableArticles =
+                            articles.associate { article ->
+                                article.id to "${article.title}\n${article.description}"
+                            }
 
-                // Generate recommendations
-                val result =
-                    aiService.generateRecommendations(
-                        userInterests = userInterests,
-                        availableArticles = availableArticles,
-                        limit = 10,
-                    )
+                        // Generate recommendations
+                        val recommendationResult =
+                            aiService.generateRecommendations(
+                                userInterests = userInterests,
+                                availableArticles = availableArticles,
+                                limit = 10,
+                            )
 
-                result.onSuccess { recommendationResult ->
-                    updateState {
-                        it.copy(
-                            recommendations = recommendationResult.recommendations,
-                            userInterests = recommendationResult.userProfile,
-                            isLoading = false,
-                            hasMoreRecommendations = recommendationResult.recommendations.size >= 10,
-                        )
-                    }
-                }
-
-                result.onFailure { error ->
-                    updateState {
-                        it.copy(
-                            error = error.message ?: "Failed to load recommendations",
-                            isLoading = false,
-                        )
+                        if (recommendationResult.isSuccess) {
+                            val data = recommendationResult.getOrNull()
+                            if (data != null) {
+                                 updateState {
+                                    it.copy(
+                                        recommendations = data.recommendations,
+                                        userInterests = data.userProfile,
+                                        isLoading = false,
+                                        hasMoreRecommendations = data.recommendations.size >= 10,
+                                    )
+                                }
+                            }
+                        } else {
+                            val exception = recommendationResult.exceptionOrNull()
+                            updateState {
+                                it.copy(
+                                    error = exception?.message ?: "Failed to load recommendations",
+                                    isLoading = false,
+                                )
+                            }
+                        }
+                    } else if (result is com.example.nexusnews.util.Result.Error) {
+                         updateState {
+                            it.copy(
+                                error = result.exception.message ?: "Failed to load articles",
+                                isLoading = false,
+                            )
+                        }
                     }
                 }
             } catch (e: Exception) {

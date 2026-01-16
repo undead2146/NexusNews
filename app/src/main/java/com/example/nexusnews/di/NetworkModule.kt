@@ -30,7 +30,9 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
+    fun provideOkHttpClient(
+        authInterceptor: com.example.nexusnews.data.remote.interceptor.AuthInterceptor,
+    ): OkHttpClient {
         val loggingInterceptor =
             HttpLoggingInterceptor().apply {
                 level = HttpLoggingInterceptor.Level.BODY
@@ -38,6 +40,7 @@ object NetworkModule {
 
         return OkHttpClient
             .Builder()
+            .addInterceptor(authInterceptor)
             .addInterceptor(loggingInterceptor)
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
@@ -77,7 +80,7 @@ object NetworkModule {
     @Singleton
     fun provideNewsApi(
         @Named("NewsApi") retrofit: Retrofit,
-    ): com.example.nexusnews.data.remote.api.NewsApi = retrofit.create(com.example.nexusnews.data.remote.api.NewsApi::class.java)
+    ): com.example.nexusnews.data.remote.api.NewsApiService = retrofit.create(com.example.nexusnews.data.remote.api.NewsApiService::class.java)
 
     @Provides
     @Singleton

@@ -5,6 +5,7 @@ import com.example.nexusnews.data.local.dao.BookmarkDao
 import com.example.nexusnews.data.mapper.toDomain
 import com.example.nexusnews.data.mapper.toDomainList
 import com.example.nexusnews.data.mapper.toEntity
+import com.example.nexusnews.data.mapper.toEntityList
 import com.example.nexusnews.data.remote.NewsRemoteDataSource
 import com.example.nexusnews.domain.model.Article
 import com.example.nexusnews.domain.repository.NewsRepository
@@ -39,8 +40,10 @@ class NewsRepositoryImpl
                             country = "us", // Default to US news
                             pageSize = 20,
                         )
+                    // Cache articles
+                    articleDao.insertArticles(articles.toEntityList())
                     emit(Result.Success(articles))
-                } catch (e: IOException) {
+                } catch (e: Exception) {
                     Timber.e(e, "Error fetching articles")
                     emit(Result.Error(e))
                 }
@@ -50,10 +53,13 @@ class NewsRepositoryImpl
             flow {
                 emit(Result.Loading)
                 try {
-                    // Single article fetching not yet implemented
-                    // For now, this is a placeholder that returns an error
-                    emit(Result.Error(UnsupportedOperationException("Single article fetching not yet implemented")))
-                } catch (e: IOException) {
+                    val articleEntity = articleDao.getArticleById(id)
+                    if (articleEntity != null) {
+                        emit(Result.Success(articleEntity.toDomain()))
+                    } else {
+                        emit(Result.Error(Exception("Article not found")))
+                    }
+                } catch (e: Exception) {
                     Timber.e(e, "Error fetching article by ID: $id")
                     emit(Result.Error(e))
                 }

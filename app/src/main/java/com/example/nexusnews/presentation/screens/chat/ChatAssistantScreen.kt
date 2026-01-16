@@ -1,5 +1,6 @@
 package com.example.nexusnews.presentation.screens.chat
 
+import androidx.lifecycle.viewModelScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -55,7 +56,7 @@ fun ChatAssistantScreen(
     viewModel: ChatAssistantViewModel,
     onNavigateBack: () -> Unit,
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.state.collectAsState<ChatAssistantUiState>()
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
 
