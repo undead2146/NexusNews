@@ -25,8 +25,12 @@ android {
 
         // Load API key from local.properties
         val properties = Properties()
-        properties.load(project.rootProject.file("local.properties").inputStream())
+        val localPropertiesFile = project.rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            properties.load(localPropertiesFile.inputStream())
+        }
         buildConfigField("String", "NEWS_API_KEY", "\"${properties.getProperty("NEWS_API_KEY", "")}\"")
+        buildConfigField("String", "OPENROUTER_API_KEY", "\"${properties.getProperty("OPENROUTER_API_KEY", "")}\"")
     }
 
     buildTypes {
