@@ -86,6 +86,7 @@ private fun ArticleDetailContent(
     onGenerateSummary: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     Column(
         modifier =
             modifier
@@ -172,6 +173,20 @@ private fun ArticleDetailContent(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 8.dp),
             )
+
+            // Read Full Article Button
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(
+                onClick = {
+                    val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(article.url))
+                    context.startActivity(intent)
+                },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(text = "Read Full Article")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }

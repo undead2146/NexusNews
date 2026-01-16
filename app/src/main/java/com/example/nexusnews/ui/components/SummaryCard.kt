@@ -41,7 +41,7 @@ fun SummaryCard(
         Column(
             modifier = Modifier.padding(16.dp),
         ) {
-            // Header with icon and model info
+            // Header with icon
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -66,15 +66,6 @@ fun SummaryCard(
                 text = summary.summary,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Metadata
-            SummaryMetadata(
-                model = summary.modelUsed,
-                timestamp = summary.generatedAt,
-                tokens = summary.totalTokens,
             )
         }
     }
