@@ -16,12 +16,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -51,7 +56,35 @@ fun NewsDetailScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val summaryState by viewModel.summaryState.collectAsStateWithLifecycle()
 
-    Scaffold(modifier = modifier) { paddingValues ->
+    var showSummarySheet by remember { mutableStateOf(false) }
+
+    Scaffold(
+        modifier = modifier,
+        floatingActionButton = {
+            // Show FAB only when article is loaded and summary is idle
+            if (uiState.article != null && summaryState is SummaryState.Idle) {
+                FloatingActionButton(
+                    onClick = { viewModel.generateSummary(uiState.article!!) },
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = "Generate AI Summary",
+                        )
+                        Text("AI Summary")
+                    }
+                }
+            }
+            // Show summary in sheet when available
+            if (summaryState is SummaryState.Success) {
+                showSummarySheet = true
+            }
+        },
+    ) { paddingValues ->
         if (uiState.isLoading) {
             LoadingState()
         } else if (uiState.error != null) {
@@ -65,7 +98,8 @@ fun NewsDetailScreen(
             ArticleDetailContent(
                 article = uiState.article!!,
                 summaryState = summaryState,
-                onGenerateSummary = { viewModel.generateSummary(uiState.article!!) },
+                showSummarySheet = showSummarySheet,
+                onDismissSummary = { showSummarySheet = false },
                 modifier = Modifier.padding(paddingValues),
             )
         } else {
@@ -83,7 +117,8 @@ fun NewsDetailScreen(
 private fun ArticleDetailContent(
     article: com.example.nexusnews.domain.model.Article,
     summaryState: SummaryState,
-    onGenerateSummary: () -> Unit,
+    showSummarySheet: Boolean,
+    onDismissSummary: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -94,11 +129,26 @@ private fun ArticleDetailContent(
                 .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        // Summary section
-        SummarySection(
-            summaryState = summaryState,
-            onGenerateSummary = onGenerateSummary,
-        )
+        // Show summary sheet
+        if (showSummarySheet && summaryState is SummaryState.Success) {
+            SummaryCard(
+                summary = summaryState.summary,
+                onDismiss = onDismissSummary,
+            )
+        }
+
+        // Show loading indicator
+        if (summaryState is SummaryState.Loading) {
+            LoadingSummaryCard()
+        }
+
+        // Show error
+        if (summaryState is SummaryState.Error) {
+            ErrorSummaryCard(
+                message = summaryState.message,
+                onRetry = {}, // Handled by FAB
+            )
+        }
 
         // Article image
         if (article.imageUrl != null) {
@@ -175,59 +225,6 @@ private fun ArticleDetailContent(
             )
 
             Spacer(modifier = Modifier.height(16.dp))
-        }
-    }
-}
-
-/**
- * Displays summary section with generate button and summary card.
- */
-@Composable
-private fun SummarySection(
-    summaryState: SummaryState,
-    onGenerateSummary: () -> Unit,
-) {
-    when (summaryState) {
-        is SummaryState.Success -> {
-            SummaryCard(
-                summary = summaryState.summary,
-            )
-        }
-        is SummaryState.Error -> {
-            ErrorSummaryCard(
-                message = summaryState.message,
-                onRetry = onGenerateSummary,
-            )
-        }
-        is SummaryState.Loading -> {
-            LoadingSummaryCard()
-        }
-        SummaryState.Idle -> {
-            GenerateSummaryButton(onClick = onGenerateSummary)
-        }
-    }
-}
-
-/**
- * Button to generate AI summary.
- */
-@Composable
-private fun GenerateSummaryButton(onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(
-                imageVector = Icons.Default.Star,
-                contentDescription = null,
-                modifier = Modifier.size(20.dp),
-            )
-            Spacer(modifier = Modifier.size(8.dp))
-            Text(text = "Generate AI Summary")
         }
     }
 }

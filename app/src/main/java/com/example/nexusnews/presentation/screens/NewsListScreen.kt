@@ -50,48 +50,46 @@ fun NewsListScreen(
     val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
     val selectedCategory by viewModel.selectedCategory.collectAsStateWithLifecycle()
 
-    Scaffold(modifier = modifier) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues)) {
-            // Category selector
-            CategorySelector(
-                selectedCategory = selectedCategory,
-                onCategorySelected = { viewModel.selectCategory(it) },
-            )
+    Column(modifier = modifier.fillMaxSize()) {
+        // Category selector
+        CategorySelector(
+            selectedCategory = selectedCategory,
+            onCategorySelected = { viewModel.selectCategory(it) },
+        )
 
-            // News content with pull-to-refresh
-            PullToRefreshBox(
-                isRefreshing = isRefreshing,
-                onRefresh = { viewModel.refreshNews() },
-            ) {
-                when (uiState) {
-                    is UiState.Idle -> {
-                        // Initial state - could show welcome message
-                        IdleState()
-                    }
+        // News content with pull-to-refresh
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = { viewModel.refreshNews() },
+        ) {
+            when (uiState) {
+                is UiState.Idle -> {
+                    // Initial state - could show welcome message
+                    IdleState()
+                }
 
-                    is UiState.Loading -> {
-                        LoadingState()
-                    }
+                is UiState.Loading -> {
+                    LoadingState()
+                }
 
-                    is UiState.Success -> {
-                        val articles = (uiState as UiState.Success).data
-                        if (articles.isEmpty()) {
-                            EmptyState()
-                        } else {
-                            ArticleList(
-                                articles = articles,
-                                onArticleClick = onArticleClick,
-                            )
-                        }
-                    }
-
-                    is UiState.Error -> {
-                        val error = uiState as UiState.Error
-                        ErrorState(
-                            message = error.message,
-                            onRetry = { viewModel.retryLoadNews() },
+                is UiState.Success -> {
+                    val articles = (uiState as UiState.Success).data
+                    if (articles.isEmpty()) {
+                        EmptyState()
+                    } else {
+                        ArticleList(
+                            articles = articles,
+                            onArticleClick = onArticleClick,
                         )
                     }
+                }
+
+                is UiState.Error -> {
+                    val error = uiState as UiState.Error
+                    ErrorState(
+                        message = error.message,
+                        onRetry = { viewModel.retryLoadNews() },
+                    )
                 }
             }
         }
@@ -116,11 +114,12 @@ private fun ArticleList(
             key = { it.id },
         ) { article ->
             val isBookmarked by viewModel.isBookmarked(article.id).collectAsStateWithLifecycle(initialValue = false)
+            val isFavorite by viewModel.isFavorite(article.id).collectAsStateWithLifecycle(initialValue = false)
 
             SwipeableArticleItem(
                 article = article,
                 isBookmarked = isBookmarked,
-                isFavorite = false, // TODO: Track favorite state
+                isFavorite = isFavorite,
                 onBookmarkToggle = { viewModel.toggleBookmark(article) },
                 onFavoriteToggle = { viewModel.toggleFavorite(article.id) },
                 onClick = { onArticleClick(article.id) },

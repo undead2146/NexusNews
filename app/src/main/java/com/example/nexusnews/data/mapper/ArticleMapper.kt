@@ -36,6 +36,31 @@ object ArticleMapper {
     fun toDomainList(newsApiArticles: List<NewsApiArticle>): List<Article> = newsApiArticles.map { toDomain(it) }
 
     /**
+     * Converts a PopulatedBookmark to an Article domain model.
+     */
+    fun toDomain(populatedBookmark: com.example.nexusnews.data.local.model.PopulatedBookmark): Article =
+        Article(
+            id = populatedBookmark.article.id,
+            title = populatedBookmark.article.title,
+            description = populatedBookmark.article.description,
+            content = populatedBookmark.article.content,
+            url = populatedBookmark.article.url,
+            imageUrl = populatedBookmark.article.imageUrl,
+            author = populatedBookmark.article.author,
+            source = populatedBookmark.article.source,
+            publishedAt = populatedBookmark.article.publishedAt,
+            category = populatedBookmark.article.category,
+            tags = populatedBookmark.article.tags,
+            isFavorite = populatedBookmark.isFavorite,
+        )
+
+    /**
+     * Converts a list of PopulatedBookmark to a list of Article domain models.
+     */
+    fun toDomainListFromBookmarks(populatedBookmarks: List<com.example.nexusnews.data.local.model.PopulatedBookmark>): List<Article> =
+        populatedBookmarks.map { toDomain(it) }
+
+    /**
      * Generates a unique ID for the article based on URL.
      * Uses URL hash to ensure consistency across API calls.
      */

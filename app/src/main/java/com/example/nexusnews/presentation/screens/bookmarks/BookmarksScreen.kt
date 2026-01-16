@@ -47,105 +47,103 @@ fun BookmarksScreen(
     val uiState by viewModel.bookmarks.collectAsState()
     val showFavoritesOnly by viewModel.showFavoritesOnly.collectAsState()
 
-    Scaffold(
-    ) { paddingValues ->
-        Column(
+    Column(
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        Text(
+            text = "Bookmarks",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+        )
+        // Favorites filter chip
+        FilterChip(
+            selected = showFavoritesOnly,
+            onClick = { viewModel.toggleFavoritesFilter() },
+            label = { Text(if (showFavoritesOnly) "Favorites Only" else "All Bookmarks") },
+            leadingIcon = {
+                Icon(
+                    imageVector =
+                        if (showFavoritesOnly) {
+                            Icons.Filled.Favorite
+                        } else {
+                            Icons.Outlined.FavoriteBorder
+                        },
+                    contentDescription = null,
+                )
+            },
             modifier =
                 Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-        ) {
-            Text(
-                text = "Bookmarks",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
-            )
-            // Favorites filter chip
-            FilterChip(
-                selected = showFavoritesOnly,
-                onClick = { viewModel.toggleFavoritesFilter() },
-                label = { Text(if (showFavoritesOnly) "Favorites Only" else "All Bookmarks") },
-                leadingIcon = {
-                    Icon(
-                        imageVector =
-                            if (showFavoritesOnly) {
-                                Icons.Filled.Favorite
-                            } else {
-                                Icons.Outlined.FavoriteBorder
-                            },
-                        contentDescription = null,
-                    )
-                },
-                modifier =
-                    Modifier
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-            )
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+        )
 
-            // Content
-            when (uiState) {
-                is UiState.Loading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        CircularProgressIndicator()
-                    }
+        // Content
+        when (uiState) {
+            is UiState.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    CircularProgressIndicator()
                 }
+            }
 
-                is UiState.Success -> {
-                    val articles = (uiState as UiState.Success<List<Article>>).data
-                    if (articles.isEmpty()) {
-                        // Empty state
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Text(
-                                text =
-                                    if (showFavoritesOnly) {
-                                        "No favorite articles yet.\nMark articles as favorites to see them here."
-                                    } else {
-                                        "No bookmarks yet.\nSave articles to read them later."
-                                    },
-                                style = MaterialTheme.typography.bodyLarge,
-                                textAlign = TextAlign.Center,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(32.dp),
-                            )
-                        }
-                    } else {
-                        // Bookmarks list
-                        LazyColumn(
-                            contentPadding = PaddingValues(vertical = 8.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                        ) {
-                            items(articles, key = { it.id }) { article ->
-                                ArticleItem(
-                                    article = article,
-                                    onClick = { onArticleClick(article.id) },
-                                )
-                            }
-                        }
-                    }
-                }
-
-                is UiState.Error -> {
+            is UiState.Success -> {
+                val articles = (uiState as UiState.Success<List<Article>>).data
+                if (articles.isEmpty()) {
+                    // Empty state
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
-                            text = "Error loading bookmarks",
+                            text =
+                                if (showFavoritesOnly) {
+                                    "No favorite articles yet.\nMark articles as favorites to see them here."
+                                } else {
+                                    "No bookmarks yet.\nSave articles to read them later."
+                                },
                             style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.error,
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(32.dp),
                         )
                     }
+                } else {
+                    // Bookmarks list
+                    LazyColumn(
+                        contentPadding = PaddingValues(vertical = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        items(articles, key = { it.id }) { article ->
+                            ArticleItem(
+                                article = article,
+                                isBookmarked = true,
+                                isFavorite = article.isFavorite,
+                                onClick = { onArticleClick(article.id) },
+                                onBookmarkClick = { viewModel.removeBookmark(article.id) },
+                                onFavoriteClick = { viewModel.toggleFavorite(article.id) },
+                            )
+                        }
+                    }
                 }
+            }
 
-                is UiState.Idle -> {
-                    // Do nothing
+            is UiState.Error -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = "Error loading bookmarks",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.error,
+                    )
                 }
+            }
+
+            is UiState.Idle -> {
+                // Do nothing
             }
         }
     }

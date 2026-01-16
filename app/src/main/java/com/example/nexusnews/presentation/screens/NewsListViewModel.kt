@@ -134,6 +134,11 @@ class NewsListViewModel
         fun isBookmarked(articleId: String) = newsRepository.isBookmarked(articleId)
 
         /**
+         * Checks if an article is a favorite.
+         */
+        fun isFavorite(articleId: String) = newsRepository.isFavorite(articleId)
+
+        /**
          * Toggles favorite status for a bookmarked article.
          */
         fun toggleFavorite(articleId: String) {

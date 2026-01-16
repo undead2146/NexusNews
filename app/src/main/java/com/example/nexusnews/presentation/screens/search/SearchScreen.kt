@@ -56,63 +56,59 @@ fun SearchScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val searchHistory by viewModel.searchHistory.collectAsStateWithLifecycle()
 
-    Scaffold(
-        modifier = modifier,
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier.padding(paddingValues),
-        ) {
-            Text(
-                text = "Search News",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
-            )
-            // Search bar
-            SearchBar(
-                query = searchQuery,
-                onQueryChange = { viewModel.updateSearchQuery(it) },
-                onClearClick = { viewModel.updateSearchQuery("") },
-            )
+    Column(
+        modifier = modifier.fillMaxSize(),
+    ) {
+        Text(
+            text = "Search News",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+        )
+        // Search bar
+        SearchBar(
+            query = searchQuery,
+            onQueryChange = { viewModel.updateSearchQuery(it) },
+            onClearClick = { viewModel.updateSearchQuery("") },
+        )
 
-            // Category filters
-            CategoryFilters(
-                selectedCategory = selectedCategory,
-                onCategorySelected = { viewModel.updateCategory(it) },
-            )
+        // Category filters
+        CategoryFilters(
+            selectedCategory = selectedCategory,
+            onCategorySelected = { viewModel.updateCategory(it) },
+        )
 
-            // Search results or history
-            when (uiState) {
-                is UiState.Idle -> {
-                    if (searchHistory.isNotEmpty() && searchQuery.isBlank()) {
-                        SearchHistorySection(
-                            history = searchHistory,
-                            onHistoryItemClick = { viewModel.selectHistoryItem(it) },
-                            onRemoveItem = { viewModel.removeFromHistory(it) },
-                            onClearHistory = { viewModel.clearHistory() },
-                        )
-                    } else {
-                        EmptySearchState()
-                    }
+        // Search results or history
+        when (uiState) {
+            is UiState.Idle -> {
+                if (searchHistory.isNotEmpty() && searchQuery.isBlank()) {
+                    SearchHistorySection(
+                        history = searchHistory,
+                        onHistoryItemClick = { viewModel.selectHistoryItem(it) },
+                        onRemoveItem = { viewModel.removeFromHistory(it) },
+                        onClearHistory = { viewModel.clearHistory() },
+                    )
+                } else {
+                    EmptySearchState()
                 }
-                is UiState.Loading -> {
-                    LoadingState()
+            }
+            is UiState.Loading -> {
+                LoadingState()
+            }
+            is UiState.Success -> {
+                val articles = (uiState as UiState.Success<List<com.example.nexusnews.domain.model.Article>>).data
+                if (articles.isEmpty()) {
+                    NoResultsState()
+                } else {
+                    SearchResults(
+                        articles = articles,
+                        onArticleClick = onArticleClick,
+                    )
                 }
-                is UiState.Success -> {
-                    val articles = (uiState as UiState.Success<List<com.example.nexusnews.domain.model.Article>>).data
-                    if (articles.isEmpty()) {
-                        NoResultsState()
-                    } else {
-                        SearchResults(
-                            articles = articles,
-                            onArticleClick = onArticleClick,
-                        )
-                    }
-                }
-                is UiState.Error -> {
-                    val error = uiState as UiState.Error
-                    ErrorState(message = error.message)
-                }
+            }
+            is UiState.Error -> {
+                val error = uiState as UiState.Error
+                ErrorState(message = error.message)
             }
         }
     }

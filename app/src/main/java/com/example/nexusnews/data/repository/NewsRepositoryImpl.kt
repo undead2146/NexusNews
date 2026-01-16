@@ -90,7 +90,7 @@ class NewsRepositoryImpl
                 emit(Result.Loading)
                 try {
                     bookmarkDao.getAllBookmarks().collect { entities ->
-                        emit(Result.Success(entities.toDomainList()))
+                        emit(Result.Success(com.example.nexusnews.data.mapper.ArticleMapper.toDomainListFromBookmarks(entities)))
                     }
                 } catch (e: Exception) {
                     Timber.e(e, "Error fetching bookmarks")
@@ -103,7 +103,7 @@ class NewsRepositoryImpl
                 emit(Result.Loading)
                 try {
                     bookmarkDao.getFavorites().collect { entities ->
-                        emit(Result.Success(entities.toDomainList()))
+                        emit(Result.Success(com.example.nexusnews.data.mapper.ArticleMapper.toDomainListFromBookmarks(entities)))
                     }
                 } catch (e: Exception) {
                     Timber.e(e, "Error fetching favorites")
@@ -111,7 +111,9 @@ class NewsRepositoryImpl
                 }
             }
 
-        override fun isBookmarked(articleId: String): Flow<Boolean> = bookmarkDao.isBookmarked(articleId)
+    override fun isBookmarked(articleId: String): Flow<Boolean> = bookmarkDao.isBookmarked(articleId)
+
+    override fun isFavorite(articleId: String): Flow<Boolean> = bookmarkDao.isFavorite(articleId)
 
         override suspend fun addBookmark(article: Article) {
             try {

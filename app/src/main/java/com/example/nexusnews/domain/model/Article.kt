@@ -18,4 +18,5 @@ data class Article(
     val publishedAt: LocalDateTime,
     val category: String?,
     val tags: List<String> = emptyList(),
+    val isFavorite: Boolean = false,
 )

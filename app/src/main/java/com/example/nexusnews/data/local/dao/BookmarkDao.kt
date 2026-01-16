@@ -22,12 +22,12 @@ interface BookmarkDao {
     @Transaction
     @Query(
         """
-        SELECT a.* FROM articles a
+        SELECT a.*, b.is_favorite FROM articles a
         INNER JOIN bookmarks b ON a.id = b.article_id
         ORDER BY b.bookmarked_at DESC
     """,
     )
-    fun getAllBookmarks(): Flow<List<ArticleEntity>>
+    fun getAllBookmarks(): Flow<List<com.example.nexusnews.data.local.model.PopulatedBookmark>>
 
     /**
      * Gets only favorite articles.
@@ -35,13 +35,13 @@ interface BookmarkDao {
     @Transaction
     @Query(
         """
-        SELECT a.* FROM articles a
+        SELECT a.*, b.is_favorite FROM articles a
         INNER JOIN bookmarks b ON a.id = b.article_id
         WHERE b.is_favorite = 1
         ORDER BY b.bookmarked_at DESC
     """,
     )
-    fun getFavorites(): Flow<List<ArticleEntity>>
+    fun getFavorites(): Flow<List<com.example.nexusnews.data.local.model.PopulatedBookmark>>
 
     /**
      * Checks if an article is bookmarked.
@@ -49,6 +49,12 @@ interface BookmarkDao {
      */
     @Query("SELECT EXISTS(SELECT 1 FROM bookmarks WHERE article_id = :articleId)")
     fun isBookmarked(articleId: String): Flow<Boolean>
+
+    /**
+     * Checks if an article is marked as favorite.
+     */
+    @Query("SELECT EXISTS(SELECT 1 FROM bookmarks WHERE article_id = :articleId AND is_favorite = 1)")
+    fun isFavorite(articleId: String): Flow<Boolean>
 
     /**
      * Gets bookmark entity for an article.

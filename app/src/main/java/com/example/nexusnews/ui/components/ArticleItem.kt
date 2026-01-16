@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -50,7 +52,9 @@ fun ArticleItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     isBookmarked: Boolean = false,
+    isFavorite: Boolean = false,
     onBookmarkClick: (() -> Unit)? = null,
+    onFavoriteClick: (() -> Unit)? = null,
 ) {
     Card(
         modifier =
@@ -77,17 +81,33 @@ fun ArticleItem(
                                     isBookmarked,
                                 ),
                             )
+                            if (isFavorite) {
+                                append(" Favorited.")
+                            }
                         }
 
                     // Add custom accessibility actions
+                    val customActions = mutableListOf<Pair<String, () -> Boolean>>()
                     if (onBookmarkClick != null) {
+                        customActions.add(
+                            (if (isBookmarked) "Remove bookmark" else "Add bookmark") to {
+                                onBookmarkClick()
+                                true
+                            }
+                        )
+                    }
+                    if (onFavoriteClick != null) {
+                        customActions.add(
+                            (if (isFavorite) "Remove from favorites" else "Add to favorites") to {
+                                onFavoriteClick()
+                                true
+                            }
+                        )
+                    }
+
+                    if (customActions.isNotEmpty()) {
                         com.example.nexusnews.ui.accessibility.AccessibilityUtils.run {
-                            addCustomActions(
-                                (if (isBookmarked) "Remove bookmark" else "Add bookmark") to {
-                                    onBookmarkClick()
-                                    true
-                                },
-                            )
+                            addCustomActions(*customActions.toTypedArray())
                         }
                     }
                 },
@@ -177,33 +197,70 @@ fun ArticleItem(
                 }
             }
 
-            // Bookmark icon button
-            if (onBookmarkClick != null) {
-                IconButton(
-                    onClick = onBookmarkClick,
-                    modifier = Modifier.align(Alignment.Top),
-                ) {
-                    androidx.compose.animation.AnimatedVisibility(
-                        visible = isBookmarked,
-                        enter = com.example.nexusnews.ui.animations.NexusAnimations.bookmarkToggle,
-                        exit = com.example.nexusnews.ui.animations.NexusAnimations.bookmarkExit,
+            // Action buttons
+            Column(
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(4.dp)
+            ) {
+                // Bookmark Icon
+                if (onBookmarkClick != null) {
+                    IconButton(
+                        onClick = onBookmarkClick,
+                        modifier = Modifier.size(24.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Filled.Favorite,
-                            contentDescription = "Remove bookmark",
-                            tint = MaterialTheme.colorScheme.primary,
-                        )
+                        androidx.compose.animation.AnimatedVisibility(
+                            visible = isBookmarked,
+                            enter = com.example.nexusnews.ui.animations.NexusAnimations.bookmarkToggle,
+                            exit = com.example.nexusnews.ui.animations.NexusAnimations.bookmarkExit,
+                        ) {
+                            Icon(
+                                imageVector = androidx.compose.material.icons.filled.Bookmark,
+                                contentDescription = "Remove bookmark",
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                        }
+                        androidx.compose.animation.AnimatedVisibility(
+                            visible = !isBookmarked,
+                            enter = com.example.nexusnews.ui.animations.NexusAnimations.fadeIn,
+                            exit = com.example.nexusnews.ui.animations.NexusAnimations.fadeOut,
+                        ) {
+                            Icon(
+                                imageVector = androidx.compose.material.icons.outlined.BookmarkBorder,
+                                contentDescription = "Add bookmark",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
                     }
-                    androidx.compose.animation.AnimatedVisibility(
-                        visible = !isBookmarked,
-                        enter = com.example.nexusnews.ui.animations.NexusAnimations.fadeIn,
-                        exit = com.example.nexusnews.ui.animations.NexusAnimations.fadeOut,
+                }
+
+                // Favorite Icon
+                if (onFavoriteClick != null) {
+                     IconButton(
+                        onClick = onFavoriteClick,
+                        modifier = Modifier.size(24.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Outlined.FavoriteBorder,
-                            contentDescription = "Add bookmark",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
+                        androidx.compose.animation.AnimatedVisibility(
+                            visible = isFavorite,
+                            enter = com.example.nexusnews.ui.animations.NexusAnimations.bookmarkToggle, // Reuse animation
+                            exit = com.example.nexusnews.ui.animations.NexusAnimations.bookmarkExit,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Favorite,
+                                contentDescription = "Remove from favorites",
+                                tint = androidx.compose.ui.graphics.Color.Red,
+                            )
+                        }
+                        androidx.compose.animation.AnimatedVisibility(
+                            visible = !isFavorite,
+                            enter = com.example.nexusnews.ui.animations.NexusAnimations.fadeIn,
+                            exit = com.example.nexusnews.ui.animations.NexusAnimations.fadeOut,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.FavoriteBorder,
+                                contentDescription = "Add to favorites",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
                     }
                 }
             }

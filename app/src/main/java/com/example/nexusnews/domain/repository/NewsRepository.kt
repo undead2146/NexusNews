@@ -44,6 +44,8 @@ interface NewsRepository {
      */
     fun isBookmarked(articleId: String): Flow<Boolean>
 
+    fun isFavorite(articleId: String): Flow<Boolean>
+
     /**
      * Adds an article to bookmarks.
      */

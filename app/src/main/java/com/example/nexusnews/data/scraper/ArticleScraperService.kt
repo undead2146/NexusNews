@@ -1,5 +1,7 @@
 package com.example.nexusnews.data.scraper
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import timber.log.Timber
@@ -20,30 +22,32 @@ class ArticleScraperService
          * @return The extracted article content, or null if scraping fails
          */
         suspend fun fetchFullContent(url: String): Result<String> =
-            try {
-                Timber.d("Fetching full content from: $url")
+            withContext(Dispatchers.IO) {
+                try {
+                    Timber.d("Fetching full content from: $url")
 
-                // Fetch the HTML document
-                val document: Document =
-                    Jsoup
-                        .connect(url)
-                        .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-                        .timeout(10000)
-                        .get()
+                    // Fetch the HTML document
+                    val document: Document =
+                        Jsoup
+                            .connect(url)
+                            .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+                            .timeout(10000)
+                            .get()
 
-                // Extract article content using common selectors
-                val content = extractArticleContent(document)
+                    // Extract article content using common selectors
+                    val content = extractArticleContent(document)
 
-                if (content.isNotBlank()) {
-                    Timber.d("Successfully extracted ${content.length} characters")
-                    Result.success(content)
-                } else {
-                    Timber.w("No content extracted from URL")
-                    Result.failure(Exception("Could not extract article content"))
+                    if (content.isNotBlank()) {
+                        Timber.d("Successfully extracted ${content.length} characters")
+                        Result.success(content)
+                    } else {
+                        Timber.w("No content extracted from URL")
+                        Result.failure(Exception("Could not extract article content"))
+                    }
+                } catch (e: Exception) {
+                    Timber.e(e, "Failed to scrape article content")
+                    Result.failure(e)
                 }
-            } catch (e: Exception) {
-                Timber.e(e, "Failed to scrape article content")
-                Result.failure(e)
             }
 
         /**
