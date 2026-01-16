@@ -32,7 +32,12 @@ class OpenRouterAiService
          */
         private val config: AiServiceConfig
             get() {
-                val apiKey = apiKeyDataStore.getOpenRouterApiKey()
+                val storedKey = apiKeyDataStore.getOpenRouterApiKey()
+                val apiKey = if (storedKey.isNullOrBlank()) {
+                    com.example.nexusnews.BuildConfig.OPENROUTER_API_KEY.takeIf { it.isNotBlank() }
+                } else {
+                    storedKey
+                }
                 return AiServiceConfig.create(apiKey)
             }
 
