@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.nexusnews.domain.model.Article
 import com.example.nexusnews.presentation.common.UiState
 import com.example.nexusnews.ui.components.ArticleItem
 

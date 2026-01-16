@@ -1,5 +1,6 @@
 package com.example.nexusnews.presentation.navigation
 
+import com.example.nexusnews.presentation.navigation.NexusNewsNavGraph
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
