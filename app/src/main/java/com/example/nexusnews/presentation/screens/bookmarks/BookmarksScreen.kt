@@ -47,11 +47,6 @@ fun BookmarksScreen(
     val showFavoritesOnly by viewModel.showFavoritesOnly.collectAsState()
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Bookmarks") },
-            )
-        },
     ) { paddingValues ->
         Column(
             modifier =
@@ -59,6 +54,12 @@ fun BookmarksScreen(
                     .fillMaxSize()
                     .padding(paddingValues),
         ) {
+            Text(
+                text = "Bookmarks",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+            )
             // Favorites filter chip
             FilterChip(
                 selected = showFavoritesOnly,
@@ -92,7 +93,7 @@ fun BookmarksScreen(
                 }
 
                 is UiState.Success -> {
-                    val articles = (uiState as UiState.Success).data
+                    val articles = (uiState as UiState.Success<List<Article>>).data
                     if (articles.isEmpty()) {
                         // Empty state
                         Box(

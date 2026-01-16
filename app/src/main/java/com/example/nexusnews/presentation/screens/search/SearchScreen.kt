@@ -58,15 +58,16 @@ fun SearchScreen(
 
     Scaffold(
         modifier = modifier,
-        topBar = {
-            TopAppBar(
-                title = { Text("Search News") },
-            )
-        },
     ) { paddingValues ->
         Column(
             modifier = Modifier.padding(paddingValues),
         ) {
+            Text(
+                text = "Search News",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+            )
             // Search bar
             SearchBar(
                 query = searchQuery,
@@ -98,7 +99,7 @@ fun SearchScreen(
                     LoadingState()
                 }
                 is UiState.Success -> {
-                    val articles = (uiState as UiState.Success).data
+                    val articles = (uiState as UiState.Success<List<com.example.nexusnews.domain.model.Article>>).data
                     if (articles.isEmpty()) {
                         NoResultsState()
                     } else {
