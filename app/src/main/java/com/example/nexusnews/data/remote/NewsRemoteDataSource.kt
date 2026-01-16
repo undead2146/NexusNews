@@ -43,7 +43,6 @@ class NewsRemoteDataSource
             safeApiCall {
                 val response =
                     newsApiService.getTopHeadlines(
-                        apiKey = "", // Will be replaced by AuthInterceptor
                         country = country,
                         category = category,
                         query = query,
@@ -81,7 +80,6 @@ class NewsRemoteDataSource
             safeApiCall {
                 val response =
                     newsApiService.getEverything(
-                        apiKey = "", // Will be replaced by AuthInterceptor
                         query = query,
                         sources = sources,
                         from = from,

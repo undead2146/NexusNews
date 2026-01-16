@@ -57,7 +57,6 @@ class NewsRemoteDataSourceTest {
             val mockResponse = Response.success(mockApiResponse)
             coEvery {
                 newsApiService.getTopHeadlines(
-                    apiKey = any(),
                     country = "us",
                     category = null,
                     query = null,
@@ -80,7 +79,6 @@ class NewsRemoteDataSourceTest {
 
             coVerify {
                 newsApiService.getTopHeadlines(
-                    apiKey = "",
                     country = "us",
                     category = null,
                     query = null,
@@ -104,7 +102,6 @@ class NewsRemoteDataSourceTest {
             val mockResponse = Response.success(mockApiResponse)
             coEvery {
                 newsApiService.getTopHeadlines(
-                    apiKey = any(),
                     country = "us",
                     category = null,
                     query = null,
@@ -121,7 +118,6 @@ class NewsRemoteDataSourceTest {
 
             coVerify {
                 newsApiService.getTopHeadlines(
-                    apiKey = "",
                     country = "us",
                     category = null,
                     query = null,
@@ -157,7 +153,6 @@ class NewsRemoteDataSourceTest {
             val mockResponse = Response.success(mockApiResponse)
             coEvery {
                 newsApiService.getEverything(
-                    apiKey = any(),
                     query = "bitcoin",
                     sources = null,
                     from = null,
@@ -180,7 +175,6 @@ class NewsRemoteDataSourceTest {
 
             coVerify {
                 newsApiService.getEverything(
-                    apiKey = "",
                     query = "bitcoin",
                     sources = null,
                     from = null,

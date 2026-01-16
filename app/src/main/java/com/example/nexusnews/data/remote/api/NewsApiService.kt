@@ -24,7 +24,6 @@ interface NewsApiService {
      */
     @GET("top-headlines")
     suspend fun getTopHeadlines(
-        @Query("apiKey") apiKey: String,
         @Query("country") country: String? = null,
         @Query("category") category: String? = null,
         @Query("sources") sources: String? = null,
@@ -36,7 +35,6 @@ interface NewsApiService {
     /**
      * Fetches all articles from NewsAPI based on search criteria.
      *
-     * @param apiKey NewsAPI key for authentication
      * @param q Keywords or phrases to search for (required)
      * @param sources Comma-separated string of news sources or blogs
      * @param domains Comma-separated string of domains to restrict search to
@@ -51,7 +49,6 @@ interface NewsApiService {
      */
     @GET("everything")
     suspend fun getEverything(
-        @Query("apiKey") apiKey: String,
         @Query("q") query: String,
         @Query("sources") sources: String? = null,
         @Query("domains") domains: String? = null,
