@@ -38,4 +38,24 @@ sealed class Result<out T> {
      * Returns true if this is a Loading result.
      */
     fun isLoading(): Boolean = this is Loading
+
+    /**
+     * Performs the given action if this is a Success result.
+     */
+    inline fun onSuccess(action: (T) -> Unit): Result<T> {
+        if (this is Success) {
+            action(data)
+        }
+        return this
+    }
+
+    /**
+     * Performs the given action if this is an Error result.
+     */
+    inline fun onFailure(action: (Throwable) -> Unit): Result<T> {
+        if (this is Error) {
+            action(exception)
+        }
+        return this
+    }
 }
