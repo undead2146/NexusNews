@@ -22,7 +22,7 @@ interface NewsApiService {
      * @param page Page number for pagination
      * @return Response containing NewsApiResponse with articles
      */
-    @GET("v2/top-headlines")
+    @GET("top-headlines")
     suspend fun getTopHeadlines(
         @Query("apiKey") apiKey: String,
         @Query("country") country: String? = null,
@@ -49,7 +49,7 @@ interface NewsApiService {
      * @param page Page number for pagination
      * @return Response containing NewsApiResponse with articles
      */
-    @GET("v2/everything")
+    @GET("everything")
     suspend fun getEverything(
         @Query("apiKey") apiKey: String,
         @Query("q") query: String,
