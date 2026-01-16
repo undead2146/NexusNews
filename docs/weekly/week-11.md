@@ -49,14 +49,29 @@ Week 11 focused on completing the AI refactoring migration, including:
 | Added Result extension functions for better error handling. | `feat(util): add Result extensions` | `Result.kt` |
 | Restored missing configuration property in AI service. | `fix(ai): fix OpenRouterAiService config` | `OpenRouterAiService.kt` |
 | Resolved missing imports and references in UI components. | `fix(ui): fix imports and references` | `NavGraph.kt`, `MainScreen.kt`, `SettingsScreen.kt`, `BookmarksScreen.kt`, `ArticleAnalysisComponents.kt` |
+| Improved NewsRepository error handling for stuck loading. | `fix(data): improve NewsRepositoryImpl error handling` | `NewsRepositoryImpl.kt` |
 
-## Total Hours: 4
+## Verification & Testing
+
+| Description | Commit Message | Files |
+|-------------|----------------|-------|
+| Robustified integer parsing in AI response parsers. | `fix(ai): robustify AiResponseParser integer parsing` | `AiResponseParser.kt` |
+| Implemented latency tracking for AI performance monitoring. | `feat(ai): implement latency tracking` | `AiUsageEntity.kt`, `DatabaseConstants.kt`, `OpenRouterAiService.kt` |
+| Added comprehensive unit tests for AI parsers and builders. | `test(ai): add unit tests for AI parsers and prompt builders` | `AiResponseParserTest.kt`, `KeyPointsPromptBuilderTest.kt` |
+| Added integration tests for OpenRouterAiService fallback. | `test(ai): add integration tests for OpenRouterAiService with fallback logic` | `OpenRouterAiServiceTest.kt` |
+
+## Total Hours: 8
+
 
 ## Summary
 
-Week 11 completed the AI refactoring migration with following accomplishments:
+Week 11 completed the AI refactoring migration and established a robust testing framework:
+- **Clean Architecture**: Finalized Use Case implementation for all 10+ AI features.
+- **Dependency Injection**: Fixed Room and DAO injection issues, upgraded Room for Kotlin 2.0+ compatibility.
+- **Reliability**: Improved error handling to prevent UI freezing and robustified JSON parsing.
+- **Testing**: Implemented 9 core tests (unit & integration) covering the entire AI pipeline and model fallback logic.
+- **Monitoring**: Added performance tracking (latency) for all AI API calls.
 
-## Total Hours: 4
 
 ---
 *End of Report*
