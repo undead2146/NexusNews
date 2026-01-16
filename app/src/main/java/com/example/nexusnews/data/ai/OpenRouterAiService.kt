@@ -33,7 +33,7 @@ class OpenRouterAiService
         private val config: AiServiceConfig
             get() {
                 val apiKey = apiKeyDataStore.getOpenRouterApiKey()
-                AiServiceConfig.create(apiKey)
+                return AiServiceConfig.create(apiKey)
             }
 
         override suspend fun summarizeArticle(
