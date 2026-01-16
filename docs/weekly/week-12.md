@@ -18,7 +18,8 @@ Week 12 focuses on stabilizing the application, resolving persistent network iss
 | Description | Commit Message | Files |
 |-------------|----------------|-------|
 | Removed debug metadata banner from AI summary cards. | `fix(ui): remove debug metadata from SummaryCard` | `SummaryCard.kt` |
-| **Implemented web scraping to fetch full article content** using JSoup. | `feat(scraper): implement ArticleScraperService for full content` | `ArticleScraperService.kt`, `NewsDetailViewModel.kt`, `NewsDetailScreen.kt` |
+| **Implemented web scraping to fetch full article content** using JSoup. | `feat(scraper): implement ArticleScraperService for full content` | `ArticleScraperService.kt`, `NewsDetailViewModel.kt` |
+| **Redesigned AI Summary as FAB** in bottom-right corner for better UX. | `feat(ui): redesign summary generation with FAB` | `NewsDetailScreen.kt`, `SummaryCard.kt` |
 
 ---
 *End of Report*

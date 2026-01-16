@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -144,9 +146,9 @@ private fun SwipeBackground(
         when (swipeDirection) {
             SwipeToDismissBoxValue.StartToEnd -> {
                 if (isBookmarked) {
-                    Icons.Outlined.FavoriteBorder // Remove bookmark
+                    Icons.Outlined.BookmarkBorder // Remove bookmark
                 } else {
-                    Icons.Filled.Favorite // Add bookmark
+                    Icons.Filled.Bookmark // Add bookmark
                 }
             }
             SwipeToDismissBoxValue.EndToStart -> {

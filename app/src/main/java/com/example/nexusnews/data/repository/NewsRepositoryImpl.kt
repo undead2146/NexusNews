@@ -11,8 +11,10 @@ import com.example.nexusnews.domain.model.Article
 import com.example.nexusnews.domain.repository.NewsRepository
 import com.example.nexusnews.util.Result
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
@@ -86,30 +88,26 @@ class NewsRepositoryImpl
         // Bookmark operations
 
         override fun getBookmarks(): Flow<Result<List<Article>>> =
-            flow {
-                emit(Result.Loading)
-                try {
-                    bookmarkDao.getAllBookmarks().collect { entities ->
-                        emit(Result.Success(com.example.nexusnews.data.mapper.ArticleMapper.toDomainListFromBookmarks(entities)))
-                    }
-                } catch (e: Exception) {
+            bookmarkDao.getAllBookmarks()
+                .map { entities ->
+                    Result.Success(com.example.nexusnews.data.mapper.ArticleMapper.toDomainListFromBookmarks(entities)) as Result<List<Article>>
+                }
+                .onStart { emit(Result.Loading) }
+                .catch { e ->
                     Timber.e(e, "Error fetching bookmarks")
                     emit(Result.Error(e))
                 }
-            }
 
         override fun getFavorites(): Flow<Result<List<Article>>> =
-            flow {
-                emit(Result.Loading)
-                try {
-                    bookmarkDao.getFavorites().collect { entities ->
-                        emit(Result.Success(com.example.nexusnews.data.mapper.ArticleMapper.toDomainListFromBookmarks(entities)))
-                    }
-                } catch (e: Exception) {
+            bookmarkDao.getFavorites()
+                .map { entities ->
+                    Result.Success(com.example.nexusnews.data.mapper.ArticleMapper.toDomainListFromBookmarks(entities)) as Result<List<Article>>
+                }
+                .onStart { emit(Result.Loading) }
+                .catch { e ->
                     Timber.e(e, "Error fetching favorites")
                     emit(Result.Error(e))
                 }
-            }
 
     override fun isBookmarked(articleId: String): Flow<Boolean> = bookmarkDao.isBookmarked(articleId)
 

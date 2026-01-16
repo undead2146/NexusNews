@@ -214,7 +214,7 @@ fun ArticleItem(
                             exit = com.example.nexusnews.ui.animations.NexusAnimations.bookmarkExit,
                         ) {
                             Icon(
-                                imageVector = androidx.compose.material.icons.filled.Bookmark,
+                                imageVector = androidx.compose.material.icons.Icons.Filled.Bookmark,
                                 contentDescription = "Remove bookmark",
                                 tint = MaterialTheme.colorScheme.primary,
                             )
@@ -225,7 +225,7 @@ fun ArticleItem(
                             exit = com.example.nexusnews.ui.animations.NexusAnimations.fadeOut,
                         ) {
                             Icon(
-                                imageVector = androidx.compose.material.icons.outlined.BookmarkBorder,
+                                imageVector = androidx.compose.material.icons.Icons.Outlined.BookmarkBorder,
                                 contentDescription = "Add bookmark",
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
