@@ -7,7 +7,7 @@ import path from 'path'
 function generateWeeklyItems() {
     const weeklyDir = path.join(__dirname, 'weekly')
     const items = [{ text: 'Overview', link: '/weekly/' }]
-    
+
     if (fs.existsSync(weeklyDir)) {
         const files = fs.readdirSync(weeklyDir)
             .filter(file => file.endsWith('.md') && file !== 'index.md')
@@ -18,7 +18,7 @@ function generateWeeklyItems() {
             })
         items.push(...files)
     }
-    
+
     return items
 }
 
@@ -45,6 +45,7 @@ export default withMermaid(
                 { text: 'Development', link: '/development/' },
                 { text: 'API', link: '/api/' },
                 { text: 'Weekly Reports', link: '/weekly/' },
+                { text: 'Reports', link: '/report/' },
                 { text: 'Context', link: '/context/' }
             ],
 
@@ -102,6 +103,16 @@ export default withMermaid(
                         items: generateWeeklyItems()
                     }
                 ],
+                '/report/': [
+                    {
+                        text: 'Application Reports',
+                        items: [
+                            { text: 'Overview', link: '/report/' },
+                            { text: 'User Experience', link: '/report/user' },
+                            { text: 'Technical Report', link: '/report/developer' }
+                        ]
+                    }
+                ],
                 '/context/': [
                     {
                         text: 'Context',
@@ -133,7 +144,8 @@ export default withMermaid(
                         text: 'Guides',
                         items: [
                             { text: 'Documentation Structure', link: '/STRUCTURE' },
-                            { text: 'Weekly Reports', link: '/weekly/' }
+                            { text: 'Weekly Reports', link: '/weekly/' },
+                            { text: 'Application Reports', link: '/report/' }
                         ]
                     }
                 ]

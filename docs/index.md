@@ -18,9 +18,15 @@ This documentation is organized into several key sections, designed to be both h
 
 <div class="grid">
   <div class="card">
-    <h3>🏗️ Architecture</h3>
-    <p>System design, patterns, and technical decisions</p>
-    <a href="./architecture/">Explore Architecture →</a>
+    <h3>📊 Application Reports</h3>
+    <p>Comprehensive analysis from both user and developer perspectives.</p>
+    <a href="/report/">Read Reports →</a>
+  </div>
+
+  <div class="card">
+    <h3>🏛️ Architecture</h3>
+    <p>Clean Architecture, MVVM, and offline-first data management.</p>
+    <a href="./architecture/">Technical Documentation →</a>
   </div>
 
   <div class="card">
