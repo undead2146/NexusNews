@@ -5,8 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.example.nexusnews.util.ErrorHandler
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -16,7 +20,13 @@ import timber.log.Timber
  * - Event management (one-time UI events)
  * - Loading state management
  */
-abstract class BaseViewModel : ViewModel() {
+abstract class BaseViewModel<S>(initialState: S) : ViewModel() {
+    private val _uiState = MutableStateFlow(initialState)
+    val state: StateFlow<S> = _uiState.asStateFlow()
+
+    protected val currentState: S
+        get() = state.value
+
     private val _events = MutableSharedFlow<UiEvent>()
     val events: SharedFlow<UiEvent> = _events.asSharedFlow()
 
@@ -32,6 +42,13 @@ abstract class BaseViewModel : ViewModel() {
 
             handleError(throwable)
         }
+
+    /**
+     * Updates the current state using a transformation function.
+     */
+    protected fun updateState(transform: (S) -> S) {
+        _uiState.update { transform(it) }
+    }
 
     /**
      * Handle errors and convert to user-friendly messages.
