@@ -36,8 +36,10 @@ Week 11 focused on completing the AI refactoring migration, including:
 | Updated migration status for all phases to Completed. | `docs(architecture): mark migration phases as completed` |
 | Added Use Case Pattern example to documentation. | `docs(architecture): add use case pattern example` |
 | Removed .vitepress build artifacts from docs directory. | `chore(docs): remove vitepress build artifacts` |
+| Fixed build errors in NewsDetailScreen and ViewModels. | `fix(build): resolve UiState usage and generic type errors` |
+| Fixed app loading state by implementing repository caching and API key injection. | `fix(runtime): implement caching in NewsRepository and fix API authentication` |
 
-## Total Hours: 3
+## Total Hours: 4
 
 ## Summary
 
