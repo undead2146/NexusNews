@@ -69,7 +69,7 @@ class KeyPointsResponseParser(
                 KeyPoint(
                     text = map["text"]?.toString() ?: "",
                     importance = (map["importance"]?.toString()?.toDoubleOrNull() ?: 0.5).toFloat(),
-                    position = (map["position"]?.toString()?.toIntOrNull() ?: 0),
+                    position = (map["position"]?.toString()?.toDoubleOrNull()?.toInt() ?: 0),
                 )
             }
 
@@ -107,7 +107,7 @@ class EntityRecognitionResponseParser : BaseMoshiParser<EntityRecognitionResult>
                     confidence = (map["confidence"]?.toString()?.toDoubleOrNull() ?: 0.5).toFloat(),
                     mentions =
                         (map["mentions"] as? List<*>)?.mapNotNull {
-                            it?.toString()?.toIntOrNull()
+                            it?.toString()?.toDoubleOrNull()?.toInt()
                         } ?: emptyList(),
                 )
             }
