@@ -395,19 +395,6 @@ class NewsDetailViewModel
                             }
                         }
                 }
-
-                // Note: We don't have a definitive "all done" signal here easily without using async/await or combine,
-                // but since these flow into state individually, the UI will update progressively.
-                // We'll toggle isAnalyzing off after a delay or when all are done?
-                // For simplicity in this implementation, we can leave isAnalyzing true or toggle it off in each block if we want per-item loading.
-                // But better UX: let's use async/await to wait for all if we want a global loading spinner.
-                // However, progressive loading is better. Let's set isAnalyzing to false after the block launch,
-                // but actually we want to show loading indicators.
-
-                // Let's rely on individual null checks in UI or add specific loading states if needed.
-                // For now, let's just turn off the global flag after launching,
-                // OR we can make the UI components show loading if data is null but we want to show skeletons.
-                // Given existing components have `isLoading` param, let's keep it simple for now.
                 updateState { it.copy(isAnalyzing = false) }
             }
         }

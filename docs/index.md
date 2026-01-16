@@ -5,30 +5,7 @@ lastUpdated: 2026-01-16
 version: 1.0.0
 aiContext: true
 ---
-
 # NexusNews Documentation
-
-Welcome to the comprehensive documentation for **NexusNews** - a multi-source Belgian & International news aggregator powered by OpenRouter AI.
-
-## ✨ Latest Updates (January 2026)
-
-### 🎉 AI Feature Implementation Complete!
-
-All AI features have been successfully integrated into the application with full UI support:
-
-- ✅ **Individual AI Analyses**: Sentiment, Key Points, Entities, Topics, and Bias Detection
-- ✅ **Loading Indicators**: Each feature shows progress while processing
-- ✅ **Context Menu**: Easy access to all AI features from article detail screen
-- ✅ **Deep Analysis**: Run all analyses at once with progressive results
-- ✅ **Chat Assistant**: Conversational AI interface for discussing articles
-- ✅ **Recommendations**: Personalized article suggestions
-
-[**Read the Implementation Plan →**](../implementation_plan)
-
-[**View Developer Report →**](./report/developer)
-[**View User Guide →**](./report/user)
-
----
 
 ## 📚 Documentation Structure
 

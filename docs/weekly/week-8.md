@@ -2,7 +2,7 @@
 
 | Description | Commit Message |
 |-------------|----------------|
-| Created Room type converters for LocalDateTime and List<String> to support Article tags and database operations. | `feat(data): add Room type converters for database` |
+| Created Room type converters for LocalDateTime and `List&lt;String&gt;` to support Article tags and database operations. | `feat(data): add Room type converters for database` |
 | Created ArticleEntity for Room database with all article fields including tags and cache timestamp for offline support. | `feat(data): create ArticleEntity for local caching` |
 | Created BookmarkEntity with foreign key to ArticleEntity and favorite flag support for bookmark management. | `feat(data): create BookmarkEntity with favorites support` |
 | Created ArticleDao with CRUD operations for article caching including cache cleanup functionality. | `feat(data): create ArticleDao for article caching` |

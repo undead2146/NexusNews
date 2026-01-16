@@ -54,7 +54,7 @@ Used for lightweight user settings and flags.
   - `breaking_news_enabled`: Boolean
   - `daily_digest_enabled`: Boolean
   - `digest_time_hour`: Int (0-23)
-  - `enabled_categories`: Set<NewsCategory>
+  - `enabled_categories`: `Set<NewsCategory>`
   - `sound_enabled`, `vibration_enabled`: Boolean
 - **PrivacyPreferencesDataStore**:
   - `analytics_enabled`: Boolean
