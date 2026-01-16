@@ -5,7 +5,7 @@ package com.example.nexusnews.util.constants
  */
 object DatabaseConstants {
     const val DATABASE_NAME = "nexus_news.db"
-    const val DATABASE_VERSION = 2
+    const val DATABASE_VERSION = 3
 
     // Table names
     const val ARTICLES_TABLE = "articles"
