@@ -209,6 +209,7 @@ class OpenRouterAiService
 
             for (currentModel in modelsToTry) {
                 try {
+                    val startTime = System.currentTimeMillis()
                     Timber.d("Trying model: ${currentModel.displayName} (${currentModel.id})")
 
                     val response =
@@ -238,6 +239,7 @@ class OpenRouterAiService
                         promptTokens = response.usage.promptTokens,
                         completionTokens = response.usage.completionTokens,
                         totalTokens = response.usage.totalTokens,
+                        latencyMs = System.currentTimeMillis() - startTime,
                     )
 
                     return Result.success(content.trim())
@@ -279,6 +281,7 @@ class OpenRouterAiService
             promptTokens: Int,
             completionTokens: Int,
             totalTokens: Int,
+            latencyMs: Long,
         ) {
             try {
                 val usageEntity =
@@ -290,6 +293,7 @@ class OpenRouterAiService
                         completionTokens = completionTokens,
                         totalTokens = totalTokens,
                         requestCount = 1,
+                        latencyMs = latencyMs,
                         timestamp = java.time.LocalDateTime.now(),
                     )
                 aiUsageDao.insertUsage(usageEntity)

@@ -35,4 +35,5 @@ object DatabaseConstants {
     const val COLUMN_LANGUAGE = "language"
     const val COLUMN_REQUEST_TYPE = "request_type"
     const val COLUMN_REQUEST_COUNT = "request_count"
+    const val COLUMN_LATENCY_MS = "latency_ms"
 }

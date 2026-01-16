@@ -27,6 +27,8 @@ data class AiUsageEntity(
     val totalTokens: Int,
     @ColumnInfo(name = DatabaseConstants.COLUMN_REQUEST_COUNT)
     val requestCount: Int,
+    @ColumnInfo(name = DatabaseConstants.COLUMN_LATENCY_MS)
+    val latencyMs: Long,
     @ColumnInfo(name = DatabaseConstants.COLUMN_GENERATED_AT)
     val timestamp: LocalDateTime,
 ) {
