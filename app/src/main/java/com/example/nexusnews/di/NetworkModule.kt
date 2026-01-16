@@ -30,8 +30,15 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    fun provideRetryPolicy(): com.example.nexusnews.data.util.RetryPolicy =
+        com.example.nexusnews.data.util.RetryPolicy()
+
+    @Provides
+    @Singleton
     fun provideOkHttpClient(
         authInterceptor: com.example.nexusnews.data.remote.interceptor.AuthInterceptor,
+        retryInterceptor: com.example.nexusnews.data.remote.interceptor.RetryInterceptor,
+        errorInterceptor: com.example.nexusnews.data.remote.interceptor.ErrorInterceptor,
     ): OkHttpClient {
         val loggingInterceptor =
             HttpLoggingInterceptor().apply {
@@ -41,6 +48,8 @@ object NetworkModule {
         return OkHttpClient
             .Builder()
             .addInterceptor(authInterceptor)
+            .addInterceptor(retryInterceptor)
+            .addInterceptor(errorInterceptor)
             .addInterceptor(loggingInterceptor)
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
