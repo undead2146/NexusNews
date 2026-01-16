@@ -19,7 +19,7 @@ interface AiUsageDao {
      * Gets all usage records ordered by timestamp.
      * @return Flow emitting all usage records
      */
-    @Query("SELECT * FROM ai_usage ORDER BY timestamp DESC")
+    @Query("SELECT * FROM ai_usage ORDER BY generated_at DESC")
     fun getAllUsage(): Flow<List<AiUsageEntity>>
 
     /**
@@ -27,7 +27,7 @@ interface AiUsageDao {
      * @param requestType The type of request
      * @return Flow emitting usage records for the type
      */
-    @Query("SELECT * FROM ai_usage WHERE request_type = :requestType ORDER BY timestamp DESC")
+    @Query("SELECT * FROM ai_usage WHERE request_type = :requestType ORDER BY generated_at DESC")
     fun getUsageByType(requestType: AiRequestType): Flow<List<AiUsageEntity>>
 
     /**
@@ -36,7 +36,7 @@ interface AiUsageDao {
      * @param endDate End of the date range
      * @return Flow emitting usage records in the range
      */
-    @Query("SELECT * FROM ai_usage WHERE timestamp BETWEEN :startDate AND :endDate ORDER BY timestamp DESC")
+    @Query("SELECT * FROM ai_usage WHERE generated_at BETWEEN :startDate AND :endDate ORDER BY generated_at DESC")
     fun getUsageByDateRange(startDate: LocalDateTime, endDate: LocalDateTime): Flow<List<AiUsageEntity>>
 
     /**
@@ -45,7 +45,7 @@ interface AiUsageDao {
      * @param endDate End of the date range
      * @return Total tokens used in the range
      */
-    @Query("SELECT SUM(total_tokens) FROM ai_usage WHERE timestamp BETWEEN :startDate AND :endDate")
+    @Query("SELECT SUM(total_tokens) FROM ai_usage WHERE generated_at BETWEEN :startDate AND :endDate")
     suspend fun getTotalTokensByDateRange(startDate: LocalDateTime, endDate: LocalDateTime): Int?
 
     /**
@@ -54,21 +54,21 @@ interface AiUsageDao {
      * @param endDate End of the date range
      * @return Total requests in the range
      */
-    @Query("SELECT SUM(request_count) FROM ai_usage WHERE timestamp BETWEEN :startDate AND :endDate")
+    @Query("SELECT SUM(request_count) FROM ai_usage WHERE generated_at BETWEEN :startDate AND :endDate")
     suspend fun getTotalRequestsByDateRange(startDate: LocalDateTime, endDate: LocalDateTime): Int?
 
     /**
      * Gets today's total token usage.
      * @return Total tokens used today
      */
-    @Query("SELECT SUM(total_tokens) FROM ai_usage WHERE date(timestamp) = date('now')")
+    @Query("SELECT SUM(total_tokens) FROM ai_usage WHERE date(generated_at) = date('now')")
     suspend fun getTodayTokenUsage(): Int?
 
     /**
      * Gets today's request count.
      * @return Total requests made today
      */
-    @Query("SELECT SUM(request_count) FROM ai_usage WHERE date(timestamp) = date('now')")
+    @Query("SELECT SUM(request_count) FROM ai_usage WHERE date(generated_at) = date('now')")
     suspend fun getTodayRequestCount(): Int?
 
     /**
@@ -76,7 +76,7 @@ interface AiUsageDao {
      * @param days Number of days to look back
      * @return Flow emitting usage records for the period
      */
-    @Query("SELECT * FROM ai_usage WHERE timestamp >= date('now', '-' || :days || ' days') ORDER BY timestamp DESC")
+    @Query("SELECT * FROM ai_usage WHERE generated_at >= date('now', '-' || :days || ' days') ORDER BY generated_at DESC")
     fun getUsageForLastDays(days: Int): Flow<List<AiUsageEntity>>
 
     /**
@@ -97,7 +97,7 @@ interface AiUsageDao {
      * Deletes usage records older than specified threshold.
      * @param threshold The datetime threshold
      */
-    @Query("DELETE FROM ai_usage WHERE timestamp < :threshold")
+    @Query("DELETE FROM ai_usage WHERE generated_at < :threshold")
     suspend fun deleteOldUsage(threshold: LocalDateTime)
 
     /**
