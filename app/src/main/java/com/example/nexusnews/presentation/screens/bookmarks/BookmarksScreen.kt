@@ -122,7 +122,7 @@ fun BookmarksScreen(
                                 isFavorite = article.isFavorite,
                                 onClick = { onArticleClick(article.id) },
                                 onBookmarkClick = { viewModel.removeBookmark(article.id) },
-                                onFavoriteClick = { viewModel.toggleFavorite(article.id) },
+                                onFavoriteClick = { viewModel.toggleFavorite(article) },
                             )
                         }
                     }

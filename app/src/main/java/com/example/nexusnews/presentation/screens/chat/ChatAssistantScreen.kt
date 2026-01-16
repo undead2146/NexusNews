@@ -280,8 +280,8 @@ data class ChatAssistantUiState(
 /**
  * ViewModel for Chat Assistant.
  */
-class ChatAssistantViewModel(
-    private val aiService: com.example.nexusnews.domain.ai.AiService,
+class ChatAssistantViewModel @javax.inject.Inject constructor(
+    private val chatWithAssistantUseCase: com.example.nexusnews.domain.usecase.ai.ChatWithAssistantUseCase,
 ) : BaseViewModel<ChatAssistantUiState>(ChatAssistantUiState()) {
     fun onInputTextChanged(text: String) {
         updateState { it.copy(inputText = text) }
@@ -305,31 +305,34 @@ class ChatAssistantViewModel(
             // Add user message immediately
             updateState { it.copy(messages = it.messages + userMessage) }
 
-            val result =
-                aiService.chatWithAssistant(
+            chatWithAssistantUseCase(
+                com.example.nexusnews.domain.usecase.ai.ChatWithAssistantUseCase.Params(
                     conversationHistory = currentState.messages,
                     userMessage = message,
-                    articleContext = null,
+                    articleContext = null
                 )
-
-            result.onSuccess { response ->
-                updateState {
-                    it.copy(
-                        messages = it.messages + response.message,
-                        suggestedQuestions = response.suggestedQuestions,
-                        isSending = false,
-                    )
+            ).collect { result ->
+                if (result is com.example.nexusnews.util.Result.Success) {
+                    val response = result.data
+                    updateState {
+                        it.copy(
+                            messages = it.messages + response.message,
+                            suggestedQuestions = response.suggestedQuestions,
+                            isSending = false,
+                        )
+                    }
+                } else if (result is com.example.nexusnews.util.Result.Error) {
+                     updateState {
+                        it.copy(
+                            error = result.exception.message ?: "Failed to send message",
+                            isSending = false,
+                        )
+                    }
                 }
             }
 
-            result.onFailure { error ->
-                updateState {
-                    it.copy(
-                        error = error.message ?: "Failed to send message",
-                        isSending = false,
-                    )
-                }
-            }
+            // Error handling moved to collect block
+
         }
     }
 

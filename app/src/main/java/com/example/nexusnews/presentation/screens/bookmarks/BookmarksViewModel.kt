@@ -75,13 +75,13 @@ class BookmarksViewModel
         /**
          * Toggles the favorite status of a bookmarked article.
          */
-        fun toggleFavorite(articleId: String) {
+        fun toggleFavorite(article: Article) {
             viewModelScope.launch(exceptionHandler) {
                 try {
-                    newsRepository.toggleFavorite(articleId)
-                    Timber.d("Favorite toggled for: $articleId")
+                    newsRepository.toggleFavorite(article)
+                    Timber.d("Favorite toggled for: ${article.id}")
                 } catch (e: Exception) {
-                    Timber.e(e, "Failed to toggle favorite: $articleId")
+                    Timber.e(e, "Failed to toggle favorite: ${article.id}")
                 }
             }
         }

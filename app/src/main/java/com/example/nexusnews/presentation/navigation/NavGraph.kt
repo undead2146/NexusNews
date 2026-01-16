@@ -82,5 +82,28 @@ fun NexusNewsNavGraph(
                 onBackClick = { navController.popBackStack() },
             )
         }
+
+        // Chat Assistant Screen
+        composable(Screen.ChatAssistant.route) {
+            val viewModel: com.example.nexusnews.presentation.screens.chat.ChatAssistantViewModel =
+                androidx.hilt.navigation.compose.hiltViewModel()
+            ChatAssistantScreen(
+                viewModel = viewModel,
+                onNavigateBack = { navController.popBackStack() },
+            )
+        }
+
+        // Recommendations Screen
+        composable(Screen.Recommendations.route) {
+            val viewModel: com.example.nexusnews.presentation.screens.recommendations.RecommendationsViewModel =
+                androidx.hilt.navigation.compose.hiltViewModel()
+            RecommendationsScreen(
+                viewModel = viewModel,
+                onNavigateBack = { navController.popBackStack() },
+                onArticleClick = { articleId ->
+                    navController.navigate(Screen.ArticleDetail.createRoute(articleId))
+                },
+            )
+        }
     }
 }

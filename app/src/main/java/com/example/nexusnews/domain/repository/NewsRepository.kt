@@ -1,6 +1,7 @@
 package com.example.nexusnews.domain.repository
 
 import com.example.nexusnews.domain.model.Article
+import com.example.nexusnews.domain.model.NewsCategory
 import com.example.nexusnews.util.Result
 import kotlinx.coroutines.flow.Flow
 
@@ -12,9 +13,24 @@ interface NewsRepository {
     /**
      * Fetches articles with offline-first strategy.
      * @param forceRefresh If true, bypasses cache and fetches from network
+     * @param category Optional category filter (null for all categories)
      * @return Flow emitting Result states (Loading, Success, Error)
      */
-    fun getArticles(forceRefresh: Boolean = false): Flow<Result<List<Article>>>
+    fun getArticles(
+        forceRefresh: Boolean = false,
+        category: NewsCategory? = null
+    ): Flow<Result<List<Article>>>
+
+    /**
+     * Fetches a specific page of articles.
+     * @param page Page number (1-indexed)
+     * @param category Optional category filter (null for all categories)
+     * @return Flow emitting Result states (Loading, Success, Error)
+     */
+    fun getArticlesPage(
+        page: Int,
+        category: NewsCategory? = null
+    ): Flow<Result<List<Article>>>
 
     /**
      * Fetches a single article by ID.
@@ -57,7 +73,8 @@ interface NewsRepository {
     suspend fun removeBookmark(articleId: String)
 
     /**
-     * Toggles the favorite status of a bookmarked article.
+     * Toggles the favorite status of an article.
+     * If the article is not bookmarked, it will be added to bookmarks first.
      */
-    suspend fun toggleFavorite(articleId: String)
+    suspend fun toggleFavorite(article: Article)
 }

@@ -2,7 +2,7 @@
 title: API Documentation
 description: API references, dependencies, and integration guides
 category: api
-lastUpdated: 2025-11-03
+lastUpdated: 2026-01-16
 aiContext: true
 ---
 
@@ -18,29 +18,27 @@ Complete API documentation for NexusNews dependencies and integrations.
 
 ### News Sources
 
-1. **[NewsAPI Integration](/api/newsapi)** *(Coming Soon)*
+1. **[NewsAPI Integration](./newsapi)**
    - Authentication and rate limiting
-   - Endpoints and response models
-   - Example requests
+   - Top Headlines and Everything endpoints
+   - Caching strategy
 
-2. **[Guardian API Integration](/api/guardian)** *(Coming Soon)*
+2. **[Guardian API Integration](./guardian)** *(In Development)*
    - API key setup
    - Query parameters
-   - Response parsing
 
 ### AI Services
 
-3. **[OpenRouter API](/api/openrouter)** *(Coming Soon)*
-   - Model selection
-   - Request formatting
-   - Cost tracking
+3. **[OpenRouter API](./openrouter)**
+   - Model selection and Fallback strategy
+   - Summarization, Sentiment, and Translation features
+   - Usage tracking (tokens/cost)
 
 ## 🕸️ Web Scraping
 
-4. **[Jsoup Scraping Guide](/api/scraping)** *(Coming Soon)*
-   - HBVL scraper implementation
-   - GvA scraper implementation
-   - Best practices
+4. **[Jsoup Scraping Guide](./scraping)** *(In Development)*
+   - HBVL & GvA scaper implementations
+   - HTML parsing with Jsoup selectors
 
 ## 📚 Quick Links
 

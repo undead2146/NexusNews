@@ -67,11 +67,9 @@ fun SwipeableArticleItem(
                         false // Don't dismiss, just trigger action
                     }
                     SwipeToDismissBoxValue.EndToStart -> {
-                        // Swipe left - toggle favorite (only if bookmarked)
-                        if (isBookmarked) {
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            onFavoriteToggle()
-                        }
+                        // Swipe left - toggle favorite
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onFavoriteToggle()
                         false // Don't dismiss, just trigger action
                     }
                     SwipeToDismissBoxValue.Settled -> false
@@ -128,15 +126,11 @@ private fun SwipeBackground(
                 }
             }
             SwipeToDismissBoxValue.EndToStart -> {
-                // Swipe left - favorite action (only if bookmarked)
-                if (isBookmarked) {
-                    if (isFavorite) {
-                        MaterialTheme.colorScheme.surfaceVariant
-                    } else {
-                        MaterialTheme.colorScheme.tertiaryContainer
-                    }
+                // Swipe left - favorite action
+                if (isFavorite) {
+                    MaterialTheme.colorScheme.surfaceVariant
                 } else {
-                    Color.Transparent
+                    MaterialTheme.colorScheme.tertiaryContainer
                 }
             }
             SwipeToDismissBoxValue.Settled -> Color.Transparent
@@ -152,14 +146,11 @@ private fun SwipeBackground(
                 }
             }
             SwipeToDismissBoxValue.EndToStart -> {
-                if (isBookmarked) {
-                    if (isFavorite) {
-                        Icons.Outlined.FavoriteBorder // Remove favorite
-                    } else {
-                        Icons.Filled.Favorite // Add favorite
-                    }
+                // Swipe left - toggle favorite
+                if (isFavorite) {
+                    Icons.Outlined.FavoriteBorder // Remove favorite
                 } else {
-                    null
+                    Icons.Filled.Favorite // Add favorite
                 }
             }
             SwipeToDismissBoxValue.Settled -> null
@@ -199,11 +190,7 @@ private fun SwipeBackground(
                                 }
                             }
                             SwipeToDismissBoxValue.EndToStart -> {
-                                if (isBookmarked) {
-                                    MaterialTheme.colorScheme.onTertiaryContainer
-                                } else {
-                                    MaterialTheme.colorScheme.onSurface
-                                }
+                                MaterialTheme.colorScheme.onTertiaryContainer
                             }
                             SwipeToDismissBoxValue.Settled -> MaterialTheme.colorScheme.onSurface
                         },

@@ -38,6 +38,14 @@ class NewsListViewModel
         private val _selectedCategory = MutableStateFlow<NewsCategory?>(null)
         val selectedCategory: StateFlow<NewsCategory?> = _selectedCategory.asStateFlow()
 
+        // Pagination state
+        private val _currentPage = MutableStateFlow(1)
+        private val _canLoadMore = MutableStateFlow(true)
+        val canLoadMore: StateFlow<Boolean> = _canLoadMore.asStateFlow()
+
+        private val _isLoadingMore = MutableStateFlow(false)
+        val isLoadingMore: StateFlow<Boolean> = _isLoadingMore.asStateFlow()
+
         init {
             // Observe category preference changes
             viewModelScope.launch {
@@ -55,12 +63,17 @@ class NewsListViewModel
             if (currentState.isLoading()) return // Prevent multiple simultaneous loads
 
             viewModelScope.launch(exceptionHandler) {
-                Timber.d("Loading news articles (forceRefresh: $forceRefresh)")
+                val category = _selectedCategory.value
+                Timber.d("Loading news articles (category: ${category?.value ?: "all"}, forceRefresh: $forceRefresh)")
+
+                // Reset pagination when loading fresh articles
+                _currentPage.value = 1
+                _canLoadMore.value = true
 
                 updateState { UiState.Loading }
 
                 newsRepository
-                    .getArticles(forceRefresh)
+                    .getArticles(forceRefresh, category)
                     .collect { result ->
                         val uiState = result.toUiState()
                         updateState { uiState }
@@ -107,6 +120,48 @@ class NewsListViewModel
             loadNews(forceRefresh = false)
         }
 
+        /**
+         * Load more articles (pagination).
+         */
+        fun loadMoreArticles() {
+            if (_isLoadingMore.value || !_canLoadMore.value || currentState.isLoading()) return
+
+            viewModelScope.launch(exceptionHandler) {
+                _isLoadingMore.value = true
+                val nextPage = _currentPage.value + 1
+                val category = _selectedCategory.value
+
+                Timber.d("Loading more articles (page: $nextPage, category: ${category?.value ?: "all"})")
+
+                newsRepository
+                    .getArticlesPage(nextPage, category)
+                    .collect { result ->
+                        when (result) {
+                            is com.example.nexusnews.util.Result.Success -> {
+                                val newArticles = result.data
+                                if (newArticles.isEmpty()) {
+                                    _canLoadMore.value = false
+                                    Timber.d("No more articles to load")
+                                } else {
+                                    // Append to existing articles
+                                    val currentArticles = (currentState as? UiState.Success)?.data ?: emptyList()
+                                    val updatedArticles = currentArticles + newArticles
+                                    updateState { UiState.Success(updatedArticles) }
+                                    _currentPage.value = nextPage
+                                    Timber.d("Loaded ${newArticles.size} more articles (total: ${updatedArticles.size})")
+                                }
+                            }
+                            is com.example.nexusnews.util.Result.Error -> {
+                                Timber.e(result.exception, "Failed to load more articles")
+                                // Don't update state, just stop loading
+                            }
+                            else -> {}
+                        }
+                        _isLoadingMore.value = false
+                    }
+            }
+        }
+
         // Bookmark operations
 
         /**
@@ -141,13 +196,13 @@ class NewsListViewModel
         /**
          * Toggles favorite status for a bookmarked article.
          */
-        fun toggleFavorite(articleId: String) {
+        fun toggleFavorite(article: Article) {
             viewModelScope.launch(exceptionHandler) {
                 try {
-                    newsRepository.toggleFavorite(articleId)
-                    Timber.d("Favorite toggled for: $articleId")
+                    newsRepository.toggleFavorite(article)
+                    Timber.d("Favorite toggled for: ${article.id}")
                 } catch (e: Exception) {
-                    Timber.e(e, "Failed to toggle favorite for: $articleId")
+                    Timber.e(e, "Failed to toggle favorite for: ${article.id}")
                 }
             }
         }

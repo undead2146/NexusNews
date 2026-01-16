@@ -2,7 +2,7 @@
 title: Project Overview
 description: High-level overview of the NexusNews project
 category: project
-lastUpdated: 2025-11-03
+lastUpdated: 2026-01-16
 aiContext: true
 ---
 
@@ -10,7 +10,7 @@ aiContext: true
 
 ## What is NexusNews?
 
-NexusNews is a modern Android news aggregator application that combines international news APIs with local  sources through web scraping. The app is enhanced with OpenRouter AI to provide intelligent features like summarization, sentiment analysis, and personalized recommendations.
+NexusNews is a modern Android news aggregator application that combines international news APIs with local sources through web scraping. The app is enhanced with OpenRouter AI to provide intelligent features like summarization, sentiment analysis, and personalized recommendations.
 
 ## Project Goals
 
@@ -44,6 +44,7 @@ NexusNews is a modern Android news aggregator application that combines internat
 - **Sentiment Analysis**: Classify articles as positive, neutral, or negative
 - **Translations**: On-demand translation between Dutch and English
 - **Recommendations**: AI-suggested related articles
+- **Chat Assistant**: Context-aware Q&A about articles
 
 ### Technical Features
 
@@ -89,84 +90,65 @@ NexusNews is a modern Android news aggregator application that combines internat
 3. **Phase 2**: Enhanced Features & UI Polish (Weeks 6-7)
 4. **Phase 3**: AI Integration Foundation (Week 8)
 5. **Phase 4**: Advanced AI Features (Week 9)
-6. **Phase 5**: Expansion & Polish (Week 10)
+6. **Phase 5**: Expansion & Polish (Weeks 10+)
 
 [View detailed roadmap →](/project/roadmap)
 
 ## Current Status
 
-**Phase**: Phase 2 - Enhanced News Features & UI Polish
+**Phase**: Phase 5 - Refactoring & Stabilization
 **Status**: In Progress
-**Last Updated**: December 15, 2025
+**Last Updated**: January 16, 2026
 
 ### Completed
 
 **Phase 0 & 1:**
-- ✅ Project structure setup
-- ✅ Gradle configuration with version catalogs
-- ✅ CI/CD pipeline (GitHub Actions)
-- ✅ Documentation structure (VitePress)
-- ✅ Code quality tools (Ktlint, Detekt)
-- ✅ Core architecture implementation (MVVM + Clean Architecture)
-- ✅ Network layer foundation with monitoring, retry logic, and error handling
-- ✅ Comprehensive testing infrastructure (unit + integration tests)
-- ✅ Constants restructuring into categorized classes
-- ✅ NewsAPI integration
-- ✅ Room database for offline caching
-- ✅ Basic news list UI with pull-to-refresh
-- ✅ News detail screen
-- ✅ Bottom navigation (Home, Search, Bookmarks, Settings)
+- ✅ Project structure & Gradle setup
+- ✅ CI/CD pipeline & Documentation
+- ✅ Core architecture (MVVM)
+- ✅ Network layer & NewsAPI integration
+- ✅ Room database & Offline caching
+- ✅ Basic UI (News Feed, Details, Navigation)
 
-**Phase 2 - Epic 2.1 (Week 6):**
-- ✅ Search functionality with debounced input
-- ✅ Search history with DataStore
-- ✅ Category filtering
-- ✅ Sort options
+**Phase 2 - Enhanced Features:**
+- ✅ Search & Filtering (History, Categories, Sort)
+- ✅ Topic/Tag system
+- ✅ Bookmarks with Room persistence
+- ✅ UI Polish (Animations, Dark/Light Theme)
+- ✅ Settings & Preferences (DataStore)
 
-**Phase 2 - Epic 2.2 (Week 7):**
-- ✅ Category navigation with horizontal selector
-- ✅ Enhanced NewsCategory enum (icons, colors, descriptions)
-- ✅ Topic/tag system with automatic extraction
-- ✅ Tag display UI components
-- ✅ Category preferences persistence (DataStore)
+**Phase 3 - AI Foundation:**
+- ✅ OpenRouter API Client & Secure Storage
+- ✅ AI Service Architecture
+- ✅ Model Selection & Fallback Logic (6 models)
+- ✅ Article Summarization with Caching
+- ✅ AI Usage Tracking
 
-**Phase 2 - Epic 2.3 (Week 8):**
-- ✅ Room database infrastructure setup
-- ✅ Bookmark entities and DAOs
-- ✅ Bookmark repository layer
-- ✅ BookmarksViewModel with favorites filtering
-- ✅ BookmarksScreen UI
-- ✅ Navigation integration
-- ✅ Final integration and testing
+**Phase 4 - Advanced AI:**
+- ✅ Sentiment Analysis & Bias Detection
+- ✅ Key Points & Entity Extraction
+- ✅ Smart Recommendations
+- ✅ AI Chat Assistant
+- ✅ Content Generation (Headlines, Tweets)
 
-**Phase 2 - Epic 2.4 (Week 9):**
-- ✅ Theme management (Light/Dark/System)
-- ✅ Settings screen implementation
-- ✅ Swipe gestures for bookmarks/favorites
-- ✅ Custom animations (Material Motion)
-- ✅ Accessibility features (TalkBack, preferences)
+**Phase 5 - Refactoring (Partial):**
+- ✅ Clean Architecture Migration (Use Cases)
+- ✅ Comprehensive Unit & Integration Testing
+- ✅ Performance Monitoring (Latency Tracking)
+- ✅ Room 2.7.0+ Migration
 
 ### In Progress
 
-- 🔄 Phase 3: AI Integration Foundation (90% Complete - Backend Done)
-  - ✅ Epic 3.1: OpenRouter Setup (API client, secure key storage)
-  - ✅ Epic 3.2: AI Service Architecture (summarization, sentiment, translation)
-  - ✅ Epic 3.3: Model Selection (6 free models, Settings UI complete)
-  - ⏳ Epic 3.4: Article Summarization UI (pending)
-
-### Recently Completed
-
-- ✅ Epic 2.5: Settings & Preferences (67% - core features)
-  - Notification preferences with DataStore
-  - Cache management with statistics
-  - Feed/Privacy DataStores
-  - 5 new DataStores created
+- 🔄 **Phase 5: Stabilization**
+  - Refactoring legacy view models
+  - Improving error handling and recovery
+  - Final UI polish and consistent styling
 
 ### Next Up
 
-- ⏳ Epic 3.4: Complete Article Summarization UI
-- ⏳ Epic 3.5: Advanced AI Features (optional)
-- ⏳ Phase 4: Production Polish & Testing
+- ⏳ **Epic 5.3: Advanced Features** (Notifications, Widgets)
+- ⏳ **Epic 5.5: Analytics & Monitoring** (Crashlytics)
+- ⏳ **Release Preparation** (ProGuard/R8, Signing)
 
 ## Team
 

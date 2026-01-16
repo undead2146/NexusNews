@@ -38,11 +38,38 @@ abstract class BaseMoshiParser<T>(
 
     override fun parse(response: String): T {
         return try {
-            parseInternal(response)
+            parseInternal(extractJson(response))
         } catch (e: Exception) {
             Timber.e(e, "Failed to parse ${this::class.simpleName}")
             defaultValue
         }
+    }
+
+    /**
+     * Extracts JSON from a response that may contain additional text.
+     * Handles cases where AI models include explanatory text before/after JSON.
+     */
+    protected fun extractJson(response: String): String {
+        val trimmed = response.trim()
+
+        // Find the first opening brace and the last closing brace
+        val firstBrace = trimmed.indexOf('{')
+        val lastBrace = trimmed.lastIndexOf('}')
+
+        if (firstBrace != -1 && lastBrace != -1 && lastBrace > firstBrace) {
+            return trimmed.substring(firstBrace, lastBrace + 1)
+        }
+
+        // If no braces found, try with brackets for arrays
+        val firstBracket = trimmed.indexOf('[')
+        val lastBracket = trimmed.lastIndexOf(']')
+
+        if (firstBracket != -1 && lastBracket != -1 && lastBracket > firstBracket) {
+            return trimmed.substring(firstBracket, lastBracket + 1)
+        }
+
+        // Return original if no JSON structure found
+        return trimmed
     }
 
     /**

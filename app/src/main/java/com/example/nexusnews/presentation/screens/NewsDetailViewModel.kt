@@ -27,6 +27,17 @@ data class NewsDetailUiState(
     val article: Article? = null,
     val error: String? = null,
     val isLoadingFullContent: Boolean = false,
+    val isLoadingSentiment: Boolean = false,
+    val isLoadingKeyPoints: Boolean = false,
+    val isLoadingEntities: Boolean = false,
+    val isLoadingTopics: Boolean = false,
+    val isLoadingBias: Boolean = false,
+    val sentiment: com.example.nexusnews.domain.ai.Sentiment? = null,
+    val keyPoints: com.example.nexusnews.domain.ai.KeyPointsResult? = null,
+    val entities: com.example.nexusnews.domain.ai.EntityRecognitionResult? = null,
+    val topics: com.example.nexusnews.domain.ai.TopicClassificationResult? = null,
+    val bias: com.example.nexusnews.domain.ai.BiasDetectionResult? = null,
+    val isAnalyzing: Boolean = false,
 )
 
 /**
@@ -55,7 +66,12 @@ class NewsDetailViewModel
     @Inject
     constructor(
         private val newsRepository: NewsRepository,
-        private val aiService: AiService,
+        private val summarizeArticleUseCase: com.example.nexusnews.domain.usecase.ai.SummarizeArticleUseCase,
+        private val analyzeSentimentUseCase: com.example.nexusnews.domain.usecase.ai.AnalyzeSentimentUseCase,
+        private val extractKeyPointsUseCase: com.example.nexusnews.domain.usecase.ai.ExtractKeyPointsUseCase,
+        private val recognizeEntitiesUseCase: com.example.nexusnews.domain.usecase.ai.RecognizeEntitiesUseCase,
+        private val classifyTopicUseCase: com.example.nexusnews.domain.usecase.ai.ClassifyTopicUseCase,
+        private val detectBiasUseCase: com.example.nexusnews.domain.usecase.ai.DetectBiasUseCase,
         private val articleSummaryDao: ArticleSummaryDao,
         private val articleScraperService: ArticleScraperService,
     ) : BaseViewModel<NewsDetailUiState>(NewsDetailUiState()) {
@@ -126,6 +142,43 @@ class NewsDetailViewModel
         }
 
         /**
+         * Ensures full article content is available for AI analysis.
+         * Returns the content to use, fetching full content if needed.
+         */
+        private suspend fun ensureFullContentForAI(article: Article): String {
+            val currentContent = article.content ?: article.description ?: ""
+
+            // Check if content is truncated or empty
+            val isTruncated = currentContent.contains("[+") && currentContent.contains("chars]")
+            val isEmpty = currentContent.isBlank()
+
+            if (isEmpty || isTruncated) {
+                Timber.d("Content is empty or truncated, fetching full content for AI analysis")
+                updateState { it.copy(isLoadingFullContent = true) }
+
+                val result = articleScraperService.fetchFullContent(article.url)
+                result.onSuccess { fullContent ->
+                    val updatedArticle = article.copy(content = fullContent)
+                    updateState { it.copy(article = updatedArticle, isLoadingFullContent = false) }
+                    Timber.d("Full content loaded for AI: ${fullContent.length} characters")
+                }.onFailure { exception ->
+                    Timber.w(exception, "Failed to fetch full content for AI, using available content")
+                    updateState { it.copy(isLoadingFullContent = false) }
+                }
+
+                // Wait for the fetch to complete and return the updated content
+                // We need to wait for the state to update
+                kotlinx.coroutines.delay(500) // Brief delay to allow state update
+
+                // Return the updated content from state
+                val updatedArticle = state.value.article
+                return updatedArticle?.content ?: currentContent
+            }
+
+            return currentContent
+        }
+
+        /**
          * Loads cached summary for the article.
          */
         private suspend fun loadCachedSummary(articleId: String) {
@@ -145,41 +198,217 @@ class NewsDetailViewModel
                 _summaryState.value = SummaryState.Loading
 
                 try {
-                    val content = article.content ?: article.description ?: ""
+                    val content = ensureFullContentForAI(article)
                     if (content.isBlank()) {
                         _summaryState.value = SummaryState.Error("No content to summarize")
                         return@launch
                     }
 
-                    val result = aiService.summarizeArticle(content, maxLength = 150)
-                    result.onSuccess { summaryText ->
-                        val model = FreeAiModel.getDefault()
+                    summarizeArticleUseCase(
+                        com.example.nexusnews.domain.usecase.ai.SummarizeArticleUseCase.Params(
+                            articleContent = content,
+                            maxLength = 150
+                        )
+                    ).collect { result ->
+                        when(result) {
+                            is com.example.nexusnews.util.Result.Success -> {
+                                val summaryText = result.data
+                                val model = FreeAiModel.getDefault()
 
-                        // Create and cache the summary
-                        val summaryEntity =
-                            ArticleSummaryEntity(
-                                id = ArticleSummaryEntity.generateId(article.id, model.id),
-                                articleId = article.id,
-                                summary = summaryText,
-                                modelUsed = model.displayName,
-                                promptTokens = 0, // TODO: Track actual tokens
-                                completionTokens = 0,
-                                totalTokens = 0,
-                                generatedAt = LocalDateTime.now(),
-                            )
+                                // Create and cache the summary
+                                val summaryEntity =
+                                    ArticleSummaryEntity(
+                                        id = ArticleSummaryEntity.generateId(article.id, model.id),
+                                        articleId = article.id,
+                                        summary = summaryText,
+                                        modelUsed = model.displayName,
+                                        promptTokens = 0, // TODO: Track actual tokens
+                                        completionTokens = 0,
+                                        totalTokens = 0,
+                                        generatedAt = LocalDateTime.now(),
+                                    )
 
-                        articleSummaryDao.insertSummary(summaryEntity)
-                        _summaryState.value = SummaryState.Success(summaryEntity)
+                                articleSummaryDao.insertSummary(summaryEntity)
+                                _summaryState.value = SummaryState.Success(summaryEntity)
 
-                        Timber.d("Summary generated successfully for article: ${article.id}")
-                    }.onFailure { exception ->
-                        _summaryState.value = SummaryState.Error(exception.localizedMessage ?: "Failed to generate summary")
-                        Timber.e(exception, "Failed to generate summary")
+                                Timber.d("Summary generated successfully for article: ${article.id}")
+                            }
+                            is com.example.nexusnews.util.Result.Error -> {
+                                _summaryState.value = SummaryState.Error(result.exception.localizedMessage ?: "Failed to generate summary")
+                                Timber.e(result.exception, "Failed to generate summary")
+                            }
+                            is com.example.nexusnews.util.Result.Loading -> {
+                                // Already handled by initial state
+                            }
+                        }
                     }
                 } catch (e: Exception) {
                     _summaryState.value = SummaryState.Error(e.localizedMessage ?: "Failed to generate summary")
                     Timber.e(e, "Failed to generate summary")
                 }
+            }
+        }
+
+        fun analyzeSentiment(article: Article) {
+            viewModelScope.launch {
+                val content = ensureFullContentForAI(article)
+                if (content.isBlank()) return@launch
+
+                updateState { it.copy(isLoadingSentiment = true) }
+
+                analyzeSentimentUseCase(com.example.nexusnews.domain.usecase.ai.AnalyzeSentimentUseCase.Params(content))
+                    .collect { result ->
+                        if (result is com.example.nexusnews.util.Result.Success) {
+                            updateState { it.copy(sentiment = result.data, isLoadingSentiment = false) }
+                        } else if (result is com.example.nexusnews.util.Result.Error) {
+                            updateState { it.copy(isLoadingSentiment = false) }
+                        }
+                    }
+            }
+        }
+
+        fun extractKeyPoints(article: Article) {
+            viewModelScope.launch {
+                val content = ensureFullContentForAI(article)
+                if (content.isBlank()) return@launch
+
+                updateState { it.copy(isLoadingKeyPoints = true) }
+
+                extractKeyPointsUseCase(com.example.nexusnews.domain.usecase.ai.ExtractKeyPointsUseCase.Params(content))
+                    .collect { result ->
+                        if (result is com.example.nexusnews.util.Result.Success) {
+                            updateState { it.copy(keyPoints = result.data, isLoadingKeyPoints = false) }
+                        } else if (result is com.example.nexusnews.util.Result.Error) {
+                            updateState { it.copy(isLoadingKeyPoints = false) }
+                        }
+                    }
+            }
+        }
+
+        fun recognizeEntities(article: Article) {
+            viewModelScope.launch {
+                val content = ensureFullContentForAI(article)
+                if (content.isBlank()) return@launch
+
+                updateState { it.copy(isLoadingEntities = true) }
+
+                recognizeEntitiesUseCase(com.example.nexusnews.domain.usecase.ai.RecognizeEntitiesUseCase.Params(content))
+                    .collect { result ->
+                        if (result is com.example.nexusnews.util.Result.Success) {
+                            updateState { it.copy(entities = result.data, isLoadingEntities = false) }
+                        } else if (result is com.example.nexusnews.util.Result.Error) {
+                            updateState { it.copy(isLoadingEntities = false) }
+                        }
+                    }
+            }
+        }
+
+        fun classifyTopic(article: Article) {
+            viewModelScope.launch {
+                val content = ensureFullContentForAI(article)
+                if (content.isBlank()) return@launch
+
+                updateState { it.copy(isLoadingTopics = true) }
+
+                classifyTopicUseCase(com.example.nexusnews.domain.usecase.ai.ClassifyTopicUseCase.Params(content, article.title))
+                    .collect { result ->
+                        if (result is com.example.nexusnews.util.Result.Success) {
+                            updateState { it.copy(topics = result.data, isLoadingTopics = false) }
+                        } else if (result is com.example.nexusnews.util.Result.Error) {
+                            updateState { it.copy(isLoadingTopics = false) }
+                        }
+                    }
+            }
+        }
+
+        fun detectBias(article: Article) {
+            viewModelScope.launch {
+                val content = ensureFullContentForAI(article)
+                if (content.isBlank()) return@launch
+
+                updateState { it.copy(isLoadingBias = true) }
+
+                detectBiasUseCase(com.example.nexusnews.domain.usecase.ai.DetectBiasUseCase.Params(content, article.title))
+                    .collect { result ->
+                        if (result is com.example.nexusnews.util.Result.Success) {
+                            updateState { it.copy(bias = result.data, isLoadingBias = false) }
+                        } else if (result is com.example.nexusnews.util.Result.Error) {
+                            updateState { it.copy(isLoadingBias = false) }
+                        }
+                    }
+            }
+        }
+
+        fun analyzeArticle(article: Article) {
+            viewModelScope.launch {
+                updateState { it.copy(isAnalyzing = true) }
+
+                val content = ensureFullContentForAI(article)
+
+                if (content.isBlank()) {
+                    updateState { it.copy(isAnalyzing = false) }
+                    return@launch
+                }
+
+                // Launch parallel analysis
+                launch {
+                    analyzeSentimentUseCase(com.example.nexusnews.domain.usecase.ai.AnalyzeSentimentUseCase.Params(content))
+                        .collect { result ->
+                            if (result is com.example.nexusnews.util.Result.Success) {
+                                updateState { it.copy(sentiment = result.data) }
+                            }
+                        }
+                }
+
+                launch {
+                    extractKeyPointsUseCase(com.example.nexusnews.domain.usecase.ai.ExtractKeyPointsUseCase.Params(content))
+                        .collect { result ->
+                            if (result is com.example.nexusnews.util.Result.Success) {
+                                updateState { it.copy(keyPoints = result.data) }
+                            }
+                        }
+                }
+
+                launch {
+                    recognizeEntitiesUseCase(com.example.nexusnews.domain.usecase.ai.RecognizeEntitiesUseCase.Params(content))
+                        .collect { result ->
+                            if (result is com.example.nexusnews.util.Result.Success) {
+                                updateState { it.copy(entities = result.data) }
+                            }
+                        }
+                }
+
+                launch {
+                    classifyTopicUseCase(com.example.nexusnews.domain.usecase.ai.ClassifyTopicUseCase.Params(content, article.title))
+                        .collect { result ->
+                            if (result is com.example.nexusnews.util.Result.Success) {
+                                updateState { it.copy(topics = result.data) }
+                            }
+                        }
+                }
+
+                launch {
+                    detectBiasUseCase(com.example.nexusnews.domain.usecase.ai.DetectBiasUseCase.Params(content, article.title))
+                        .collect { result ->
+                            if (result is com.example.nexusnews.util.Result.Success) {
+                                updateState { it.copy(bias = result.data) }
+                            }
+                        }
+                }
+
+                // Note: We don't have a definitive "all done" signal here easily without using async/await or combine,
+                // but since these flow into state individually, the UI will update progressively.
+                // We'll toggle isAnalyzing off after a delay or when all are done?
+                // For simplicity in this implementation, we can leave isAnalyzing true or toggle it off in each block if we want per-item loading.
+                // But better UX: let's use async/await to wait for all if we want a global loading spinner.
+                // However, progressive loading is better. Let's set isAnalyzing to false after the block launch,
+                // but actually we want to show loading indicators.
+
+                // Let's rely on individual null checks in UI or add specific loading states if needed.
+                // For now, let's just turn off the global flag after launching,
+                // OR we can make the UI components show loading if data is null but we want to show skeletons.
+                // Given existing components have `isLoading` param, let's keep it simple for now.
+                updateState { it.copy(isAnalyzing = false) }
             }
         }
 

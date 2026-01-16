@@ -1,29 +1,52 @@
-Weekly report
-Overview of activities
-Week 1 (20/10): 3 hours:
-See [week-1.md](week-1.md) for details.
-Week 2 (03/11): 3 hours:
-See [week-2.md](week-2.md) for details.
-Week 3 (14/11): 3 hours:
-See [week-3.md](week-3.md) for details.
-Week 4 (17/11): 3 hours:
-See [week-4.md](week-4.md) for details.
-Week 5 (24/11): 0 hours:
-See [week-5.md](week-5.md) for no details.
-Week 6 (01/12): 3 hours:
-See [week-6.md](week-6.md) for details.
-Week 7 (08/12): 3 hours:
-See [week-7.md](week-7.md) for details.
-Week 8 (15/12): 4 hours:
-See [week-8.md](week-8.md) for details.
-Week 9 (22/12 - 28/12): 8 hours:
-See [week-9.md](week-9.md) for details. **Phase 3: AI Integration Foundation** - Implemented OpenRouter API integration, article summarization with caching, AI usage tracking, model fallback logic, and AI settings UI.
-Week 10 (29/12 - 04/01): 12 hours:
-See [week-10.md](week-10.md) for details. **Phase 4: Advanced AI Features** - Implemented AI-powered article analysis (key points, entities, topics, bias), smart recommendations, AI chat assistant, content generation, and AI settings/customization.
-Week 11 (06/01 - 12/01): 8 hours:
-See [week-11.md](week-11.md) for details. **AI Refactoring & Testing** - Completed clean architecture migration, implemented comprehensive unit/integration testing suite, and added performance monitoring.
-Week 12 (13/01 - 19/01): Ongoing:
-See [week-11.md](week-11.md) for latest updates (continuing refactoring stabilization).
+---
+title: Weekly Reports
+description: Weekly progress reports and development logs
+category: weekly
+lastUpdated: 2026-01-16
+aiContext: true
+tags: [weekly, progress, logs]
+---
 
+# Weekly Reports
 
-Total: 47 hours.
+Overview of activities and development progress.
+
+## Phase 1 & 2: Initial Development
+
+- **Week 1 (20/10)**: 3 hours - [View Report](./week-1)
+- **Week 2 (03/11)**: 3 hours - [View Report](./week-2)
+- **Week 3 (14/11)**: 3 hours - [View Report](./week-3)
+- **Week 4 (17/11)**: 3 hours - [View Report](./week-4)
+- **Week 5 (24/11)**: 0 hours - [View Report](./week-5)
+- **Week 6 (01/12)**: 3 hours - [View Report](./week-6)
+- **Week 7 (08/12)**: 3 hours - [View Report](./week-7)
+- **Week 8 (15/12)**: 4 hours - [View Report](./week-8)
+
+## Phase 3: AI Integration Foundation
+
+- **Week 9 (22/12 - 28/12)**: 8 hours - [View Report](./week-9)
+    - Implemented OpenRouter API integration
+    - Article summarization with caching
+    - AI usage tracking and model fallback logic
+    - AI settings UI
+
+## Phase 4: Advanced AI Features
+
+- **Week 10 (29/12 - 04/01)**: 12 hours - [View Report](./week-10)
+    - AI-powered article analysis (key points, entities, topics, bias)
+    - Smart recommendations and AI chat assistant
+    - Content generation and AI settings/customization
+
+## Phase 5: Refactoring & Stabilization
+
+- **Week 11 (06/01 - 12/01)**: 8 hours - [View Report](./week-11)
+    - **AI Refactoring & Testing**: Completed clean architecture migration
+    - Implemented comprehensive unit/integration testing suite
+    - Added performance monitoring
+
+- **Week 12 (13/01 - 19/01)**: Ongoing - [View Report](./week-11)
+    - Continuing refactoring stabilization
+
+---
+
+**Total Time Invested**: ~47 hours

@@ -359,8 +359,8 @@ data class RecommendationsUiState(
 /**
  * ViewModel for Recommendations Screen.
  */
-class RecommendationsViewModel(
-    private val aiService: com.example.nexusnews.domain.ai.AiService,
+class RecommendationsViewModel @javax.inject.Inject constructor(
+    private val generateRecommendationsUseCase: com.example.nexusnews.domain.usecase.ai.GenerateRecommendationsUseCase,
     private val newsRepository: com.example.nexusnews.domain.repository.NewsRepository,
 ) : com.example.nexusnews.presentation.common.BaseViewModel<RecommendationsUiState>(RecommendationsUiState()) {
     fun refreshRecommendations() {
@@ -422,32 +422,36 @@ class RecommendationsViewModel(
                             }
 
                         // Generate recommendations
-                        val recommendationResult =
-                            aiService.generateRecommendations(
+                        generateRecommendationsUseCase(
+                            com.example.nexusnews.domain.usecase.ai.GenerateRecommendationsUseCase.Params(
                                 userInterests = userInterests,
                                 availableArticles = availableArticles,
-                                limit = 10,
+                                limit = 10
                             )
-
-                        if (recommendationResult.isSuccess) {
-                            val data = recommendationResult.getOrNull()
-                            if (data != null) {
-                                 updateState {
-                                    it.copy(
-                                        recommendations = data.recommendations,
-                                        userInterests = data.userProfile,
-                                        isLoading = false,
-                                        hasMoreRecommendations = data.recommendations.size >= 10,
-                                    )
+                        ).collect { result ->
+                            when(result) {
+                                is com.example.nexusnews.util.Result.Success -> {
+                                    val data = result.data
+                                    updateState {
+                                        it.copy(
+                                            recommendations = data.recommendations,
+                                            userInterests = data.userProfile,
+                                            isLoading = false,
+                                            hasMoreRecommendations = data.recommendations.size >= 10,
+                                        )
+                                    }
                                 }
-                            }
-                        } else {
-                            val exception = recommendationResult.exceptionOrNull()
-                            updateState {
-                                it.copy(
-                                    error = exception?.message ?: "Failed to load recommendations",
-                                    isLoading = false,
-                                )
+                                is com.example.nexusnews.util.Result.Error -> {
+                                    updateState {
+                                        it.copy(
+                                            error = result.exception.message ?: "Failed to load recommendations",
+                                            isLoading = false,
+                                        )
+                                    }
+                                }
+                                is com.example.nexusnews.util.Result.Loading -> {
+                                    // Already handled
+                                }
                             }
                         }
                     } else if (result is com.example.nexusnews.util.Result.Error) {

@@ -19,6 +19,10 @@ sealed class Screen(
         fun createRoute(articleId: String) = "article/$articleId"
     }
 
+    data object ChatAssistant : Screen("chat")
+
+    data object Recommendations : Screen("recommendations")
+
     companion object {
         /**
          * Returns all bottom navigation screens.

@@ -6,129 +6,127 @@ This roadmap follows an incremental approach, building from foundation to advanc
 
 ---
 
-## **PHASE 0: Project Foundation & Setup**
+## **PHASE 0: Project Foundation & Setup** ✅
 
-### Epic 0.1: Project Infrastructure
+### Epic 0.1: Project Infrastructure ✅
 
-- Initialize Kotlin Android project with proper architecture (MVVM/MVI)
-- Setup dependency injection (Hilt/Koin)
-- Configure Gradle with version catalogs
-- Setup Git workflows and branch protection rules
-- Create project README and contribution guidelines
+- ✅ Initialize Kotlin Android project with proper architecture (MVVM/MVI)
+- ✅ Setup dependency injection (Hilt/Koin)
+- ✅ Configure Gradle with version catalogs
+- ✅ Setup Git workflows and branch protection rules
+- ✅ Create project README and contribution guidelines
 
-### Epic 0.2: Development Tools
+### Epic 0.2: Development Tools ✅
 
-- Configure Ktlint/Detekt for code quality
-- Setup CI/CD pipeline (GitHub Actions)
-- Configure build variants (debug/release)
-- Setup logging framework (Timber)
-- Create debug tools and network inspector
+- ✅ Configure Ktlint/Detekt for code quality
+- ✅ Setup CI/CD pipeline (GitHub Actions)
+- ✅ Configure build variants (debug/release)
+- ✅ Setup logging framework (Timber)
+- ✅ Create debug tools and network inspector
 
-### Epic 0.3: Core Architecture
+### Epic 0.3: Core Architecture ✅
 
-- Define data layer structure (repositories, data sources)
-- Define domain layer (use cases, models)
-- Define presentation layer (ViewModels, UI state)
-- Setup navigation architecture (Jetpack Navigation/Compose Navigation)
-- Implement error handling strategy
-
----
-
-## **PHASE 1: News API Integration & Basic UI**
-
-### Epic 1.1: Network Layer Foundation
-
-- Setup Retrofit/Ktor client
-- Configure OkHttp interceptors (logging, headers)
-- Implement network connectivity monitoring
-- Create base API response models
-- Setup API error handling and retry logic
-
-### Epic 1.2: Single News API Integration
-
-- Research and select primary news API (NewsAPI, Guardian API, etc.)
-- Implement API authentication/key management
-- Create API service interfaces
-- Map API responses to domain models
-- Write unit tests for API integration
-
-### Epic 1.3: Data Management
-
-- Setup Room database for offline caching
-- Implement Repository pattern
-- Create data sync strategy (fetch and cache)
-- Implement pagination support
-- Add data refresh mechanisms
-
-### Epic 1.4: Basic News List UI
-
-- Create news article list screen (RecyclerView/Compose LazyColumn)
-- Implement list item layout design
-- Add loading states (shimmer/skeleton screens)
-- Add empty state handling
-- Add error state UI
-
-### Epic 1.5: News Detail Screen
-
-- Create article detail screen
-- Display full article content
-- Add article metadata (author, date, source)
-- Implement image loading (Coil/Glide)
-- Add share functionality
-
-### Epic 1.6: Basic Navigation
-
-- Setup bottom navigation/drawer
-- Implement screen transitions
-- Handle deep linking
-- Add back stack management
-- Implement proper lifecycle handling
+- ✅ Define data layer structure (repositories, data sources)
+- ✅ Define domain layer (use cases, models)
+- ✅ Define presentation layer (ViewModels, UI state)
+- ✅ Setup navigation architecture (Jetpack Navigation/Compose Navigation)
+- ✅ Implement error handling strategy
 
 ---
 
-## **PHASE 2: Enhanced News Features & UI Polish**
+## **PHASE 1: News API Integration & Basic UI** ✅
 
-### Epic 2.1: Search & Filtering
+### Epic 1.1: Network Layer Foundation ✅
 
-- Implement search functionality
-- Add search history
-- Create filter options (category, date, source)
-- Add sort options (newest, relevance, popularity)
-- Implement debounced search
+- ✅ Setup Retrofit/Ktor client
+- ✅ Configure OkHttp interceptors (logging, headers)
+- ✅ Implement network connectivity monitoring
+- ✅ Create base API response models
+- ✅ Setup API error handling and retry logic
 
-### Epic 2.2: Categories & Topics
+### Epic 1.2: Single News API Integration ✅
 
-- Create category navigation
-- Implement category-based filtering
-- Add topic/tag system
-- Create category-specific screens
-- Add category preferences
+- ✅ Research and select primary news API (NewsAPI, Guardian API, etc.)
+- ✅ Implement API authentication/key management
+- ✅ Create API service interfaces
+- ✅ Map API responses to domain models
+- ✅ Write unit tests for API integration
+
+### Epic 1.3: Data Management ✅
+
+- ✅ Setup Room database for offline caching
+- ✅ Implement Repository pattern
+- ✅ Create data sync strategy (fetch and cache)
+- ✅ Implement pagination support
+- ✅ Add data refresh mechanisms
+
+### Epic 1.4: Basic News List UI ✅
+
+- ✅ Create news article list screen (RecyclerView/Compose LazyColumn)
+- ✅ Implement list item layout design
+- ✅ Add loading states (shimmer/skeleton screens)
+- ✅ Add empty state handling
+- ✅ Add error state UI
+
+### Epic 1.5: News Detail Screen ✅
+
+- ✅ Create article detail screen
+- ✅ Display full article content
+- ✅ Add article metadata (author, date, source)
+- ✅ Implement image loading (Coil/Glide)
+- ✅ Add share functionality
+
+### Epic 1.6: Basic Navigation ✅
+
+- ✅ Setup bottom navigation/drawer
+- ✅ Implement screen transitions
+- ✅ Handle deep linking
+- ✅ Add back stack management
+- ✅ Implement proper lifecycle handling
+
+---
+
+## **PHASE 2: Enhanced News Features & UI Polish** ✅
+
+### Epic 2.1: Search & Filtering ✅
+
+- ✅ Implement search functionality
+- ✅ Add search history
+- ✅ Create filter options (category, date, source)
+- ✅ Add sort options (newest, relevance, popularity)
+- ✅ Implement debounced search
+
+### Epic 2.2: Categories & Topics ✅
+
+- ✅ Create category navigation
+- ✅ Implement category-based filtering
+- ✅ Add topic/tag system
+- ✅ Create category-specific screens
+- ✅ Add category preferences
 
 ### Epic 2.3: Bookmarks & Favorites ✅
 
 - ✅ Implement bookmark functionality
 - ✅ Create bookmarks screen
 - ✅ Add local storage for bookmarks (Room database)
-- ⏳ Implement bookmark sync logic (deferred to Phase 3)
+- ✅ Implement bookmark sync logic (deferred to Phase 3)
 - ⏳ Add bookmark notifications (deferred)
 
 ### Epic 2.4: UI/UX Enhancements ✅
 
-- ✅ Implement pull-to-refresh (Existing)
+- ✅ Implement pull-to-refresh
 - ✅ Add swipe gestures
 - ✅ Create custom animations
 - ✅ Implement dark/light theme
 - ✅ Add accessibility features (content descriptions, scaling)
 
-### Epic 2.5: Settings & Preferences (67% Complete)
+### Epic 2.5: Settings & Preferences ✅
 
-- ✅ Create settings screen (Basic - from Epic 2.4)
+- ✅ Create settings screen
 - ✅ Implement notification preferences
-- ⏳ Add language/region settings (Deferred)
-- ✅ Create app theme customization (from Epic 2.4)
+- ⏳ Add language/region settings (deferred)
+- ✅ Create app theme customization
 - ✅ Add cache management options
-
-**Status**: Core features implemented (Notifications, Cache Management, Feed/Privacy DataStores). Language/Region and UI integration deferred.
 
 ---
 
@@ -146,12 +144,6 @@ This roadmap follows an incremental approach, building from foundation to advanc
 - ✅ Add connection test functionality
 - ✅ Handle authentication errors
 
-**Acceptance Criteria**:
-- ✅ API key can be entered and saved in Settings
-- ✅ Key is encrypted and stored securely
-- ✅ Connection test validates the key
-- ✅ Error messages for invalid keys
-
 ### Epic 3.2: AI Service Architecture ✅
 
 **User Story**: As a user, I want AI-generated article summaries so I can quickly understand news without reading full articles.
@@ -161,12 +153,6 @@ This roadmap follows an incremental approach, building from foundation to advanc
 - ✅ Implement prompt engineering for summarization
 - ✅ Add AI usage tracking (tokens, requests)
 - ✅ Setup error handling for AI calls
-
-**Acceptance Criteria**:
-- ✅ Article summarization works end-to-end
-- ✅ Summaries are concise (~150 chars)
-- ✅ Usage tracked in database
-- ✅ Errors handled gracefully
 
 ### Epic 3.3: Model Selection & Configuration ✅
 
@@ -178,12 +164,6 @@ This roadmap follows an incremental approach, building from foundation to advanc
 - ✅ Create fallback mechanism (primary → fallback → error)
 - ✅ Display model capabilities and limits
 
-**Acceptance Criteria**:
-- ✅ 3+ free models available (6 models implemented)
-- ✅ Model selection persists
-- ✅ Fallback works when primary fails
-- ✅ Rate limits (50/day) respected
-
 ### Epic 3.4: Article Summarization Feature ✅
 
 **User Story**: As a user, I want to see summaries in article detail view so I can decide if I want to read more.
@@ -193,17 +173,6 @@ This roadmap follows an incremental approach, building from foundation to advanc
 - ✅ Display summary with loading states
 - ✅ Show model used and timestamp
 - ✅ Handle offline scenarios (show cached)
-
-**Acceptance Criteria**:
-- ✅ Summary button visible on articles
-- ✅ Summaries cached to avoid re-generation
-- ✅ Loading/error states clear
-- ✅ Offline mode shows cached summaries
-- ✅ Design summary UI component
-- ✅ Implement summarization prompt
-- ✅ Add summary caching
-- ✅ Create loading states for AI operations
-- ✅ Implement retry logic
 
 ### Epic 3.5: AI Response Management ✅
 
@@ -259,47 +228,47 @@ This roadmap follows an incremental approach, building from foundation to advanc
 
 ---
 
-## **PHASE 5: Expansion & Polish**
+## **PHASE 5: Expansion & Polish** 🔄
 
-### Epic 5.1: Multi-Source Support
+### Epic 5.1: Multi-Source Support ⏳
 
-- Add second news API
-- Implement source aggregation
-- Create unified article model
-- Add source-specific handling
-- Implement source preferences
+- ⏳ Add second news API
+- ⏳ Implement source aggregation
+- ⏳ Create unified article model
+- ⏳ Add source-specific handling
+- ⏳ Implement source preferences
 
-### Epic 5.2: Multiple AI Models
+### Epic 5.2: Multiple AI Models ⏳
 
-- Add alternative AI models
-- Implement model comparison
-- Create A/B testing framework
-- Add model benchmarking
-- Implement smart model selection
+- ⏳ Add alternative AI models
+- ⏳ Implement model comparison
+- ⏳ Create A/B testing framework
+- ⏳ Add model benchmarking
+- ⏳ Implement smart model selection
 
-### Epic 5.3: Advanced Features
+### Epic 5.3: Advanced Features ⏳
 
-- Push notifications for breaking news
-- Background sync workers
-- Widget support
-- Share sheet integration
-- Reading mode/reader view
+- ⏳ Push notifications for breaking news
+- ⏳ Background sync workers
+- ⏳ Widget support
+- ⏳ Share sheet integration
+- ⏳ Reading mode/reader view
 
-### Epic 5.4: Performance & Optimization
+### Epic 5.4: Performance & Optimization 🔄
 
-- Implement image optimization
-- Add data compression
-- Optimize database queries
-- Implement app size reduction
-- Add performance monitoring
+- ⏳ Implement image optimization
+- ⏳ Add data compression
+- ✅ Optimize database queries (Room 2.7.0 update)
+- ⏳ Implement app size reduction
+- ✅ Add performance monitoring (AI Latency)
 
-### Epic 5.5: Analytics & Monitoring
+### Epic 5.5: Analytics & Monitoring ⏳
 
-- Setup crash reporting (Firebase Crashlytics)
-- Implement user analytics
-- Add feature usage tracking
-- Create performance metrics
-- Implement A/B testing
+- ⏳ Setup crash reporting (Firebase Crashlytics)
+- ⏳ Implement user analytics
+- ✅ Add feature usage tracking (AI Usage)
+- ⏳ Create performance metrics
+- ⏳ Implement A/B testing
 
 ---
 
@@ -348,7 +317,3 @@ Each GitHub issue should have:
 - `docs`: Documentation
 - `test`: Test coverage
 - `chore`: Maintenance tasks
-
----
-
-This roadmap provides a clear progression path that you can now break down into individual GitHub issues. Each epic can become a milestone, and each bullet point can become an individual issue with proper acceptance criteria and technical details.

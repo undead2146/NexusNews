@@ -1,13 +1,18 @@
+This is the revised **NexusNews AI PRD v2.0** with all major sections encapsulated in `<details>` and `<summary>` tags as requested.
+
+---
+
 # NexusNews AI - Comprehensive PRD v2.0
 
 ## Multi-Source & International News Aggregator with OpenRouter AI
 
 ---
 
-## 1. Executive Summary (Revised)
+<details>
+<summary>1. Executive Summary (Revised)</summary>
 
-**Project Name**: NexusNews AI  
-**Duration**: 10 weeks (50-60 hours)  
+**Project Name**: NexusNews AI
+**Duration**: 10 weeks (50-60 hours)
 **Tech Stack**: Kotlin, Jetpack Compose, MVVM, Clean Architecture, OpenRouter API, Room, Retrofit, Jsoup (web scraping)
 
 ### Key Differentiators from NexusChat
@@ -21,16 +26,16 @@
 
 1. **Kotlin MVVM Mastery**: Clean Architecture with complex data flows (multiple sources → unified repository)
 2. **OpenRouter AI**: Model selection strategies, cost-aware routing, streaming responses
-3. **Web Scraping**: Jsoup for parsing  news sites without APIs
+3. **Web Scraping**: Jsoup for parsing news sites without APIs
 4. **Production Patterns**: Rate limiting, caching strategies, error recovery, source health monitoring
+</details>
 
----
-
-## 2. Technical Architecture (Revised)
+<details>
+<summary>2. Technical Architecture (Revised)</summary>
 
 ### 2.1 System Architecture Overview
 
-```
+```text
 ┌────────────────────────────────────────────────────────────────┐
 │                      PRESENTATION LAYER                         │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────┐│
@@ -82,7 +87,7 @@
 │  │  └────────────┘ │  │  └────────────┘  └────────────┘ │   │
 │  │  ┌────────────┐ │  └──────────────────────────────────┘   │
 │  │  │ GvA        │ │                                          │
-│  │  │ Scraper    │ │  ┌──────────────────────────────────┐   │
+│  │  │ (Retrofit) │ │  ┌──────────────────────────────────┐   │
 │  │  └────────────┘ │  │  OpenRouter Service Layer        │   │
 │  │  ┌────────────┐ │  │  ┌────────────┐  ┌────────────┐ │   │
 │  │  │ Guardian   │ │  │  │ OpenRouter │  │ Model      │ │   │
@@ -131,13 +136,13 @@ interface NewsSourceRepository {
 interface NewsSourceAdapter {
     val sourceId: String
     val source: NewsSource
-    
+
     suspend fun fetchArticles(
         category: String? = null,
         page: Int = 1,
         limit: Int = 20
     ): Result<List<Article>>
-    
+
     suspend fun fetchArticleDetail(url: String): Result<ArticleDetail>
     suspend fun healthCheck(): HealthStatus
 }
@@ -147,7 +152,7 @@ class NewsApiAdapter @Inject constructor(
     private val apiService: NewsApiService,
     @Named("newsapi_key") private val apiKey: String
 ) : NewsSourceAdapter {
-    
+
     override val sourceId = "newsapi"
     override val source = NewsSource(
         id = "newsapi",
@@ -158,7 +163,7 @@ class NewsApiAdapter @Inject constructor(
         category = listOf(Category.GENERAL, Category.TECH, Category.BUSINESS),
         baseUrl = "https://newsapi.org"
     )
-    
+
     override suspend fun fetchArticles(
         category: String?,
         page: Int,
@@ -172,7 +177,7 @@ class NewsApiAdapter @Inject constructor(
                 pageSize = limit,
                 apiKey = apiKey
             )
-            
+
             val articles = response.articles.map { dto ->
                 Article(
                     id = dto.url.hashCode().toString(),
@@ -194,7 +199,7 @@ class NewsApiAdapter @Inject constructor(
             Result.failure(e)
         }
     }
-    
+
     override suspend fun healthCheck(): HealthStatus {
         return try {
             apiService.getTopHeadlines(country = "us", pageSize = 1, apiKey = apiKey)
@@ -210,7 +215,7 @@ class HBVLScraperAdapter @Inject constructor(
     private val httpClient: OkHttpClient,
     private val htmlParser: HtmlParser
 ) : NewsSourceAdapter {
-    
+
     override val sourceId = "hbvl"
     override val source = NewsSource(
         id = "hbvl",
@@ -222,7 +227,7 @@ class HBVLScraperAdapter @Inject constructor(
         logo = "https://www.hbvl.be/static/images/logo.png",
         baseUrl = "https://www.hbvl.be"
     )
-    
+
     override suspend fun fetchArticles(
         category: String?,
         page: Int,
@@ -234,17 +239,17 @@ class HBVLScraperAdapter @Inject constructor(
                 "sports" -> "https://www.hbvl.be/sport"
                 else -> "https://www.hbvl.be/nieuws"
             }
-            
+
             val request = Request.Builder().url(url).build()
             val response = httpClient.newCall(request).execute()
-            
+
             if (!response.isSuccessful) {
                 return@withContext Result.failure(Exception("HTTP ${response.code}"))
             }
-            
+
             val html = response.body?.string() ?: ""
             val document = Jsoup.parse(html)
-            
+
             val articles = document.select("article.article-teaser").take(limit).map { element ->
                 Article(
                     id = element.select("a").attr("href").hashCode().toString(),
@@ -261,37 +266,37 @@ class HBVLScraperAdapter @Inject constructor(
                     category = Category.fromString(category)
                 )
             }
-            
+
             Result.success(articles)
         } catch (e: Exception) {
             Timber.e(e, "HBVL scraping failed")
             Result.failure(e)
         }
     }
-    
+
     override suspend fun fetchArticleDetail(url: String): Result<ArticleDetail> = withContext(Dispatchers.IO) {
         try {
             val request = Request.Builder().url(url).build()
             val response = httpClient.newCall(request).execute()
             val html = response.body?.string() ?: ""
             val document = Jsoup.parse(html)
-            
+
             val content = document.select("div.article__body p")
                 .joinToString("\n\n") { it.text() }
-            
+
             val detail = ArticleDetail(
                 fullContent = content,
                 images = document.select("div.article__body img")
                     .map { it.attr("src") },
                 tags = document.select("a.tag").map { it.text() }
             )
-            
+
             Result.success(detail)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
-    
+
     override suspend fun healthCheck(): HealthStatus {
         return try {
             val request = Request.Builder()
@@ -304,7 +309,7 @@ class HBVLScraperAdapter @Inject constructor(
             HealthStatus.DOWN
         }
     }
-    
+
     private fun parseHBVLDate(datetime: String): Instant {
         // Parse ISO date or custom format
         return try {
@@ -319,7 +324,7 @@ class HBVLScraperAdapter @Inject constructor(
 class GvaScraperAdapter @Inject constructor(
     private val httpClient: OkHttpClient
 ) : NewsSourceAdapter {
-    
+
     override val sourceId = "gva"
     override val source = NewsSource(
         id = "gva",
@@ -331,7 +336,7 @@ class GvaScraperAdapter @Inject constructor(
         logo = "https://www.gva.be/static/logo.png",
         baseUrl = "https://www.gva.be"
     )
-    
+
     override suspend fun fetchArticles(
         category: String?,
         page: Int,
@@ -343,7 +348,7 @@ class GvaScraperAdapter @Inject constructor(
             val response = httpClient.newCall(request).execute()
             val html = response.body?.string() ?: ""
             val document = Jsoup.parse(html)
-            
+
             // GvA uses different HTML structure
             val articles = document.select("div.teaser").take(limit).map { element ->
                 Article(
@@ -361,19 +366,19 @@ class GvaScraperAdapter @Inject constructor(
                     category = Category.fromString(category)
                 )
             }
-            
+
             Result.success(articles)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
-    
+
     override suspend fun fetchArticleDetail(url: String): Result<ArticleDetail> {
         // Similar to HBVL but with GvA's HTML selectors
         // Implementation follows same pattern
         TODO("Implement GvA detail scraping")
     }
-    
+
     override suspend fun healthCheck(): HealthStatus {
         return try {
             val request = Request.Builder().url(source.baseUrl).head().build()
@@ -400,7 +405,7 @@ class NewsSourceAdapterFactory @Inject constructor(
             else -> throw IllegalArgumentException("Unknown source: $sourceId")
         }
     }
-    
+
     fun getAllAdapters(): List<NewsSourceAdapter> {
         return listOf(
             newsApiAdapter.get(),
@@ -446,7 +451,7 @@ interface OpenRouterService {
         @Header("X-Title") appTitle: String = "NexusNews AI",
         @Body request: OpenRouterRequest
     ): OpenRouterResponse
-    
+
     @GET("api/v1/models")
     suspend fun getAvailableModels(
         @Header("Authorization") authorization: String
@@ -509,7 +514,7 @@ class OpenRouterClient @Inject constructor(
     private val aiRepository: AIRepository,
     private val usageTracker: UsageTracker
 ) {
-    
+
     suspend fun summarize(
         text: String,
         language: Language,
@@ -517,12 +522,12 @@ class OpenRouterClient @Inject constructor(
         modelOverride: String? = null
     ): Result<Summary> {
         return try {
-            val apiKey = aiRepository.getApiKey() 
+            val apiKey = aiRepository.getApiKey()
                 ?: return Result.failure(Exception("No API key configured"))
-            
-            val model = modelOverride 
+
+            val model = modelOverride
                 ?: aiRepository.getSelectedModel(AITask.SUMMARIZATION).id
-            
+
             val systemPrompt = buildSummarizationPrompt(language)
             val request = OpenRouterRequest(
                 model = model,
@@ -533,15 +538,15 @@ class OpenRouterClient @Inject constructor(
                 max_tokens = maxTokens,
                 temperature = 0.3
             )
-            
+
             val response = service.createChatCompletion(
                 authorization = "Bearer $apiKey",
                 request = request
             )
-            
+
             // Track usage
             usageTracker.recordUsage(response.usage, model)
-            
+
             val summaryText = response.choices.first().message.content
             Result.success(Summary(
                 text = summaryText,
@@ -553,20 +558,20 @@ class OpenRouterClient @Inject constructor(
             Result.failure(e)
         }
     }
-    
+
     suspend fun analyzeSentiment(
         text: String,
         language: Language
     ): Result<Sentiment> {
         val apiKey = aiRepository.getApiKey() ?: return Result.failure(Exception("No API key"))
         val model = aiRepository.getSelectedModel(AITask.SENTIMENT).id
-        
+
         val systemPrompt = """
-            Analyze the sentiment of news articles. 
+            Analyze the sentiment of news articles.
             Respond with ONLY one word: POSITIVE, NEUTRAL, or NEGATIVE.
             ${if (language == Language.NL) "The article is in Dutch." else ""}
         """.trimIndent()
-        
+
         val request = OpenRouterRequest(
             model = model,
             messages = listOf(
@@ -576,28 +581,28 @@ class OpenRouterClient @Inject constructor(
             max_tokens = 10,
             temperature = 0.1
         )
-        
+
         return try {
             val response = service.createChatCompletion(
                 authorization = "Bearer $apiKey",
                 request = request
             )
-            
+
             usageTracker.recordUsage(response.usage, model)
-            
+
             val sentimentText = response.choices.first().message.content.trim().uppercase()
             val sentiment = when {
                 sentimentText.contains("POSITIVE") -> Sentiment.POSITIVE
                 sentimentText.contains("NEGATIVE") -> Sentiment.NEGATIVE
                 else -> Sentiment.NEUTRAL
             }
-            
+
             Result.success(sentiment)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
-    
+
     suspend fun translate(
         text: String,
         fromLanguage: Language,
@@ -605,13 +610,13 @@ class OpenRouterClient @Inject constructor(
     ): Result<String> {
         val apiKey = aiRepository.getApiKey() ?: return Result.failure(Exception("No API key"))
         val model = aiRepository.getSelectedModel(AITask.TRANSLATION).id
-        
+
         val systemPrompt = """
-            You are a professional translator. 
+            You are a professional translator.
             Translate from ${fromLanguage.name} to ${toLanguage.name}.
             Preserve the tone and meaning. Output ONLY the translation.
         """.trimIndent()
-        
+
         val request = OpenRouterRequest(
             model = model,
             messages = listOf(
@@ -621,20 +626,20 @@ class OpenRouterClient @Inject constructor(
             max_tokens = (text.length * 1.5).toInt(),
             temperature = 0.2
         )
-        
+
         return try {
             val response = service.createChatCompletion(
                 authorization = "Bearer $apiKey",
                 request = request
             )
-            
+
             usageTracker.recordUsage(response.usage, model)
             Result.success(response.choices.first().message.content)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
-    
+
     private fun buildSummarizationPrompt(language: Language): String {
         return when (language) {
             Language.NL -> """
@@ -663,7 +668,7 @@ class UsageTracker @Inject constructor(
     suspend fun recordUsage(usage: Usage, modelId: String) = withContext(Dispatchers.IO) {
         val model = modelsRepository.getModel(modelId)
         val cost = calculateCost(usage, model)
-        
+
         val record = UsageRecord(
             timestamp = Instant.now(),
             modelId = modelId,
@@ -672,23 +677,23 @@ class UsageTracker @Inject constructor(
             totalTokens = usage.total_tokens,
             costUSD = cost
         )
-        
+
         usageDao.insertUsage(record)
     }
-    
+
     private fun calculateCost(usage: Usage, model: AIModel?): Double {
         if (model == null) return 0.0
-        
+
         val inputCost = (usage.prompt_tokens / 1000.0) * model.costPer1kTokens.inputCostUSD
         val outputCost = (usage.completion_tokens / 1000.0) * model.costPer1kTokens.outputCostUSD
-        
+
         return inputCost + outputCost
     }
-    
+
     suspend fun getUsageStats(): UsageStats {
         val today = Instant.now().truncatedTo(ChronoUnit.DAYS)
         val records = usageDao.getUsageSince(today)
-        
+
         return UsageStats(
             totalTokensUsed = records.sumOf { it.totalTokens.toLong() },
             estimatedCostUSD = records.sumOf { it.costUSD },
@@ -711,13 +716,13 @@ class ModelSelector @Inject constructor(
         if (userPreference != null) {
             return modelsRepository.getModel(userPreference)!!
         }
-        
+
         val availableModels = modelsRepository.getModelsForTask(task)
-        
+
         return if (prioritizeCost) {
             // Select cheapest model
-            availableModels.minByOrNull { 
-                it.costPer1kTokens.inputCostUSD + it.costPer1kTokens.outputCostUSD 
+            availableModels.minByOrNull {
+                it.costPer1kTokens.inputCostUSD + it.costPer1kTokens.outputCostUSD
             }!!
         } else {
             // Select balanced model (good quality/cost ratio)
@@ -731,12 +736,12 @@ class ModelSelector @Inject constructor(
     }
 }
 ```
+</details>
 
----
+<details>
+<summary>3. Project Structure (Complete File Tree)</summary>
 
-## 3. Project Structure (Complete File Tree)
-
-```
+```text
 app/
 ├── src/
 │   ├── main/
@@ -987,10 +992,10 @@ app/
 ├── proguard-rules.pro
 └── README.md
 ```
+</details>
 
----
-
-## 4. Detailed Implementation Plan (Week by Week)
+<details>
+<summary>4. Detailed Implementation Plan (Week by Week)</summary>
 
 ### **Week 1: Foundation & Multi-Source Setup (10 hrs)** ✅ COMPLETED
 
@@ -1013,56 +1018,56 @@ dependencies {
     // Core
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
-    
+
     // Compose
     implementation(platform("androidx.compose:compose-bom:2024.01.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.activity:activity-compose:1.8.2")
-    
+
     // Navigation
     implementation("androidx.navigation:navigation-compose:2.7.6")
-    
+
     // Hilt (DI)
     implementation("com.google.dagger:hilt-android:2.50")
     kapt("com.google.dagger:hilt-compiler:2.50")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
-    
+
     // Room
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     kapt("androidx.room:room-compiler:2.6.1")
-    
+
     // Retrofit + OkHttp
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-    
+
     // Moshi (JSON)
     implementation("com.squareup.moshi:moshi:1.15.0")
     implementation("com.squareup.moshi:moshi-kotlin:1.15.0")
     kapt("com.squareup.moshi:moshi-kotlin-codegen:1.15.0")
-    
+
     // Jsoup (Web scraping)
     implementation("org.jsoup:jsoup:1.17.2")
-    
+
     // Coil (Image loading)
     implementation("io.coil-kt:coil-compose:2.5.0")
-    
+
     // DataStore
     implementation("androidx.datastore:datastore-preferences:1.0.0")
-    
+
     // Encrypted SharedPreferences
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
-    
+
     // WorkManager
     implementation("androidx.work:work-runtime-ktx:2.9.0")
-    
+
     // Timber (Logging)
     implementation("com.jakewharton.timber:timber:5.0.1")
-    
+
     // Testing
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
@@ -1125,21 +1130,21 @@ class NexusNewsApplication : Application() {
 class HomeViewModel @Inject constructor(
     private val getAggregatedNewsUseCase: GetAggregatedNewsUseCase
 ) : ViewModel() {
-    
+
     private val _state = MutableStateFlow<HomeState>(HomeState.Loading)
     val state: StateFlow<HomeState> = _state.asStateFlow()
-    
+
     private val _selectedSources = MutableStateFlow<Set<String>>(setOf("newsapi", "hbvl"))
     val selectedSources: StateFlow<Set<String>> = _selectedSources.asStateFlow()
-    
+
     init {
         loadNews()
     }
-    
+
     fun loadNews(refresh: Boolean = false) {
         viewModelScope.launch {
             _state.value = HomeState.Loading
-            
+
             getAggregatedNewsUseCase(
                 sourceIds = _selectedSources.value.toList(),
                 forceRefresh = refresh
@@ -1155,7 +1160,7 @@ class HomeViewModel @Inject constructor(
                 }
         }
     }
-    
+
     fun toggleSource(sourceId: String) {
         _selectedSources.value = if (sourceId in _selectedSources.value) {
             _selectedSources.value - sourceId
@@ -1224,17 +1229,17 @@ class SettingsViewModel @Inject constructor(
     private val aiRepository: AIRepository,
     private val usageTracker: UsageTracker
 ) : ViewModel() {
-    
+
     val usageStats = usageTracker.getUsageStats()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UsageStats.empty())
-    
+
     private val _keyValidationState = MutableStateFlow<KeyValidationState>(KeyValidationState.Idle)
     val keyValidationState = _keyValidationState.asStateFlow()
-    
+
     fun saveApiKey(key: String) {
         viewModelScope.launch {
             _keyValidationState.value = KeyValidationState.Validating
-            
+
             aiRepository.validateApiKey(key)
                 .onSuccess {
                     aiRepository.setApiKey(key)
@@ -1305,10 +1310,10 @@ class SummarizeArticleUseCase @Inject constructor(
         summaryDao.getSummary(article.id)?.let {
             return Result.success(it.toDomainModel())
         }
-        
+
         // Detect language
         val language = languageDetector.detect(article.title + " " + article.description)
-        
+
         // Generate summary with OpenRouter
         return openRouterClient.summarize(
             text = article.content ?: article.description,
@@ -1329,11 +1334,11 @@ class LanguageDetector {
     private val dutchKeywords = setOf(
         "het", "de", "een", "van", "in", "op", "voor", "met", "zijn", "als"
     )
-    
+
     fun detect(text: String): Language {
         val words = text.lowercase().split("\\s+".toRegex()).take(50)
         val dutchCount = words.count { it in dutchKeywords }
-        
+
         return if (dutchCount > 5) Language.NL else Language.EN
     }
 }
@@ -1405,26 +1410,26 @@ class DeduplicateArticlesUseCase {
     suspend operator fun invoke(articles: List<Article>): List<Article> {
         val seen = mutableSetOf<String>()
         val deduplicated = mutableListOf<Article>()
-        
+
         articles.sortedByDescending { it.publishedAt }.forEach { article ->
             val signature = generateSignature(article)
-            
+
             if (signature !in seen) {
                 seen.add(signature)
                 deduplicated.add(article)
             }
         }
-        
+
         return deduplicated
     }
-    
+
     private fun generateSignature(article: Article): String {
         // Normalize title (remove punctuation, lowercase, trim)
         val normalizedTitle = article.title
             .lowercase()
             .replace("[^a-z0-9\\s]".toRegex(), "")
             .trim()
-        
+
         // Use first 50 chars of title + source
         return normalizedTitle.take(50)
     }
@@ -1555,11 +1560,11 @@ class ExtractTopicsUseCase @Inject constructor(
         val prompt = """
             Extract 5 key topics/keywords from this article.
             Output as comma-separated list only.
-            
+
             Title: ${article.title}
             Content: ${article.description}
         """.trimIndent()
-        
+
         return openRouterClient.summarize(prompt, article.language, maxTokens = 50)
             .map { summary ->
                 summary.text.split(",").map { it.trim() }.filter { it.isNotEmpty() }
@@ -1615,14 +1620,14 @@ class SyncNewsWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val getAggregatedNewsUseCase: GetAggregatedNewsUseCase
 ) : CoroutineWorker(context, params) {
-    
+
     override suspend fun doWork(): Result {
         return try {
             getAggregatedNewsUseCase(
                 sourceIds = listOf("newsapi", "hbvl", "gva"),
                 forceRefresh = true
             ).first()
-            
+
             Result.success()
         } catch (e: Exception) {
             if (runAttemptCount < 3) Result.retry() else Result.failure()
@@ -1676,7 +1681,7 @@ class SyncNewsWorker @AssistedInject constructor(
 class GetAggregatedNewsUseCaseTest {
     private val mockNewsRepo = mockk<NewsRepository>()
     private val useCase = GetAggregatedNewsUseCase(mockNewsRepo)
-    
+
     @Test
     fun `when sources return articles, should deduplicate and sort by date`() = runTest {
         // Given
@@ -1685,10 +1690,10 @@ class GetAggregatedNewsUseCaseTest {
             createArticle(title = "Breaking News", publishedAt = Instant.now().minusSeconds(10)) // Duplicate
         )
         coEvery { mockNewsRepo.getArticles(any()) } returns flowOf(Result.success(articles))
-        
+
         // When
         val result = useCase(listOf("newsapi", "hbvl")).first().getOrNull()
-        
+
         // Then
         assertThat(result).hasSize(1) // Deduplicated
     }
@@ -1743,13 +1748,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
-      
+
       - name: Cache Gradle
         uses: actions/cache@v3
         with:
@@ -1757,29 +1762,29 @@ jobs:
             ~/.gradle/caches
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-      
+
       - name: Run tests
         run: ./gradlew test
-      
+
       - name: Build Debug APK
         run: ./gradlew assembleDebug
-      
+
       - name: Upload APK
         uses: actions/upload-artifact@v3
         with:
           name: app-debug
           path: app/build/outputs/apk/debug/*.apk
-  
+
   release:
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
     needs: build
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Decode Keystore
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > release.keystore
-      
+
       - name: Build Release APK
         run: ./gradlew assembleRelease
         env:
@@ -1787,7 +1792,7 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-      
+
       - name: Upload to Release
         uses: softprops/action-gh-release@v1
         with:
@@ -1822,10 +1827,10 @@ jobs:
 - Signed release APK
 - Complete documentation
 - Portfolio-ready project
+</details>
 
----
-
-## 5. Feature Specifications (Detailed Requirements)
+<details>
+<summary>5. Feature Specifications (Detailed Requirements)</summary>
 
 ### 5.1 Core Features (Must-Have)
 
@@ -1864,10 +1869,10 @@ jobs:
 | **Dark/Light Theme** | User-selectable theme | Low |
 | **Widget** | Home screen widget with latest headlines | Medium |
 | **Export to Podcast** | TTS → MP3 for offline listening | High |
+</details>
 
----
-
-## 6. Technical Specifications
+<details>
+<summary>6. Technical Specifications</summary>
 
 ### 6.1 Supported News Sources (Initial)
 
@@ -2007,14 +2012,14 @@ OPENROUTER_API_KEY=your_openrouter_key  # Only for development
 - Users enter OpenRouter key in settings
 - Stored encrypted
 - Optional: App-provided key with usage limits
+</details>
 
----
-
-## 7. UI/UX Specifications
+<details>
+<summary>7. UI/UX Specifications</summary>
 
 ### 7.1 Screen Flow
 
-```
+```text
 Splash Screen
     ↓
 Onboarding (first launch)
@@ -2040,7 +2045,7 @@ Home Screen
 
 **Layout:**
 
-```
+```text
 ┌─────────────────────────────────────┐
 │  NexusNews AI           🔍  ⚙️      │  ← Top bar
 ├─────────────────────────────────────┤
@@ -2119,10 +2124,10 @@ Home Screen
    - Daily spending limit (slider, $0.50 - $10)
    - Auto-summarize on load (toggle)
    - Batch summarization limit (number picker)
+</details>
 
----
-
-## 8. Success Criteria & Deliverables
+<details>
+<summary>8. Success Criteria & Deliverables</summary>
 
 ### 8.1 Minimum Viable Product (MVP)
 
@@ -2159,10 +2164,10 @@ By the end, you should be able to:
 4. Build offline-first Android apps with Room + WorkManager
 5. Setup CI/CD for Android projects
 6. Handle multi-language content and localization
+</details>
 
----
-
-## 9. Next Steps
+<details>
+<summary>9. Next Steps</summary>
 
 ### Before Week 1
 
@@ -2176,7 +2181,7 @@ By the end, you should be able to:
    - Install Kotlin plugin
    - Setup Android emulator or physical device
 
-3. **Research  News Sites:**
+3. **Research News Sites:**
    - Visit HBVL, GvA websites
    - Use browser DevTools to inspect HTML structure
    - Document CSS selectors for title, description, image, etc.
@@ -2195,33 +2200,27 @@ By the end, you should be able to:
   - Hours spent
 - **Midpoint (Week 5):** Record a quick demo video
 - **Week 10:** Finalize README and portfolio presentation
+</details>
 
----
-
-## 10. Risk Mitigation
+<details>
+<summary>10. Risk Mitigation</summary>
 
 | Risk | Mitigation Strategy |
 |------|---------------------|
-| ** news sites change HTML structure** | Create adapter interface; document selectors in config file for easy updates |
+| **News sites change HTML structure** | Create adapter interface; document selectors in config file for easy updates |
 | **OpenRouter API costs exceed budget** | Implement strict caching; daily spending cap; local fallback for non-critical features |
 | **Scraping gets blocked (rate limiting)** | Add polite delays (5s between requests); rotate User-Agent; implement exponential backoff |
 | **Language detection inaccuracy** | Allow manual language override; improve with more keywords; consider ML model if needed |
 | **Time overrun on features** | Prioritize MVP features first; move nice-to-haves to "Phase 2" backlog |
 | **Device compatibility issues** | Test on emulator + 1 physical device; focus on Android 8+ (API 26+) |
+</details>
 
----
-
-This comprehensive PRD should give you everything needed to build a production-quality, portfolio-ready app that's distinctly different from NexusChat while leveraging your existing AI integration knowledge. The multi-source aggregation, web scraping, and localization aspects add significant complexity and learning value beyond a simple chat interface.
-
-Ready to start Week 1? 🚀
-
----
-
-## 11. Design System & Color Scheme
+<details>
+<summary>11. Design System & Color Scheme</summary>
 
 ### Design Principles
 
-- **Primary Colors**: Deep blue for trust and news authority (inspired by  skies and media branding).
+- **Primary Colors**: Deep blue for trust and news authority (inspired by skies and media branding).
 - **Accent Colors**: Teal for interactivity (buttons, AI features) – energetic but not overwhelming.
 - **Neutral Base**: Grays/whites for readability; avoids fatigue during long reading sessions.
 - **Semantic Colors**: Specific for sentiments (green/red/gray), errors, and success to guide users emotionally (e.g., positive news gets a uplifting green).
@@ -2232,73 +2231,44 @@ Ready to start Week 1? 🚀
 
 ### Color Palette
 
-Here's the palette in hex codes, grouped by category. I've included usage examples for key app elements.
-
-| Category | Color Name | Hex Code | Light Mode Example | Dark Mode Example | RGB (for reference) |
-|----------|------------|----------|--------------------|-------------------|---------------------|
-| **Primary** | Deep Navy (Brand Main) | #1976D2 | Top bar, primary buttons, news source logos | Same (high contrast on dark BG) | (25, 118, 210) |
-| **Primary Variant** | Navy Light | #42A5F5 | Hover states, links in articles | Navigation icons | (66, 165, 245) |
-| **Secondary** | Teal Accent | #00BCD4 | Secondary buttons, category chips, source badges | Card borders, selected tabs | (0, 188, 212) |
-| **Secondary Variant** | Teal Soft | #80DEEA | Card backgrounds, subtle highlights | Divider lines | (128, 222, 234) |
-| **Background** | Pure White | #FFFFFF | Main background, feed | N/A (use Surface Dark) | (255, 255, 255) |
-| **Background Dark** | Charcoal | #121212 | N/A | Main background | (18, 18, 18) |
-| **Surface** | Light Gray | #F5F5F5 | Article cards, search bar, modals | N/A | (245, 245, 245) |
-| **Surface Dark** | Dark Gray | #1E1E1E | Article cards, modals | Same | (30, 30, 30) |
-| **AI Accent** | Electric Blue | #2196F3 | AI buttons (e.g., "AI Summary"), badges, loading indicators | AI highlights (glow effects) | (33, 150, 243) |
-| **AI Variant** | Blue Soft | #BBDEFB | AI summary backgrounds, tooltips | Muted AI text | (187, 222, 251) |
-| **Text Primary** | Dark Charcoal | #212121 | Article titles, body text | N/A | (33, 33, 33) |
-| **Text Secondary** | Medium Gray | #757575 | Descriptions, timestamps, subtitles | Same (on light accents) | (117, 117, 117) |
-| **Text on Dark** | Pure White | #FFFFFF | Text on primary/dark backgrounds | Article text in dark mode | (255, 255, 255) |
-| **Text on Accent** | White Soft | #E0E0E0 | Text on buttons | Text on AI accents | (224, 224, 224) |
-| **Sentiment Positive** | Success Green | #4CAF50 | Positive sentiment badges, emojis | Same | (76, 175, 80) |
-| **Sentiment Neutral** | Neutral Gray | #9E9E9E | Neutral badges | Same (muted in dark) | (158, 158, 158) |
-| **Sentiment Negative** | Alert Red | #F44336 | Negative badges, error states | Same | (244, 67, 54) |
-| **Error/Warning** | Soft Red | #EF5350 | Error messages, network failures | Invalid API key alerts | (239, 83, 80) |
-| **Success** | Mint Green | #81C784 | Success toasts (e.g., "Summary saved") | Health check OK | (129, 199, 132) |
-| **Neutral/Disabled** | Cool Gray | #BDBDBD | Disabled buttons, placeholders | Faded elements | (189, 189, 189) |
+| Category | Color Name | Hex Code | Light Mode Example | Dark Mode Example |
+|----------|------------|----------|--------------------|-------------------|
+| **Primary** | Deep Navy | #1976D2 | Top bar, primary buttons | Same |
+| **Primary Variant** | Navy Light | #42A5F5 | Hover states, links | Navigation icons |
+| **Secondary** | Teal Accent | #00BCD4 | Secondary buttons, chips | Card borders |
+| **Secondary Variant** | Teal Soft | #80DEEA | Card backgrounds | Divider lines |
+| **Background** | Pure White | #FFFFFF | Main background, feed | N/A |
+| **Background Dark** | Charcoal | #121212 | N/A | Main background |
+| **Surface** | Light Gray | #F5F5F5 | Article cards, search bar | N/A |
+| **Surface Dark** | Dark Gray | #1E1E1E | N/A | Article cards, modals |
+| **AI Accent** | Electric Blue | #2196F3 | AI buttons, badges | AI highlights |
+| **Text Primary** | Dark Charcoal | #212121 | Titles, body text | N/A |
+| **Sentiment Pos** | Success Green | #4CAF50 | Positive badges | Same |
+| **Sentiment Neg** | Alert Red | #F44336 | Negative badges | Same |
 
 #### Visual Usage Examples Across the App
 
-- **Home Feed**: Background (#FFFFFF light / #121212 dark); Article cards (#F5F5F5 light / #1E1E1E dark) with teal borders (#00BCD4); Title text (#212121); Category tabs (primary blue background #1976D2 with white text).
-- **Article Detail**: Hero image overlay with surface (#F5F5F5); Title in primary text (#212121); AI Summary button (electric blue #2196F3 background, white text); Sentiment badge: Green (#4CAF50) for positive news.
-- **AI Settings**: Model cards with teal accents (#00BCD4); Usage stats cards (secondary variant #80DEEA background); Error for invalid key (soft red #EF5350).
-- **Source Management**: Source logos on navy (#1976D2) badges; Health indicators: Green for healthy (#4CAF50), yellow (#FF9800 if added for degraded), red (#F44336) for down.
-- **Notifications**: Background tinted with primary blue; Text white (#FFFFFF); Breaking news icon in electric blue.
-- **Search Bar**: Input field with teal focus border (#00BCD4); Results highlights in AI blue (#2196F3).
-- **Dark Mode**: All backgrounds darken; Text shifts to #FFFFFF; Accents remain vivid for pop (e.g., AI button stays #2196F3 but with lighter text if needed).
-- **Animations/Gradients**: Use linear gradients for transitions, e.g., from primary blue (#1976D2) to electric blue (#2196F3) on AI load animations.
-
-This scheme is cohesive: Blues/teals for cool, intelligent feel; greens/reds for emotional cues; neutrals for focus on content. It scales well (e.g., no clashing with news images) and feels premium.
+- **Home Feed**: Background (#FFFFFF light / #121212 dark); Article cards (#F5F5F5 light / #1E1E1E dark) with teal borders (#00BCD4).
+- **Article Detail**: AI Summary button (electric blue #2196F3 background); Sentiment badge: Green (#4CAF50) for positive news.
+- **AI Settings**: Model cards with teal accents (#00BCD4); Usage stats cards (secondary variant #80DEEA).
+- **Source Management**: Source logos on navy (#1976D2) badges; Health indicators: Green for healthy (#4CAF50).
 
 ### Implementation in Jetpack Compose
 
-In your `presentation/theme/Color.kt` file, define the colors like this (extendable for dynamic theming):
+In your `presentation/theme/Color.kt` file:
 
 ```kotlin
 import androidx.compose.ui.graphics.Color
 
 val Primary = Color(0xFF1976D2)
-val PrimaryVariant = Color(0xFF42A5F5)
 val Secondary = Color(0xFF00BCD4)
-val SecondaryVariant = Color(0xFF80DEEA)
-val BackgroundLight = Color(0xFFFFFFFF)
 val BackgroundDark = Color(0xFF121212)
-val SurfaceLight = Color(0xFFF5F5F5)
-val SurfaceDark = Color(0xFF1E1E1E)
-val TextPrimary = Color(0xFF212121)
-val TextSecondary = Color(0xFF757575)
-val TextOnDark = Color(0xFFFFFFFF)
 val AIAccent = Color(0xFF2196F3)
-val AISoft = Color(0xFFBBDEFB)
 val SuccessGreen = Color(0xFF4CAF50)
-val NeutralGray = Color(0xFF9E9E9E)
 val AlertRed = Color(0xFFF44336)
-val ErrorRed = Color(0xFFEF5350)
-val SuccessMint = Color(0xFF81C784)
-val DisabledGray = Color(0xFFBDBDBD)
 ```
 
-In `presentation/theme/Theme.kt`, wrap your app:
+In `presentation/theme/Theme.kt`:
 
 ```kotlin
 @Composable
@@ -2307,41 +2277,12 @@ fun NewsNexusTheme(
     content: @Composable () -> Unit
 ) {
     val colors = if (darkTheme) {
-        darkColorScheme(
-            primary = Primary,
-            secondary = Secondary,
-            background = BackgroundDark,
-            surface = SurfaceDark,
-            onPrimary = TextOnDark,
-            onSecondary = TextOnDark,
-            onBackground = TextOnDark,
-            onSurface = TextOnDark,
-            error = ErrorRed
-        )
+        darkColorScheme(primary = Primary, background = BackgroundDark)
     } else {
-        lightColorScheme(
-            primary = Primary,
-            secondary = Secondary,
-            background = BackgroundLight,
-            surface = SurfaceLight,
-            onPrimary = TextOnDark,
-            onSecondary = TextOnDark,
-            onBackground = TextPrimary,
-            onSurface = TextPrimary,
-            error = ErrorRed
-        )
+        lightColorScheme(primary = Primary, background = Color.White)
     }
 
-    MaterialTheme(
-        colorScheme = colors,
-        typography = Typography,
-        content = content
-    )
+    MaterialTheme(colorScheme = colors, content = content)
 }
 ```
-
-Apply in `MainActivity.kt`: `NewsNexusTheme { NavGraph() }`.
-
-For custom elements (e.g., sentiment badges), reference the palette directly: `Box(modifier = Modifier.background(SuccessGreen)) { Text("😊 Positive", color = Color.White) }`.
-
-This will ensure consistency throughout. If you need a Figma/Sketch file, more variants, or adjustments (e.g., more  flag influence with orange accents), let me know! Test it early in your Compose UI for the wow factor.
+</details>

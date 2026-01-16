@@ -8,6 +8,7 @@ import com.example.nexusnews.data.mapper.toEntity
 import com.example.nexusnews.data.mapper.toEntityList
 import com.example.nexusnews.data.remote.NewsRemoteDataSource
 import com.example.nexusnews.domain.model.Article
+import com.example.nexusnews.domain.model.NewsCategory
 import com.example.nexusnews.domain.repository.NewsRepository
 import com.example.nexusnews.util.Result
 import kotlinx.coroutines.flow.Flow
@@ -31,15 +32,19 @@ class NewsRepositoryImpl
         private val articleDao: ArticleDao,
         private val bookmarkDao: BookmarkDao,
     ) : NewsRepository {
-        override fun getArticles(forceRefresh: Boolean): Flow<Result<List<Article>>> =
+        override fun getArticles(
+            forceRefresh: Boolean,
+            category: NewsCategory?
+        ): Flow<Result<List<Article>>> =
             flow {
                 emit(Result.Loading)
                 try {
-                    Timber.d("Fetching articles from remote API")
+                    Timber.d("Fetching articles from remote API (category: ${category?.value ?: "all"})")
                     // Default to top headlines for general article fetching
                     val articles =
                         remoteDataSource.getTopHeadlines(
                             country = "us", // Default to US news
+                            category = category?.value, // Pass category to API
                             pageSize = 20,
                         )
                     // Cache articles
@@ -47,6 +52,29 @@ class NewsRepositoryImpl
                     emit(Result.Success(articles))
                 } catch (e: Exception) {
                     Timber.e(e, "Error fetching articles: ${e.message}")
+                    emit(Result.Error(e))
+                }
+            }
+
+        override fun getArticlesPage(
+            page: Int,
+            category: NewsCategory?
+        ): Flow<Result<List<Article>>> =
+            flow {
+                emit(Result.Loading)
+                try {
+                    Timber.d("Fetching page $page (category: ${category?.value ?: "all"})")
+                    val articles =
+                        remoteDataSource.getTopHeadlines(
+                            country = "us",
+                            category = category?.value,
+                            page = page,
+                            pageSize = 20,
+                        )
+                    // Don't cache paginated results to avoid conflicts
+                    emit(Result.Success(articles))
+                } catch (e: Exception) {
+                    Timber.e(e, "Error fetching page $page: ${e.message}")
                     emit(Result.Error(e))
                 }
             }
@@ -78,6 +106,8 @@ class NewsRepositoryImpl
                             sortBy = "relevancy", // Sort by relevance for search results
                             pageSize = 20,
                         )
+                    // Cache articles from search to ensure they can be found by ID
+                    articleDao.insertArticles(articles.toEntityList())
                     emit(Result.Success(articles))
                 } catch (e: IOException) {
                     Timber.e(e, "Error searching articles with query: $query. Message: ${e.message}")
@@ -133,15 +163,25 @@ class NewsRepositoryImpl
             }
         }
 
-        override suspend fun toggleFavorite(articleId: String) {
+        override suspend fun toggleFavorite(article: Article) {
             try {
-                val bookmark = bookmarkDao.getBookmark(articleId)
+                val bookmark = bookmarkDao.getBookmark(article.id)
                 if (bookmark != null) {
                     val newFavoriteStatus = !bookmark.isFavorite
-                    Timber.d("Toggling favorite for article: $articleId to $newFavoriteStatus")
-                    bookmarkDao.updateFavoriteStatus(articleId, newFavoriteStatus)
+                    Timber.d("Toggling favorite for article: ${article.id} to $newFavoriteStatus")
+                    bookmarkDao.updateFavoriteStatus(article.id, newFavoriteStatus)
                 } else {
-                    Timber.w("Cannot toggle favorite - article not bookmarked: $articleId")
+                    Timber.d("Article not bookmarked, adding as favorite: ${article.id}")
+                    // Add as bookmark with favorite = true
+                    // First ensure article exists in articles table
+                    articleDao.insertArticles(listOf(article.toEntity()))
+                    // Then add bookmark with is_favorite = true
+                    bookmarkDao.insertBookmark(
+                        com.example.nexusnews.data.local.entity.BookmarkEntity(
+                            articleId = article.id,
+                            isFavorite = true
+                        )
+                    )
                 }
             } catch (e: Exception) {
                 Timber.e(e, "Error toggling favorite")

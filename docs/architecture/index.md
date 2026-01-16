@@ -2,7 +2,7 @@
 title: Architecture Overview
 description: Technical architecture and design patterns for NexusNews
 category: architecture
-lastUpdated: 2025-11-03
+lastUpdated: 2026-01-16
 aiContext: true
 tags: [architecture, mvvm, clean-architecture, design-patterns]
 ---
@@ -16,23 +16,23 @@ NexusNews follows **Clean Architecture** principles with **MVVM** pattern, ensur
 ```mermaid
 graph TB
     subgraph Presentation["🎨 Presentation Layer"]
-        UI[Compose UI]
+        UI[Compose Screens]
         VM[ViewModels]
     end
-    
+
     subgraph Domain["🎯 Domain Layer"]
         UC[Use Cases]
         ENT[Entities]
         REPO_INT[Repository Interfaces]
     end
-    
+
     subgraph Data["💾 Data Layer"]
         REPO_IMPL[Repository Implementations]
-        LOCAL[Local Data Sources]
-        REMOTE[Remote Data Sources]
-        SCRAPERS[Web Scrapers]
+        LOCAL[Room Database]
+        REMOTE[Retrofit Service]
+        AI[OpenRouter Service]
     end
-    
+
     UI --> VM
     VM --> UC
     UC --> ENT
@@ -40,68 +40,68 @@ graph TB
     REPO_INT --> REPO_IMPL
     REPO_IMPL --> LOCAL
     REPO_IMPL --> REMOTE
-    REPO_IMPL --> SCRAPERS
+    REPO_IMPL --> AI
 ```
 
 ## 📐 Layer Responsibilities
 
 ### Presentation Layer
 
-- **Location**: `app/src/main/java/com/example/nexusnews/presentation/`
+- **Location**: `com.example.nexusnews.presentation`
 - **Purpose**: UI components and state management
 - **Components**:
-  - Jetpack Compose screens
-  - ViewModels (MVVM pattern)
-  - UI State classes
-  - Navigation logic
+  - **Screens**: `NewsListScreen`, `NewsDetailScreen`
+  - **ViewModels**: `NewsListViewModel`, `NewsDetailViewModel` (Co-located with (screens)
+  - **Navigation**: `NavGraph`, `Route`
+  - **Theme**: Material 3 implementation
 
 ### Domain Layer
 
-- **Location**: `app/src/main/java/com/example/nexusnews/domain/`
-- **Purpose**: Business logic and entities
+- **Location**: `com.example.nexusnews.domain`
+- **Purpose**: Pure business logic and entities (Android-free)
 - **Components**:
-  - Use Cases (single responsibility)
-  - Domain Models (entities)
-  - Repository Interfaces
-  - Domain-specific exceptions
+  - **Use Cases**: `SummarizeArticleUseCase`, `AnalyzeSentimentUseCase`
+  - **Models**: `Article`, `NewsSource`, `AiSummary`
+  - **Repository Interfaces**: `NewsRepository`, `SettingsRepository`
 
 ### Data Layer
 
-- **Location**: `app/src/main/java/com/example/nexusnews/data/`
-- **Purpose**: Data management and sources
+- **Location**: `com.example.nexusnews.data`
+- **Purpose**: Data retrieval, caching, and storage
 - **Components**:
-  - Repository Implementations
-  - Local data sources (Room)
-  - Remote data sources (Retrofit)
-  - Web scrapers (Jsoup)
-  - Data mappers
+  - **Repositories**: `NewsRepositoryImpl` (Single Source of Truth)
+  - **Local**: `ArticleDao`, `NexusNewsDatabase` (Room)
+  - **Remote**: `NewsApiService` (Retrofit)
+  - **AI**: `OpenRouterAiService` (Custom Service)
+  - **DI**: `RepositoryModule`
 
 ## 🔄 Data Flow
 
 ```mermaid
 sequenceDiagram
-    participant UI as Compose UI
-    participant VM as ViewModel
-    participant UC as Use Case
-    participant Repo as Repository
-    participant Remote as Remote Source
-    participant Local as Local DB
+    participant UI as NewsListScreen
+    participant VM as NewsListViewModel
+    participant UC as GetNewsUseCase
+    participant Repo as NewsRepository
+    participant Remote as NewsApi
+    participant Local as ArticleDao
 
-    UI->>VM: User Action
-    VM->>UC: Execute Use Case
-    UC->>Repo: Request Data
-    
-    alt Cache Available
-        Repo->>Local: Query Cache
-        Local-->>Repo: Cached Data
-    else Fetch Required
-        Repo->>Remote: API Call
-        Remote-->>Repo: Fresh Data
-        Repo->>Local: Update Cache
+    UI->>VM: onRefresh()
+    VM->>UC: invoke()
+    UC->>Repo: getNews()
+
+    alt Cache Valid
+        Repo->>Local: getAllArticles()
+        Local-->>Repo: List<ArticleEntity>
+    else Network Call
+        Repo->>Remote: getTopHeadlines()
+        Remote-->>Repo: NewsResponse
+        Repo->>Local: insertArticles()
+        Local-->>Repo: Saved Data
     end
-    
-    Repo-->>UC: Result<Data>
-    UC-->>VM: Processed Result
+
+    Repo-->>UC: Flow<Resource<List<Article>>>
+    UC-->>VM: Flow Data
     VM-->>UI: Update UI State
 ```
 
@@ -109,84 +109,72 @@ sequenceDiagram
 
 ### 1. **MVVM (Model-View-ViewModel)**
 
-- **View**: Compose UI components
-- **ViewModel**: State management with StateFlow
-- **Model**: Domain entities and repositories
+- **View**: `NewsListScreen.kt` (Compose)
+- **ViewModel**: `NewsListViewModel.kt` (StateFlow)
+- **Model**: `Article.kt` (Domain Entity)
 
 ### 2. **Repository Pattern**
-
-- Single source of truth
-- Abstracts data sources
-- Handles caching strategy
+`NewsRepositoryImpl` mediates between `NewsApiService` and `ArticleDao`, employing a "Network-First" or "Cache-First" strategy depending on connectivity.
 
 ### 3. **Use Case Pattern**
+Business logic is encapsulated in small, reusable classes:
+- `SummarizeArticleUseCase` provided by `AiModule`
+- `ExtractKeyPointsUseCase`
+- `ChatWithAssistantUseCase`
 
-- Single responsibility per use case
-- Encapsulates business logic
-- Reusable across ViewModels
-
-### 4. **Adapter Pattern (News Sources)**
-
-- Unified interface for different sources
-- API-based sources (NewsAPI, Guardian)
-- Scraper-based sources (HBVL, GvA)
-
-### 5. **Strategy Pattern (AI Models)**
-
-- Model selection based on task
-- Cost optimization
-- Fallback mechanisms
+### 4. **Dependency Injection (Hilt)**
+Dependencies are provided via modules:
+- `NetworkModule`: Provides `OkHttpClient`, `Retrofit`
+- `DatabaseModule`: Provides `RoomDatabase`, `Dao`s
+- `RepositoryModule` (in `data/di`): Binds `NewsRepositoryImpl` to `NewsRepository`
+- `AiModule`: Provides `OpenRouterAiService`
 
 ## 🗂️ Module Structure
 
 ```
-app/
+app/src/main/java/com/example/nexusnews/
 ├── data/
-│   ├── local/          # Room database, DAOs, entities
-│   ├── remote/         # Retrofit services, DTOs
-│   ├── scraper/        # Web scraping logic
-│   ├── source/         # News source adapters
-│   ├── ai/             # OpenRouter AI integration
-│   └── repository/     # Repository implementations
+│   ├── di/             # RepositoryModule
+│   ├── local/          # Room (ArticleDao, Database)
+│   ├── remote/         # Retrofit (NewsApiService)
+│   ├── repository/     # NewsRepositoryImpl
+│   └── source/         # Data Sources
 │
 ├── domain/
-│   ├── model/          # Domain entities
-│   ├── repository/     # Repository interfaces
-│   └── usecase/        # Business logic use cases
+│   ├── model/          # Article, Source (Entities)
+│   ├── repository/     # NewsRepository (Interface)
+│   └── usecase/        # SummarizeArticleUseCase, etc.
+│       └── ai/         # Specialized AI Use Cases
+│
+├── di/                 # Core Modules (Network, Database, AI)
 │
 ├── presentation/
-│   ├── screen/         # Compose screens
-│   ├── viewmodel/      # ViewModels
-│   ├── component/      # Reusable UI components
-│   └── navigation/     # Navigation logic
+│   ├── navigation/     # NavHost, Routes
+│   ├── screens/        # Feature Screens
+│   │   ├── NewsListScreen.kt
+│   │   └── NewsListViewModel.kt
+│   └── theme/          # Type, Color, Theme
 │
-└── di/                 # Dependency injection modules
+└── NexusNewsApplication.kt
 ```
 
-## 🔌 Dependency Injection
+## 🔌 Dependency Injection Overview
 
-**Framework**: Hilt (Dagger)
-
-**Modules**:
-
-- `AppModule` - Application-level dependencies
-- `DatabaseModule` - Room database
-- `NetworkModule` - Retrofit, OkHttp
-- `RepositoryModule` - Repository bindings
-- `SourceModule` - News source adapters
-- `AIModule` - OpenRouter AI client
+| Module | Location | Provides |
+|:-------|:---------|:---------|
+| **NetworkModule** | `di/NetworkModule.kt` | `OkHttpClient`, `Retrofit`, `Moshi` |
+| **DatabaseModule** | `di/DatabaseModule.kt` | `NexusNewsDatabase`, `ArticleDao`, `BookmarksDao` |
+| **AiModule** | `di/AiModule.kt` | `OpenRouterAiService` |
+| **CacheModule** | `di/CacheModule.kt` | `CacheManager` |
+| **RepositoryModule** | `data/di/RepositoryModule.kt` | `NewsRepository`, `SettingsRepository` |
 
 ## 📚 Related Documentation
 
-- [OpenRouter AI Integration](/architecture/ai-integration) - AI-powered features architecture (Phase 3)
-- [Advanced AI Features](/architecture/phase4-advanced-ai-features) - Advanced AI features architecture (Phase 4)
-- [AI Service Refactoring](/architecture/ai-refactoring) - Clean architecture refactoring (Phase 4)
-- [Data Management](/architecture/data-management) - Database and caching strategies
-- [Dependency Injection](/architecture/dependency-injection) - Hilt modules and providers
-- [Core Architecture](/architecture/core-architecture) - MVVM and Clean Architecture
+- [OpenRouter AI Integration](/architecture/ai-integration)
+- [Data Management](/architecture/data-management)
+- [Project Overview](/project/overview)
 
 ## 🔗 External References
 
-- [Android Architecture Guide](https://developer.android.com/topic/architecture)
-- [Clean Architecture by Uncle Bob](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
-- [MVVM Pattern](https://developer.android.com/topic/libraries/architecture/viewmodel)
+- [Google Guide to App Architecture](https://developer.android.com/topic/architecture)
+- [Hilt Dependency Injection](https://developer.android.com/training/dependency-injection/hilt-android)

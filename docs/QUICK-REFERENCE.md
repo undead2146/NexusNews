@@ -2,7 +2,7 @@
 title: Quick Reference
 description: Quick links to all important documentation
 category: meta
-lastUpdated: 2025-11-03
+lastUpdated: 2026-01-16
 aiContext: true
 ---
 
@@ -20,24 +20,27 @@ Fast access to all important documentation.
 ## 📚 Main Categories
 
 ### 🏗️ Architecture
-- [Overview](./architecture/) - System architecture
-- News Sources _(coming soon)_
-- AI Integration _(coming soon)_
-- Data Management _(coming soon)_
+- [Overview](./architecture/) - System architecture & Dependency Injection
+- [AI Integration](./api/openrouter) - OpenRouter service details
+- [Data Management](./architecture/data-management) - Database & Caching
 
 ### 💻 Development
 - [Overview](./development/) - Development guides
 - [Setup Guide](./development/setup) - Getting started
 - [Coding Style](./development/coding-style) - Code conventions
-- Testing Guide _(coming soon)_
-- Git Workflow _(coming soon)_
+- [Testing Guide](./development/testing) - Unit & UI testing
+- [Git Workflow](./development/git-workflow) - Branching strategy
 
 ### 📦 API & Dependencies
 - [Overview](./api/) - API documentation
 - [Dependencies](./api/dependencies) - All libraries and versions
-- NewsAPI Integration _(coming soon)_
-- Guardian API Integration _(coming soon)_
-- OpenRouter Integration _(coming soon)_
+- [NewsAPI Integration](./api/newsapi) - Endpoints & Caching
+- [OpenRouter Integration](./api/openrouter) - AI Service details
+
+### 📊 Application Reports
+- [Reports Overview](./report/) - Comprehensive codebase analysis
+- [User Guide](./report/user) - Detailed feature walkthrough
+- [Tech Report](./report/developer) - Deep technical reference
 
 ### 📋 Project Management
 - [Overview](./project/) - Project info
@@ -46,13 +49,9 @@ Fast access to all important documentation.
 - [Roadmap](./project/roadmap) - Development plan
 
 ### 📅 Progress Tracking
-- [Weekly Reports](./weekly/) - Development logs
+- [Weekly Reports](./weekly/) - Development logs & status
 
-### 🤖 AI Agent Context
-- [Project Metadata](./ai-context/) - Structured context
-- [Linking Guide](./ai-context/linking) - Navigation for AI
-
-## �� External Links
+## 🔗 External Links
 
 - [GitHub Repository](https://github.com/undead2146/NexusNews)
 - [GitHub Issues](https://github.com/undead2146/NexusNews/issues)
@@ -75,18 +74,21 @@ Fast access to all important documentation.
 | Add dependencies | [Dependencies](./api/dependencies) |
 | Code style questions | [Coding Style](./development/coding-style) |
 | Check roadmap | [Roadmap](./project/roadmap) |
-
-### For AI Agents
-
-| Task | Documentation |
-|------|---------------|
-| Get project context | [AI Context](./ai-context/) |
-| Understand navigation | [Linking Guide](./ai-context/linking) |
-| Check dependencies | [Dependencies](./api/dependencies) |
-| Understand architecture | [Architecture](./architecture/) |
-| Check coding style | [Coding Style](./development/coding-style) |
+| View detailed reports | [Application Reports](./report/) |
 
 ## 📝 Latest Updates
+
+### ✨ AI Feature Implementation Complete (January 16, 2026)
+
+All AI features have been successfully integrated with full UI support:
+
+- **Implemented**: Sentiment Analysis, Key Points, Entities, Topics, Bias Detection
+- **Added**: Context menu with individual AI analysis options
+- **Added**: Loading indicators for each feature
+- **Added**: Chat Assistant (route: `chat`)
+- **Added**: Recommendations (route: `recommendations`)
+
+[**Read the Implementation Plan**](../implementation_plan.md) | [**View Developer Report**](./report/developer.md) | [**View User Guide**](./report/user.md)
 
 Check [Weekly Reports](./weekly/) for the most recent changes and progress.
 

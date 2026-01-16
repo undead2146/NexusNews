@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -105,6 +106,9 @@ private fun ArticleList(
     onArticleClick: (String) -> Unit,
     viewModel: NewsListViewModel = hiltViewModel(),
 ) {
+    val canLoadMore by viewModel.canLoadMore.collectAsStateWithLifecycle()
+    val isLoadingMore by viewModel.isLoadingMore.collectAsStateWithLifecycle()
+
     LazyColumn(
         contentPadding = PaddingValues(vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -121,10 +125,30 @@ private fun ArticleList(
                 isBookmarked = isBookmarked,
                 isFavorite = isFavorite,
                 onBookmarkToggle = { viewModel.toggleBookmark(article) },
-                onFavoriteToggle = { viewModel.toggleFavorite(article.id) },
+                onFavoriteToggle = { viewModel.toggleFavorite(article) },
                 onClick = { onArticleClick(article.id) },
                 modifier = Modifier.animateItem(),
             )
+        }
+
+        // Load More button
+        if (canLoadMore) {
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (isLoadingMore) {
+                        CircularProgressIndicator()
+                    } else {
+                        Button(onClick = { viewModel.loadMoreArticles() }) {
+                            Text("Load More Articles")
+                        }
+                    }
+                }
+            }
         }
     }
 }

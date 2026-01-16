@@ -9,9 +9,10 @@ This app demonstrates production-ready mobile development: offline caching, back
 ## ✨ Features
 
 ### Core News Aggregation
-- **Multi-Source Feed**: Pulls from NewsAPI (international), Guardian (UK/global), and local news sites (via Jsoup scraping).
-- **Source Management**: Enable/disable sources, view health status (API availability, scraping success), and filter by category (Tech, Local, Business, Sports).
-- **Search & Favorites**: Full-text search with filters; bookmark articles with offline export (JSON/text).
+- **Multi-Source Feed**: Pulls from NewsAPI (international) with category filtering.
+- **Full Content Access**: Automatically fetches full article content via intelligent web scraping (Jsoup) to bypass API previews.
+- **Search & Favorites**: Full-text search with history; bookmark articles for offline reading.
+- **Offline-First**: Complete offline support for reading cached articles and summaries.
 
 ### AI-Powered Enhancements (via OpenRouter)
 - **Smart Summarization**: Generate 2-3 sentence summaries in Dutch or English, cached for offline use. Batch mode for feeds.
@@ -22,16 +23,14 @@ This app demonstrates production-ready mobile development: offline caching, back
 - **Cost Optimization**: Caching, rate limiting, and spending caps to keep API calls efficient.
 
 ### Advanced UX/UI
-- **Offline-First**: Room DB for caching articles/summaries; background sync with WorkManager.
-- **Notifications**: Breaking news alerts with pre-generated AI summaries.
-- **Accessibility**: Reading time estimates, Text-to-Speech (TTS), and Material 3 themes (light/dark).
-- **Polish**: Infinite scrolling, animations (Compose), haptic feedback, and onboarding flow for preferences.
+- **Customization**: Dark/Light/System themes, notification preferences (breaking news, daily digest).
+- **Performance**: Infinite scrolling, haptic feedback, and efficient background caching.
+- **Security**: AES-256 encrypted storage for API keys.
 
 ### Architecture Highlights
-- **MVVM + Clean Architecture**: Presentation (Compose UI), Domain (Use Cases/Entities), Data (Repositories/Adapters).
-- **Reactive UI**: StateFlow for real-time updates (e.g., feed refresh, AI loading).
-- **Background Services**: Workers for prefetching and health checks.
-- **Security**: Encrypted storage for OpenRouter API keys (Android Keystore).
+- **MVVM + Clean Architecture**: Strict separation of concerns.
+- **Reactive UI**: Built 100% with Jetpack Compose.
+- **Background Services**: WorkManager for reliable offline syncing.
 
 ## 🛠 Tech Stack
 
@@ -66,19 +65,19 @@ See [Architecture Documentation](docs/architecture/core-architecture.md) for det
 ## 📱 Screenshots
 
 <!-- Add actual screenshots here -->
-1. **Home Feed**: Aggregated articles with AI badges and source filters.  
+1. **Home Feed**: Aggregated articles with AI badges and source filters.
    ![Home Feed](screenshots/home_feed.png)
 
-2. **Article Detail**: Full view with AI summary, sentiment, and translation.  
+2. **Article Detail**: Full view with AI summary, sentiment, and translation.
    ![Article Detail](screenshots/article_detail.png)
 
-3. **AI Settings**: Model selection, key management, and usage stats.  
+3. **AI Settings**: Model selection, key management, and usage stats.
    ![AI Settings](screenshots/ai_settings.png)
 
-4. **Source Management**: Toggle sources and monitor health.  
+4. **Source Management**: Toggle sources and monitor health.
    ![Sources](screenshots/sources.png)
 
-5. **Search & Favorites**: Quick search with offline support.  
+5. **Search & Favorites**: Quick search with offline support.
    ![Search](screenshots/search.png)
 
 ## 🚀 Getting Started
