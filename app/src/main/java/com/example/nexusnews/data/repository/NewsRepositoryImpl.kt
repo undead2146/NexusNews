@@ -44,7 +44,7 @@ class NewsRepositoryImpl
                     articleDao.insertArticles(articles.toEntityList())
                     emit(Result.Success(articles))
                 } catch (e: Exception) {
-                    Timber.e(e, "Error fetching articles")
+                    Timber.e(e, "Error fetching articles: ${e.message}")
                     emit(Result.Error(e))
                 }
             }
@@ -78,7 +78,7 @@ class NewsRepositoryImpl
                         )
                     emit(Result.Success(articles))
                 } catch (e: IOException) {
-                    Timber.e(e, "Error searching articles with query: $query")
+                    Timber.e(e, "Error searching articles with query: $query. Message: ${e.message}")
                     emit(Result.Error(e))
                 }
             }
